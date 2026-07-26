@@ -1,0 +1,410 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Checkout - SB Revo{% endblock %}
+
+{% block content %}
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <a href="{% url 'frontend_cart' %}">Shopping Cart</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Checkout</span>
+      </nav>
+    </div>
+  </div>
+
+  <div class="cart-steps-bar">
+    <div class="container">
+      <div class="cart-steps">
+        <div class="cart-step done">
+          <div class="step-icon"><i class="fa fa-check"></i></div>
+          <span>1. Shopping Cart</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="cart-step active">
+          <div class="step-icon"><i class="fa fa-map-marker-alt"></i></div>
+          <span>2. Checkout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="checkout-section">
+    <div class="container">
+      {% if cart_state.is_empty %}
+        <div class="alert alert-light border mb-0">
+          Your cart is empty. <a href="{% url 'frontend_products' %}">Browse products</a> before checking out.
+        </div>
+      {% else %}
+        <form
+          method="post"
+          id="checkoutForm"
+          data-abandoned-checkout-url="{% url 'save_abandoned_checkout' %}"
+          data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
+          data-delivery-area="{{ checkout_delivery_zone.key }}"
+          novalidate
+        >
+          {% csrf_token %}
+          {% if checkout_form.non_field_errors %}
+            <div class="alert alert-danger mb-4">
+              {% for error in checkout_form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        <div class="checkout-layout">
+          <div class="checkout-form-col">
+            <div class="checkout-form-card">
+              <h3 class="checkout-section-title"><i class="fa fa-map-marker-alt"></i> Shipping Information</h3>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label class="form-label" for="fullName">Full Name <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="fullName" name="full_name" placeholder="Enter your full name" value="{{ checkout_form.full_name.value|default_if_none:'' }}" required />
+                  {% for error in checkout_form.full_name.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="phone">Phone Number <span class="req">*</span></label>
+                  <input type="text" class="form-control" id="phone" name="phone" placeholder="01XXXXXXXXX" value="{{ checkout_form.phone.value|default_if_none:'' }}" required />
+                  {% for error in checkout_form.phone.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" value="{{ checkout_form.email.value|default_if_none:'' }}" />
+                {% for error in checkout_form.email.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="address">Full Address <span class="req">*</span></label>
+                <textarea class="form-control" id="address" name="address" rows="3" placeholder="House no, Road no, Area..." required>{{ checkout_form.address.value|default_if_none:'' }}</textarea>
+                {% for error in checkout_form.address.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="form-row-2">
+                <div class="form-group district-search-group">
+                  <label class="form-label" for="district">District <span class="req">*</span></label>
+                  <div class="district-search" id="districtSearch">
+                    <input
+                      type="text"
+                      class="form-control district-search-input"
+                      id="district"
+                      name="district"
+                      placeholder="Search district"
+                      value="{{ checkout_form.district.value|default_if_none:'' }}"
+                      autocomplete="off"
+                      required
+                    />
+                    <button type="button" class="district-search-toggle" id="districtToggle" aria-label="Show district list">
+                      <i class="fa fa-chevron-down"></i>
+                    </button>
+                    <div class="district-dropdown" id="districtDropdown"></div>
+                  </div>
+                  {% for error in checkout_form.district.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="thana">Area / Thana</label>
+                  <input type="text" class="form-control" id="thana" name="thana" placeholder="Enter area or thana" value="{{ checkout_form.thana.value|default_if_none:'' }}" />
+                  {% for error in checkout_form.thana.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="form-group checkout-postal-group">
+                <label class="form-label" for="postal">Postal Code</label>
+                <input type="text" class="form-control" id="postal" name="postal" placeholder="e.g. 1212" value="{{ checkout_form.postal.value|default_if_none:'' }}" />
+                {% for error in checkout_form.postal.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="checkout-form-card">
+              <h3 class="checkout-section-title"><i class="fa fa-credit-card"></i> Payment Method</h3>
+              <div class="cod-option">
+                <div class="cod-icon"><i class="fa fa-money-bill-wave"></i></div>
+                <div class="cod-info">
+                  <strong>Cash on Delivery (COD)</strong>
+                  <p>Pay when your order arrives at your doorstep. No online payment required.</p>
+                </div>
+                <div class="cod-check"><i class="fa fa-check-circle"></i></div>
+              </div>
+            </div>
+
+            <div class="checkout-form-card">
+              <h3 class="checkout-section-title"><i class="fa fa-sticky-note"></i> Order Notes <span style="font-weight:400;font-size:13px;color:var(--text-muted)">(Optional)</span></h3>
+              <div class="form-group checkout-notes-group">
+                <textarea class="form-control" id="orderNotes" name="order_notes" rows="3" placeholder="Any special instructions for your order...">{{ checkout_form.order_notes.value|default_if_none:'' }}</textarea>
+                {% for error in checkout_form.order_notes.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="checkout-summary-col">
+            <div class="order-summary-card">
+              <h3 class="summary-title">Order Summary</h3>
+
+              <div class="checkout-order-items">
+                {% for item in cart_state.items %}
+                  <div class="checkout-order-item" data-product-id="{{ item.product_id }}" data-qty="{{ item.quantity }}" data-subtotal="{{ item.subtotal }}">
+                    <img src="{% if item.image_url %}{{ item.image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ item.name }}" />
+                    <div class="checkout-item-info">
+                      <p>{{ item.name }}</p>
+                      <span>{{ item.category_name }}{% if item.brand_name %} &middot; {{ item.brand_name }}{% endif %} &middot; Qty: {{ item.quantity }}</span>
+                    </div>
+                    <strong>৳{{ item.subtotal }}</strong>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <div class="summary-rows checkout-summary-rows">
+                <div class="summary-row">
+                  <span>Subtotal (<span id="checkoutItemCount">{{ cart_state.item_count }}</span> items)</span>
+                  <span id="checkoutSubtotal">৳{{ cart_state.subtotal }}</span>
+                </div>
+              </div>
+
+              <div class="summary-rows">
+                <div class="summary-row">
+                  <span>Shipping</span>
+                  <span id="checkoutShipping">৳{{ checkout_initial_shipping|floatformat:2 }}</span>
+                </div>
+                <div class="summary-row">
+                  <span>Estimated Delivery</span>
+                  <span>{{ checkout_delivery_zone.estimate }}</span>
+                </div>
+              </div>
+
+              <div class="summary-total">
+                <span>Total</span>
+                <span id="checkoutTotal">৳{{ cart_state.subtotal|add:checkout_initial_shipping }}</span>
+              </div>
+
+              <button class="btn-place-order" id="placeOrderBtn" type="submit">
+                <i class="fa fa-lock"></i> Place Order - Cash on Delivery
+              </button>
+              <a href="{% url 'frontend_cart' %}" class="btn-confirm-track" style="margin-top:12px;display:inline-flex;justify-content:center;width:100%;">
+                Back To Cart
+              </a>
+            </div>
+          </div>
+        </div>
+        </form>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}
+
+{% block page_overlays %}
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+    (function () {
+      const districtInput = document.getElementById('district');
+      if (!districtInput) {
+        return;
+      }
+
+      const districts = [
+        'Bagerhat', 'Bandarban', 'Barguna', 'Barishal', 'Bhola', 'Bogura', 'Brahmanbaria',
+        'Chandpur', 'Chapainawabganj', 'Chattogram', 'Chuadanga', "Cox's Bazar", 'Cumilla',
+        'Dhaka', 'Dinajpur', 'Faridpur', 'Feni', 'Gaibandha', 'Gazipur', 'Gopalganj',
+        'Habiganj', 'Jamalpur', 'Jashore', 'Jhalokathi', 'Jhenaidah', 'Joypurhat',
+        'Khagrachhari', 'Khulna', 'Kishoreganj', 'Kurigram', 'Kushtia', 'Lakshmipur',
+        'Lalmonirhat', 'Madaripur', 'Magura', 'Manikganj', 'Meherpur', 'Moulvibazar',
+        'Munshiganj', 'Mymensingh', 'Naogaon', 'Narail', 'Narayanganj', 'Narsingdi',
+        'Natore', 'Netrokona', 'Nilphamari', 'Noakhali', 'Pabna', 'Panchagarh',
+        'Patuakhali', 'Pirojpur', 'Rajbari', 'Rajshahi', 'Rangamati', 'Rangpur',
+        'Satkhira', 'Shariatpur', 'Sherpur', 'Sirajganj', 'Sunamganj', 'Sylhet',
+        'Tangail', 'Thakurgaon'
+      ];
+
+      const districtSearch = document.getElementById('districtSearch');
+      const districtDropdown = document.getElementById('districtDropdown');
+      const districtToggle = document.getElementById('districtToggle');
+      const shippingEl = document.getElementById('checkoutShipping');
+      const totalEl = document.getElementById('checkoutTotal');
+      const subtotalEl = document.getElementById('checkoutSubtotal');
+      const subtotalValue = parseFloat("{{ cart_state.subtotal|default:'0' }}");
+
+      function formatCurrency(value) {
+        const amount = Number.isFinite(value) ? value : 0;
+        return `৳${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      function updateShippingSummary() {
+        const shipping = {{ checkout_initial_shipping|default:0 }};
+        const total = subtotalValue + shipping;
+
+        if (subtotalEl) {
+          subtotalEl.textContent = formatCurrency(subtotalValue);
+        }
+        if (shippingEl) {
+          shippingEl.textContent = formatCurrency(shipping);
+        }
+        if (totalEl) {
+          totalEl.textContent = formatCurrency(total);
+        }
+      }
+
+      function getFilteredDistricts(showAll = false) {
+        const query = districtInput?.value.trim().toLowerCase() || '';
+        if (showAll) return districts;
+        if (!query) return districts;
+        return districts.filter(name => name.toLowerCase().includes(query));
+      }
+
+      function openDistrictDropdown() {
+        if (!districtDropdown || !districtSearch) return;
+        districtDropdown.classList.add('active');
+        districtSearch.classList.add('active');
+      }
+
+      function closeDistrictDropdown() {
+        if (!districtDropdown || !districtSearch) return;
+        districtDropdown.classList.remove('active');
+        districtSearch.classList.remove('active');
+      }
+
+      function renderDistrictDropdown(showAll = false) {
+        if (!districtDropdown || !districtInput) return;
+
+        const matches = getFilteredDistricts(showAll);
+        districtDropdown.innerHTML = '';
+
+        if (!matches.length) {
+          const emptyState = document.createElement('div');
+          emptyState.className = 'district-empty';
+          emptyState.textContent = 'No district found';
+          districtDropdown.appendChild(emptyState);
+          openDistrictDropdown();
+          return;
+        }
+
+        matches.forEach(name => {
+          const option = document.createElement('button');
+          option.type = 'button';
+          option.className = 'district-option';
+          if (name.toLowerCase() === districtInput.value.trim().toLowerCase()) {
+            option.classList.add('active');
+          }
+          option.textContent = name;
+          option.addEventListener('mousedown', event => {
+            event.preventDefault();
+            districtInput.value = name;
+            renderDistrictDropdown();
+            closeDistrictDropdown();
+          });
+          districtDropdown.appendChild(option);
+        });
+
+        openDistrictDropdown();
+      }
+
+      districtInput?.addEventListener('focus', () => renderDistrictDropdown(true));
+      districtInput?.addEventListener('click', () => renderDistrictDropdown(true));
+      districtInput?.addEventListener('input', () => renderDistrictDropdown(false));
+      districtInput?.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeDistrictDropdown();
+      });
+
+      districtToggle?.addEventListener('click', () => {
+        districtInput?.focus();
+        renderDistrictDropdown(true);
+      });
+
+      document.addEventListener('click', event => {
+        if (!districtSearch?.contains(event.target)) {
+          closeDistrictDropdown();
+        }
+      });
+
+      updateShippingSummary();
+
+      const checkoutForm = document.getElementById('checkoutForm');
+      const phoneInput = document.getElementById('phone');
+      const isAuthenticated = checkoutForm?.dataset.authenticated === 'true';
+      let captureTimer = null;
+
+      function getCsrfToken() {
+        return checkoutForm?.querySelector('[name="csrfmiddlewaretoken"]')?.value || '';
+      }
+
+      function buildCheckoutPayload() {
+        return {
+          full_name: document.getElementById('fullName')?.value.trim() || '',
+          phone_number: phoneInput?.value.trim() || '',
+          email: document.getElementById('email')?.value.trim() || '',
+          address: document.getElementById('address')?.value.trim() || '',
+          district: districtInput?.value.trim() || '',
+          area_thana: document.getElementById('thana')?.value.trim() || '',
+          postal_code: document.getElementById('postal')?.value.trim() || '',
+          delivery_area: checkoutForm?.dataset.deliveryArea || '',
+        };
+      }
+
+      function normalizeBdPhone(value) {
+        let phone = String(value || '').trim().replace(/[\s\-()]/g, '');
+        if (phone.startsWith('+880')) {
+          phone = `0${phone.slice(4)}`;
+        } else if (phone.startsWith('880')) {
+          phone = `0${phone.slice(3)}`;
+        }
+        return phone;
+      }
+
+      function hasValidGuestPhone() {
+        return /^01[3-9]\d{8}$/.test(normalizeBdPhone(phoneInput?.value));
+      }
+
+      async function captureAbandonedCheckout() {
+        if (!checkoutForm || (!isAuthenticated && !hasValidGuestPhone())) return;
+
+        try {
+          const response = await fetch(checkoutForm.dataset.abandonedCheckoutUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCsrfToken(),
+            },
+            body: JSON.stringify(buildCheckoutPayload()),
+            credentials: 'same-origin',
+            keepalive: true,
+          });
+          if (!response.ok) {
+            throw new Error(`Abandoned checkout request failed: ${response.status}`);
+          }
+        } catch (error) {
+          // Checkout must remain usable if background capture is unavailable.
+        }
+      }
+
+      function scheduleAbandonedCheckoutCapture() {
+        if (!isAuthenticated && !hasValidGuestPhone()) {
+          window.clearTimeout(captureTimer);
+          return;
+        }
+        window.clearTimeout(captureTimer);
+        captureTimer = window.setTimeout(captureAbandonedCheckout, 1000);
+      }
+
+      checkoutForm?.querySelectorAll('input, textarea').forEach(field => {
+        field.addEventListener('input', scheduleAbandonedCheckoutCapture);
+        field.addEventListener('change', scheduleAbandonedCheckoutCapture);
+      });
+    })();
+  </script>
+{% endblock %}

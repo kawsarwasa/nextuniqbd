@@ -1,0 +1,644 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{% block title %}{{ site_company.company_name|default:default_company_name }} | Dashboard{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="title" content="{{ site_company.company_name|default:default_company_name }} | Dashboard" />
+    <meta name="author" content="ColorlibHQ" />
+    <link rel="shortcut icon" type="image/png" href="{% static 'frontend/images/next-uniq-bd.png' %}?v=2" />
+    <link rel="icon" type="image/png" href="{% static 'frontend/images/next-uniq-bd.png' %}?v=2" />
+    <link rel="apple-touch-icon" href="{% static 'frontend/images/next-uniq-bd.png' %}?v=2" />
+    <meta
+      name="description"
+      content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS."
+    />
+    <meta
+      name="keywords"
+      content="bootstrap 5 admin dashboard, bootstrap 5 charts, adminlte, dashboard"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+      integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css"
+      integrity="sha256-tZHrRjVqNSRyWg2wbppGnT833E/Ys0DHWGwT04GiqQg="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="{% static 'dashboard/css/adminlte.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard-custom.css' %}?v=2" />
+<style>
+/* top navbar profile image */
+.user-menu .nav-link img,
+.user-menu .user-image {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    padding: 0 !important;
+}
+
+/* dropdown big image */
+.user-menu .user-header img {
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px !important;
+    max-width: 90px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+/* Shared dashboard pagination */
+.dashboard-pagination .page-link {
+    color: #087fb8;
+    border-color: #b7e5f8;
+}
+.dashboard-pagination .page-link:hover {
+    color: #045f8d;
+    background-color: #e3f6ff;
+    border-color: #7ed3f5;
+}
+.dashboard-pagination .page-item.active .page-link {
+    color: #fff;
+    background-color: #38bdf8;
+    border-color: #38bdf8;
+}
+.dashboard-pagination .page-item.disabled .page-link {
+    color: #8ebfd4;
+    background-color: #f5fcff;
+    border-color: #d5effb;
+}
+</style>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    {% if messages %}
+      <div class="dashboard-toast-stack">
+        {% for message in messages %}
+          <div
+            class="dashboard-toast js-dashboard-toast {% if 'toast-create' in message.tags %}dashboard-toast--create{% elif 'toast-edit' in message.tags %}dashboard-toast--edit{% elif 'toast-delete' in message.tags %}dashboard-toast--delete{% else %}dashboard-toast--warning{% endif %}"
+            data-duration="3200"
+          >
+            <div class="dashboard-toast__body">
+              <span class="dashboard-toast__icon">
+                {% if 'toast-create' in message.tags %}
+                  <i class="bi bi-check2-circle"></i>
+                {% elif 'toast-edit' in message.tags %}
+                  <i class="bi bi-pencil-square"></i>
+                {% elif 'toast-delete' in message.tags %}
+                  <i class="bi bi-trash3"></i>
+                {% else %}
+                  <i class="bi bi-exclamation-triangle"></i>
+                {% endif %}
+              </span>
+              <div class="flex-grow-1">
+                <div class="dashboard-toast__title">
+                  {% if 'toast-create' in message.tags %}
+                    Created
+                  {% elif 'toast-edit' in message.tags %}
+                    Updated
+                  {% elif 'toast-delete' in message.tags %}
+                    Deleted
+                  {% else %}
+                    Notice
+                  {% endif %}
+                </div>
+                <div class="dashboard-toast__message">{{ message }}</div>
+              </div>
+              <button type="button" class="dashboard-toast__close js-dashboard-toast-close" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+            <div class="dashboard-toast__progress"></div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="app-wrapper">
+      <nav class="app-header navbar navbar-expand bg-body">
+        <div class="container-fluid">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                <i class="bi bi-list"></i>
+              </a>
+            </li>
+            <li class="nav-item d-none d-md-block">
+              <a href="{% url 'frontend_home' %}" class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-md-block">
+              <a href="{% url 'frontend_contact' %}" class="nav-link">Contact</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" data-widget="navbar-search" href="#" role="button">
+                <i class="bi bi-search"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+              </a>
+            </li>
+             <li class="nav-item dropdown user-menu">
+    <a href="#" class="nav-link dropdown-toggle d-flex align-items-center"
+       data-bs-toggle="dropdown">
+
+        {% if dashboard_profile and dashboard_profile.image %}
+            <img
+                src="{{ dashboard_profile.image.url }}"
+                alt="User Image"
+                class="rounded-circle me-2"
+                width="40"
+                height="40"
+                style="object-fit: cover;"
+            >
+        {% else %}
+            <img
+                src="{% static 'dashboard/assets/img/user2-160x160.jpg' %}"
+                alt="User Image"
+                class="rounded-circle me-2"
+                width="40"
+                height="40"
+                style="object-fit: cover;"
+            >
+        {% endif %}
+
+        <span class="d-none d-md-inline">
+            {{ request.user.get_full_name|default:request.user.username }}
+        </span>
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+
+        <li class="user-header text-bg-primary text-center p-3">
+
+            {% if dashboard_profile and dashboard_profile.image %}
+                <img
+                    src="{{ dashboard_profile.image.url }}"
+                    alt="User Image"
+                    class="rounded-circle shadow mb-2"
+                    width="90"
+                    height="90"
+                    style="object-fit: cover;"
+                >
+            {% else %}
+                <img
+                    src="{% static 'dashboard/assets/img/user2-160x160.jpg' %}"
+                    alt="User Image"
+                    class="rounded-circle shadow mb-2"
+                    width="90"
+                    height="90"
+                    style="object-fit: cover;"
+                >
+            {% endif %}
+
+            <p class="mb-0 fw-bold">
+                {{ request.user.get_full_name|default:request.user.username }}
+            </p>
+
+            <small>
+                {{ request.user.email }}
+            </small>
+        </li>
+
+        <li class="user-footer p-2 d-flex justify-content-between">
+            <a href="{% url 'dashboard_profile' %}"
+               class="btn btn-outline-primary btn-sm">
+                Profile
+            </a>
+
+            <a href="{% url 'frontend_home' %}"
+               class="btn btn-outline-secondary btn-sm">
+                Storefront
+            </a>
+        </li>
+
+        <li class="border-top p-2">
+            <form action="{% url 'auth_logout' %}" method="post">
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="btn btn-danger btn-sm w-100">
+                    Logout
+                </button>
+            </form>
+        </li>
+
+    </ul>
+</li>
+          </ul>
+        </div>
+      </nav>
+
+      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+        <div class="sidebar-brand">
+          <a href="{% url 'dashboard_home' %}" class="brand-link">
+            {% if site_company.logo %}
+              <img
+                src="{{ site_company.logo.url }}"
+                alt="{{ site_company.company_name }}"
+                class="brand-image dashboard-sidebar-logo"
+              />
+            {% else %}
+              <span class="brand-image dashboard-sidebar-logo dashboard-sidebar-logo--fallback">
+                {{ site_company.company_name|default:default_company_name|slice:":2" }}
+              </span>
+            {% endif %}
+            <span class="brand-text fw-semibold">{{ site_company.company_name|default:default_company_name }}</span>
+          </a>
+        </div>
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <ul
+              class="nav sidebar-menu flex-column"
+              data-lte-toggle="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              {% with current_url=request.resolver_match.url_name %}
+              <li class="nav-item">
+                <a href="{% url 'dashboard_home' %}" class="nav-link {% if current_url == 'dashboard_home' %}active{% endif %}">
+                  <i class="nav-icon bi bi-speedometer"></i>
+                  <p>Dashboard</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'dashboard_profile' %}" class="nav-link {% if current_url == 'dashboard_profile' %}active{% endif %}">
+                  <i class="nav-icon bi bi-person-circle"></i>
+                  <p>Profile</p>
+                </a>
+              </li>
+              {% if perms.finance.view_transactioncategory or perms.finance.view_cashtransaction or perms.finance.view_dueaccount or perms.finance.view_duepayment %}
+              {% with finance_page=current_url %}
+              <li class="nav-item {% if finance_page == 'dashboard' or finance_page == 'transaction_list' or finance_page == 'opening_balance' or finance_page == 'cash_in_list' or finance_page == 'cash_in_create' or finance_page == 'cash_in_update' or finance_page == 'cash_in_delete' or finance_page == 'cash_out_list' or finance_page == 'cash_out_create' or finance_page == 'cash_out_update' or finance_page == 'cash_out_delete' or finance_page == 'due_list' or finance_page == 'due_create' or finance_page == 'due_detail' or finance_page == 'due_update' or finance_page == 'due_delete' or finance_page == 'due_payment_create' or finance_page == 'due_payment_update' or finance_page == 'due_payment_delete' or finance_page == 'category_list' or finance_page == 'category_create' or finance_page == 'category_update' or finance_page == 'category_delete' or finance_page == 'reports' %}menu-open{% endif %}">
+                <a href="#" class="nav-link {% if finance_page == 'dashboard' or finance_page == 'transaction_list' or finance_page == 'opening_balance' or finance_page == 'cash_in_list' or finance_page == 'cash_in_create' or finance_page == 'cash_in_update' or finance_page == 'cash_in_delete' or finance_page == 'cash_out_list' or finance_page == 'cash_out_create' or finance_page == 'cash_out_update' or finance_page == 'cash_out_delete' or finance_page == 'due_list' or finance_page == 'due_create' or finance_page == 'due_detail' or finance_page == 'due_update' or finance_page == 'due_delete' or finance_page == 'due_payment_create' or finance_page == 'due_payment_update' or finance_page == 'due_payment_delete' or finance_page == 'category_list' or finance_page == 'category_create' or finance_page == 'category_update' or finance_page == 'category_delete' or finance_page == 'reports' %}active{% endif %}">
+                  <i class="nav-icon bi bi-wallet2"></i>
+                  <p>Accounts <i class="nav-arrow bi bi-chevron-right"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'finance:dashboard' %}" class="nav-link {% if finance_page == 'dashboard' %}active{% endif %}">
+                      <i class="nav-icon bi bi-grid-1x2"></i><p>Overview</p>
+                    </a>
+                  </li>
+                  {% if perms.finance.add_cashtransaction %}
+                  <li class="nav-item">
+                    <a href="{% url 'finance:opening_balance' %}" class="nav-link {% if finance_page == 'opening_balance' %}active{% endif %}">
+                      <i class="nav-icon bi bi-plus-slash-minus"></i><p>Opening Balance</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if perms.finance.view_cashtransaction %}
+                  <li class="nav-item">
+                    <a href="{% url 'finance:transaction_list' %}" class="nav-link {% if finance_page == 'transaction_list' %}active{% endif %}">
+                      <i class="nav-icon bi bi-list-ul"></i><p>All Transactions</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'finance:cash_in_list' %}" class="nav-link {% if finance_page == 'cash_in_list' or finance_page == 'cash_in_create' or finance_page == 'cash_in_update' or finance_page == 'cash_in_delete' %}active{% endif %}">
+                      <i class="nav-icon bi bi-arrow-down-circle"></i><p>Cash In</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'finance:cash_out_list' %}" class="nav-link {% if finance_page == 'cash_out_list' or finance_page == 'cash_out_create' or finance_page == 'cash_out_update' or finance_page == 'cash_out_delete' %}active{% endif %}">
+                      <i class="nav-icon bi bi-arrow-up-circle"></i><p>Cash Out</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if perms.finance.view_dueaccount %}
+                  <li class="nav-item">
+                    <a href="{% url 'finance:due_list' %}" class="nav-link {% if finance_page == 'due_list' or finance_page == 'due_create' or finance_page == 'due_detail' or finance_page == 'due_update' or finance_page == 'due_delete' or finance_page == 'due_payment_create' or finance_page == 'due_payment_update' or finance_page == 'due_payment_delete' %}active{% endif %}">
+                      <i class="nav-icon bi bi-receipt"></i><p>Due</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if perms.finance.view_transactioncategory %}
+                  <li class="nav-item">
+                    <a href="{% url 'finance:category_list' %}" class="nav-link {% if finance_page == 'category_list' or finance_page == 'category_create' or finance_page == 'category_update' or finance_page == 'category_delete' %}active{% endif %}">
+                      <i class="nav-icon bi bi-tags"></i><p>Categories</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li class="nav-item">
+                    <a href="{% url 'finance:reports' %}" class="nav-link {% if finance_page == 'reports' %}active{% endif %}">
+                      <i class="nav-icon bi bi-bar-chart-line"></i><p>Reports</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              {% endwith %}
+              {% endif %}
+              {% if perms.company.view_companyprofile %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_company_profile_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_company_profile_list' or current_url == 'dashboard_company_profile_add' or current_url == 'dashboard_company_profile_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-building"></i>
+                  <p>Company</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.auth.view_user %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_user_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_user_list' or current_url == 'dashboard_user_permissions' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-people"></i>
+                  <p>Users</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.auth.view_group %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_role_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_role_list' or current_url == 'dashboard_role_permissions' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-shield-lock"></i>
+                  <p>Roles &amp; Permissions</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.category.view_category %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_category_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_category_list' or current_url == 'dashboard_category_add' or current_url == 'dashboard_category_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-tags"></i>
+                  <p>Categories</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.category.view_brand %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_brand_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_brand_list' or current_url == 'dashboard_brand_add' or current_url == 'dashboard_brand_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-bookmark-star"></i>
+                  <p>Brands</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.category.view_product %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_product_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_product_list' or current_url == 'dashboard_product_add' or current_url == 'dashboard_product_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-box-seam"></i>
+                  <p>Products</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'dashboard_inventory_report' %}" class="nav-link {% if current_url == 'dashboard_inventory_report' or current_url == 'dashboard_stock_history' %}active{% endif %}">
+                  <i class="nav-icon bi bi-clipboard-data"></i><p>Inventory</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.purchase.view_purchase %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_purchase_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_purchase_list' or current_url == 'dashboard_purchase_add' or current_url == 'dashboard_purchase_detail' or current_url == 'dashboard_purchase_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-cart-plus"></i>
+                  <p>Purchases</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.sitepages.view_order %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_order_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_order_list' or current_url == 'dashboard_order_detail' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-bag-check"></i>
+                  <p>Orders</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.sitepages.view_sale %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_sale_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_sale_list' or current_url == 'dashboard_sale_detail' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-receipt"></i>
+                  <p>Sales</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.sitepages.view_sale %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_abandoned_checkout_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_abandoned_checkout_list' or current_url == 'dashboard_abandoned_checkout_detail' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-cart-x"></i>
+                  <p>Abandoned Checkout</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.sitepages.view_heroslide %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_hero_slide_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_hero_slide_list' or current_url == 'dashboard_hero_slide_add' or current_url == 'dashboard_hero_slide_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-images"></i>
+                  <p>Carousel</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.sitepages.view_homepagepromobanner %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_promo_banner_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_promo_banner_list' or current_url == 'dashboard_promo_banner_add' or current_url == 'dashboard_promo_banner_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-megaphone"></i>
+                  <p>Promo Banners</p>
+                </a>
+              </li>
+              {% endif %}
+              {% if perms.blog.view_blogpost or perms.blog.view_blogcategory or perms.blog.view_blogtag or perms.blog.view_blogcomment %}
+              <li class="nav-item {% if current_url == 'dashboard_blog_post_list' or current_url == 'dashboard_blog_post_add' or current_url == 'dashboard_blog_post_edit' or current_url == 'dashboard_blog_post_detail' or current_url == 'dashboard_blog_category_list' or current_url == 'dashboard_blog_category_add' or current_url == 'dashboard_blog_category_edit' or current_url == 'dashboard_blog_tag_list' or current_url == 'dashboard_blog_tag_add' or current_url == 'dashboard_blog_tag_edit' or current_url == 'dashboard_blog_comment_list' or current_url == 'dashboard_blog_comment_add' or current_url == 'dashboard_blog_comment_edit' %}menu-open{% endif %}">
+                <a
+                  href="#"
+                  class="nav-link {% if current_url == 'dashboard_blog_post_list' or current_url == 'dashboard_blog_post_add' or current_url == 'dashboard_blog_post_edit' or current_url == 'dashboard_blog_post_detail' or current_url == 'dashboard_blog_category_list' or current_url == 'dashboard_blog_category_add' or current_url == 'dashboard_blog_category_edit' or current_url == 'dashboard_blog_tag_list' or current_url == 'dashboard_blog_tag_add' or current_url == 'dashboard_blog_tag_edit' or current_url == 'dashboard_blog_comment_list' or current_url == 'dashboard_blog_comment_add' or current_url == 'dashboard_blog_comment_edit' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-journal-richtext"></i>
+                  <p>
+                    Blog
+                    <i class="nav-arrow bi bi-chevron-right"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  {% if perms.blog.view_blogpost %}
+                  <li class="nav-item">
+                    <a
+                      href="{% url 'dashboard_blog_post_list' %}"
+                      class="nav-link {% if current_url == 'dashboard_blog_post_list' or current_url == 'dashboard_blog_post_add' or current_url == 'dashboard_blog_post_edit' or current_url == 'dashboard_blog_post_detail' %}active{% endif %}"
+                    >
+                      <i class="nav-icon bi bi-file-text"></i>
+                      <p>Blog Posts</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if perms.blog.view_blogcategory %}
+                  <li class="nav-item">
+                    <a
+                      href="{% url 'dashboard_blog_category_list' %}"
+                      class="nav-link {% if current_url == 'dashboard_blog_category_list' or current_url == 'dashboard_blog_category_add' or current_url == 'dashboard_blog_category_edit' %}active{% endif %}"
+                    >
+                      <i class="nav-icon bi bi-diagram-3"></i>
+                      <p>Blog Categories</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if perms.blog.view_blogtag %}
+                  <li class="nav-item">
+                    <a
+                      href="{% url 'dashboard_blog_tag_list' %}"
+                      class="nav-link {% if current_url == 'dashboard_blog_tag_list' or current_url == 'dashboard_blog_tag_add' or current_url == 'dashboard_blog_tag_edit' %}active{% endif %}"
+                    >
+                      <i class="nav-icon bi bi-hash"></i>
+                      <p>Blog Tags</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                  {% if perms.blog.view_blogcomment %}
+                  <li class="nav-item">
+                    <a
+                      href="{% url 'dashboard_blog_comment_list' %}"
+                      class="nav-link {% if current_url == 'dashboard_blog_comment_list' or current_url == 'dashboard_blog_comment_add' or current_url == 'dashboard_blog_comment_edit' %}active{% endif %}"
+                    >
+                      <i class="nav-icon bi bi-chat-left-text"></i>
+                      <p>Blog Comments</p>
+                    </a>
+                  </li>
+                  {% endif %}
+                </ul>
+              </li>
+              {% endif %}
+              {% endwith %}
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <div class="app-content-header">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6"><h3 class="mb-0">{% block page_title %}Dashboard{% endblock %}</h3></div>
+              <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                  {% block breadcrumb %}
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                  {% endblock %}
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app-content">
+          <div class="container-fluid">
+            {% block content %}{% endblock %}
+          </div>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <div class="float-end d-none d-sm-inline">Anything you want</div>
+        <strong>
+          Copyright &copy; 2026&nbsp;
+          <a href="https://adminlte.io" class="text-decoration-none">Made by Kawsar Ahmed</a>.
+        </strong>
+        All rights reserved.
+      </footer>
+    </div>
+
+    <div class="modal fade" id="dashboardDeleteConfirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirm Delete</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Delete <strong class="js-delete-item-name">this item</strong>? This action cannot be undone.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger js-confirm-delete">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
+      integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+      crossorigin="anonymous"
+    ></script>
+    <script src="{% static 'dashboard/js/adminlte.min.js' %}"></script>
+    <script>
+      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+      const Default = {
+        scrollbarTheme: 'os-theme-light',
+        scrollbarAutoHide: 'leave',
+        scrollbarClickScroll: true,
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
+        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== 'undefined') {
+          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+            scrollbars: {
+              theme: Default.scrollbarTheme,
+              autoHide: Default.scrollbarAutoHide,
+              clickScroll: Default.scrollbarClickScroll,
+            },
+          });
+        }
+      });
+    </script>
+    <script src="{% static 'dashboard/js/dashboard-custom.js' %}?v=2"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

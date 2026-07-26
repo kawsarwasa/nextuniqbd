@@ -1,0 +1,129 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Profile</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row g-4">
+    <div class="col-xl-8">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="profile">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title mb-0">Profile Details</h3>
+          </div>
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-lg-4">
+                <div class="dashboard-profile-panel text-center">
+                  <img
+                    src="{% if dashboard_profile.image %}{{ dashboard_profile.image.url }}{% else %}{% static 'dashboard/assets/img/user2-160x160.jpg' %}{% endif %}"
+                    alt="{{ dashboard_profile_display_name }}"
+                    class="dashboard-profile-avatar"
+                  >
+                  <div class="fw-semibold mt-3">{{ dashboard_profile_display_name }}</div>
+                  <div class="text-muted small">{{ request.user.email }}</div>
+                </div>
+              </div>
+              <div class="col-lg-8">
+                <div class="mb-3">
+                  <label class="form-label" for="{{ profile_form.image.id_for_label }}">Profile Image</label>
+                  {{ profile_form.image }}
+                  {% for error in profile_form.image.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="{{ profile_form.name.id_for_label }}">Name</label>
+                  {{ profile_form.name }}
+                  {% for error in profile_form.name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="{{ profile_form.email.id_for_label }}">Email</label>
+                  {{ profile_form.email }}
+                  {% for error in profile_form.email.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="{{ profile_form.phone.id_for_label }}">Phone</label>
+                  {{ profile_form.phone }}
+                  {% for error in profile_form.phone.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="mb-0">
+                  <label class="form-label" for="{{ profile_form.address.id_for_label }}">Address</label>
+                  {{ profile_form.address }}
+                  {% for error in profile_form.address.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer text-end">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-floppy me-1"></i>Save Profile
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-xl-4">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="password">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title mb-0">Change Password</h3>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label" for="{{ password_form.old_password.id_for_label }}">Current Password</label>
+              {{ password_form.old_password }}
+              {% for error in password_form.old_password.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="{{ password_form.new_password1.id_for_label }}">New Password</label>
+              {{ password_form.new_password1 }}
+              {% for error in password_form.new_password1.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+              {% if password_form.new_password1.help_text %}
+                <div class="form-text">{{ password_form.new_password1.help_text|safe }}</div>
+              {% endif %}
+            </div>
+            <div class="mb-0">
+              <label class="form-label" for="{{ password_form.new_password2.id_for_label }}">Confirm Password</label>
+              {{ password_form.new_password2 }}
+              {% for error in password_form.new_password2.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+            {% for error in password_form.non_field_errors %}
+              <div class="invalid-feedback d-block mt-3">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="card-footer text-end">
+            <button type="submit" class="btn btn-outline-primary">
+              <i class="bi bi-shield-lock me-1"></i>Update Password
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

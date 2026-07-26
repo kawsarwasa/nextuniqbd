@@ -1,0 +1,113 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Abandoned Checkout #{{ abandoned_checkout.pk }}{% endblock %}
+{% block page_title %}Abandoned Checkout #{{ abandoned_checkout.pk }}{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_abandoned_checkout_list' %}">Abandoned Checkout</a></li>
+  <li class="breadcrumb-item active" aria-current="page">#{{ abandoned_checkout.pk }}</li>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <a href="{% url 'dashboard_abandoned_checkout_list' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Back to List
+    </a>
+    {% if abandoned_checkout.status == "pending" and perms.sitepages.change_sale %}
+      <div class="d-flex gap-2">
+        <form method="post" action="{% url 'dashboard_abandoned_checkout_status' abandoned_checkout.pk 'contacted' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-info">
+            <i class="bi bi-telephone-check me-1"></i>Mark as Contacted
+          </button>
+        </form>
+        <form method="post" action="{% url 'dashboard_abandoned_checkout_status' abandoned_checkout.pk 'cancelled' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">
+            <i class="bi bi-x-circle me-1"></i>Mark as Cancelled
+          </button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-xl-8">
+      <div class="card h-100">
+        <div class="card-header"><h3 class="card-title mb-0">Customer Information</h3></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6"><strong>Name:</strong> {{ abandoned_checkout.full_name|default:"—" }}</div>
+            <div class="col-md-6"><strong>Phone:</strong> {{ abandoned_checkout.phone_number|default:"—" }}</div>
+            <div class="col-md-6"><strong>Email:</strong> {{ abandoned_checkout.email|default:"—" }}</div>
+            <div class="col-md-6">
+              <strong>User Type:</strong>
+              {% if abandoned_checkout.user_id %}Registered{% else %}Guest{% endif %}
+            </div>
+            <div class="col-12"><strong>Address:</strong> {{ abandoned_checkout.address|default:"—" }}</div>
+            <div class="col-md-6"><strong>District:</strong> {{ abandoned_checkout.district|default:"—" }}</div>
+            <div class="col-md-6"><strong>Area / Thana:</strong> {{ abandoned_checkout.area_thana|default:"—" }}</div>
+            <div class="col-md-6"><strong>Postal Code:</strong> {{ abandoned_checkout.postal_code|default:"—" }}</div>
+            <div class="col-md-6"><strong>Delivery Area:</strong> {{ abandoned_checkout.delivery_area_label }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-4">
+      <div class="card h-100">
+        <div class="card-header"><h3 class="card-title mb-0">Checkout Summary</h3></div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2"><span>Subtotal</span><strong>&#2547;{{ abandoned_checkout.subtotal }}</strong></div>
+          <div class="d-flex justify-content-between mb-2"><span>Shipping Charge</span><strong>&#2547;{{ abandoned_checkout.shipping_charge }}</strong></div>
+          <hr />
+          <div class="d-flex justify-content-between fs-5"><span>Total</span><strong>&#2547;{{ abandoned_checkout.total_amount }}</strong></div>
+          <hr />
+          <div class="d-flex justify-content-between"><span>Status</span><span class="badge {{ abandoned_checkout.status_badge_class }}">{{ abandoned_checkout.get_status_display }}</span></div>
+          <div class="text-muted small mt-3">Created {{ abandoned_checkout.created_at|date:"M d, Y h:i A" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3 class="card-title mb-0">Cart Items Snapshot</h3></div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Product</th>
+            <th>SKU</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-end">Price</th>
+            <th class="text-end">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+            <tr>
+              <td>
+                <img
+                  src="{% if item.image_url %}{{ item.image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+                  alt="{{ item.name|default:'Product' }}"
+                  width="56"
+                  height="56"
+                  class="rounded border object-fit-cover"
+                />
+              </td>
+              <td class="fw-semibold">{{ item.name|default:"Product unavailable" }}</td>
+              <td>{{ item.sku|default:"—" }}</td>
+              <td class="text-center">{{ item.quantity|default:0 }}</td>
+              <td class="text-end">&#2547;{{ item.unit_price|default:"0.00" }}</td>
+              <td class="text-end fw-semibold">&#2547;{{ item.line_total|default:"0.00" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center py-5 text-muted">No cart snapshot is available.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

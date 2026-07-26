@@ -1,0 +1,130 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Company Profiles{% endblock %}
+{% block page_title %}Company Profiles{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Company Profiles</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ company_profile_total }}</h3>
+          <p>Total Profiles</p>
+        </div>
+        <i class="small-box-icon bi bi-building"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ company_profile_active_total }}</h3>
+          <p>Active Profiles</p>
+        </div>
+        <i class="small-box-icon bi bi-check-circle"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="small-box text-bg-dark">
+        <div class="inner">
+          <h3>{{ page_obj.paginator.count }}</h3>
+          <p>Visible In List</p>
+        </div>
+        <i class="small-box-icon bi bi-list-check"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title mb-0">Company Branding</h3>
+      {% if company_profile %}
+        <a href="{% url 'dashboard_company_profile_edit' company_profile.pk %}" class="btn btn-primary">
+          <i class="bi bi-pencil-square me-1"></i>Edit Company
+        </a>
+      {% else %}
+        <a href="{% url 'dashboard_company_profile_add' %}" class="btn btn-primary">
+          <i class="bi bi-plus-lg me-1"></i>Add Company
+        </a>
+      {% endif %}
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th>Company Name</th>
+            <th>Slug</th>
+            <th>Sort</th>
+            <th>Status</th>
+            <th>Updated</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for company in company_profiles %}
+            <tr>
+              <td>
+                {% if company.logo %}
+                  <img src="{{ company.logo.url }}" alt="{{ company.company_name }}" class="dashboard-company-logo-thumb" />
+                {% else %}
+                  <div class="dashboard-company-logo-thumb dashboard-company-logo-thumb--placeholder">
+                    <i class="bi bi-image"></i>
+                  </div>
+                {% endif %}
+              </td>
+              <td class="fw-semibold">{{ company.company_name }}</td>
+              <td><code>{{ company.slug }}</code></td>
+              <td>{{ company.sort_order }}</td>
+              <td>
+                {% if company.is_active %}
+                  <span class="badge text-bg-success">Active</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ company.updated_at|date:"d M Y, h:i A" }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="{% url 'dashboard_company_profile_edit' company.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <div class="mb-3 text-muted">No company profile created yet.</div>
+                <a href="{% url 'dashboard_company_profile_add' %}" class="btn btn-primary">Create your first company profile</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+      <div class="card-footer">
+        <nav aria-label="Company profile pagination">
+          <ul class="pagination pagination-sm mb-0 justify-content-end">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

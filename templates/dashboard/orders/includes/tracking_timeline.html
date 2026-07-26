@@ -1,0 +1,74 @@
+<div class="order-tracking-component">
+  <div class="order-tracking-summary">
+    <div>
+      <div class="order-tracking-summary__label">Customer</div>
+      <div class="fw-semibold">{{ tracking.customer_name|default:"Not available" }}</div>
+    </div>
+    <div>
+      <div class="order-tracking-summary__label">Current status</div>
+      <span class="badge {{ tracking.current_status_badge_class }}">{{ tracking.current_status }}</span>
+    </div>
+  </div>
+
+  {% if tracking.is_cancelled %}
+    <div class="order-tracking-cancelled">
+      <i class="bi bi-x-octagon-fill" aria-hidden="true"></i>
+      <div>
+        <div class="fw-semibold">Order cancelled</div>
+        <div class="small">{{ tracking.cancellation_recorded_at_display }}</div>
+        {% if tracking.cancellation_note %}<div class="small mt-1">{{ tracking.cancellation_note }}</div>{% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if tracking.is_returned %}
+    <div class="order-tracking-returned">
+      <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+      <div>
+        <div class="fw-semibold">Order returned</div>
+        <div class="small">{{ tracking.returned_recorded_at_display }}</div>
+        {% if tracking.returned_note %}<div class="small mt-1">{{ tracking.returned_note }}</div>{% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  <ol class="order-tracking-timeline">
+    {% for step in tracking.steps %}
+      <li class="order-tracking-step order-tracking-step--{{ step.state }}">
+        <span class="order-tracking-step__marker">
+          {% if step.state == "completed" %}
+            <i class="bi bi-check-lg"></i>
+          {% elif step.state == "current" %}
+            <i class="bi bi-dot"></i>
+          {% else %}
+            <i class="bi {{ step.icon }}"></i>
+          {% endif %}
+        </span>
+        <div>
+          <div class="order-tracking-step__label">{{ step.label }}</div>
+          <div class="order-tracking-step__time">{{ step.recorded_at_display }}</div>
+          {% if step.note %}<div class="order-tracking-step__note">{{ step.note }}</div>{% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ol>
+
+  <div class="order-tracking-history">
+    <h6 class="order-tracking-history__title">Recorded status history</h6>
+    {% for event in tracking.events %}
+      <div class="order-tracking-history__event">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <span class="badge {{ event.badge_class }}">{{ event.status }}</span>
+          {% if event.is_imported %}<span class="badge text-bg-secondary">Imported record</span>{% endif %}
+          <span class="text-muted small">{{ event.recorded_at_display }}</span>
+        </div>
+        <div class="order-tracking-history__meta">
+          Source: {{ event.source }}{% if event.changed_by %} &middot; Changed by: {{ event.changed_by }}{% endif %}
+        </div>
+        {% if event.note %}<div class="order-tracking-history__note">{{ event.note }}</div>{% endif %}
+      </div>
+    {% empty %}
+      <div class="text-muted small">No status history has been recorded.</div>
+    {% endfor %}
+  </div>
+</div>

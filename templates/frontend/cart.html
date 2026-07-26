@@ -1,0 +1,321 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Shopping Cart - SB Revo{% endblock %}
+
+{% block content %}
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Shopping Cart</span>
+      </nav>
+    </div>
+  </div>
+
+  <div class="cart-steps-bar">
+    <div class="container">
+      <div class="cart-steps">
+        <div class="cart-step active">
+          <div class="step-icon"><i class="fa fa-shopping-cart"></i></div>
+          <span>1. Shopping Cart</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="cart-step">
+          <div class="step-icon"><i class="fa fa-map-marker-alt"></i></div>
+          <span>2. Checkout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="cart-section">
+    <div class="container">
+      <div class="cart-layout">
+        <div class="cart-main">
+          <div class="cart-header-row">
+            <h2 class="cart-title">Your Cart <span id="cartItemCount">({{ cart_state.item_count }} item{{ cart_state.item_count|pluralize }})</span></h2>
+            <button class="clear-cart-btn" id="clearCartBtn"{% if cart_state.is_empty %} style="display:none"{% endif %}><i class="fa fa-trash"></i> Clear Cart</button>
+          </div>
+
+          <div class="cart-table-wrap"{% if cart_state.is_empty %} style="display:none"{% endif %}>
+            <table class="cart-table" id="cartTable">
+              <thead>
+                <tr>
+                  <th class="col-product">Product</th>
+                  <th class="col-price">Price</th>
+                  <th class="col-qty">Quantity</th>
+                  <th class="col-subtotal">Subtotal</th>
+                  <th class="col-remove"></th>
+                </tr>
+              </thead>
+              <tbody id="cartBody">
+                {% for item in cart_state.items %}
+                  <tr class="cart-row" data-product-id="{{ item.product_id }}" data-price="{{ item.current_price }}">
+                    <td class="col-product">
+                      <div class="cart-product-cell">
+                        <a href="{{ item.detail_url }}" class="cart-product-img">
+                          <img src="{% if item.image_url %}{{ item.image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ item.name }}" />
+                        </a>
+                        <div class="cart-product-details">
+                          <a href="{{ item.detail_url }}" class="cart-product-name">{{ item.name }}</a>
+                          <div class="cart-product-meta">
+                            <span>Category: {{ item.category_name }}</span>
+                            <span>Brand: {{ item.brand_name|default:"Unbranded" }}</span>
+                            <span>SKU: {{ item.sku }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="col-price" data-label="Price">
+                      <span class="cart-price">${{ item.current_price }}</span>
+                      {% if item.is_on_sale %}
+                        <span class="cart-price-old">${{ item.regular_price }}</span>
+                      {% endif %}
+                    </td>
+                    <td class="col-qty" data-label="Quantity">
+                      <div class="cart-qty-control">
+                        <button class="qty-dec" type="button"><i class="fa fa-minus"></i></button>
+                        <input type="number" class="cart-qty-input" value="{{ item.quantity }}" min="1" max="10" />
+                        <button class="qty-inc" type="button"><i class="fa fa-plus"></i></button>
+                      </div>
+                    </td>
+                    <td class="col-subtotal" data-label="Subtotal">
+                      <span class="cart-subtotal">${{ item.subtotal }}</span>
+                    </td>
+                    <td class="col-remove">
+                      <button class="cart-remove-btn" type="button" title="Remove item"><i class="fa fa-times"></i></button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="cart-empty" id="cartEmpty"{% if not cart_state.is_empty %} style="display:none"{% endif %}>
+            <i class="fa fa-shopping-cart"></i>
+            <h3>Your cart is empty</h3>
+            <p>Looks like you haven't added any items to your cart yet.</p>
+            <a href="{% url 'frontend_products' %}" class="btn-continue-shop">Start Shopping</a>
+          </div>
+
+          <div class="cart-table-footer"{% if cart_state.is_empty %} style="display:none"{% endif %}>
+            <a href="{% url 'frontend_products' %}" class="btn-continue-shop"><i class="fa fa-arrow-left"></i> Continue Shopping</a>
+            <button class="btn-update-cart" id="updateCartBtn" type="button"><i class="fa fa-sync-alt"></i> Update Cart</button>
+          </div>
+
+          <div class="coupon-section"{% if cart_state.is_empty %} style="display:none"{% endif %}>
+            <div class="coupon-wrap">
+              <i class="fa fa-tag"></i>
+              <span>Have a coupon code?</span>
+              <div class="coupon-input-wrap">
+                <input type="text" id="couponInput" placeholder="Enter coupon code (e.g. REVO20)" />
+                <button id="applyCoupon" type="button">Apply</button>
+              </div>
+            </div>
+            <div class="coupon-success" id="couponMsg" style="display:none">
+              <i class="fa fa-check-circle"></i> Coupon <strong id="appliedCode"></strong> applied - <strong id="discountAmt"></strong> off!
+              <button id="removeCoupon" type="button"><i class="fa fa-times"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-sidebar">
+          <div class="order-summary-card">
+            <h3 class="summary-title">Order Summary</h3>
+
+            <div class="summary-rows">
+              <div class="summary-row">
+                <span>Subtotal (<span id="summaryItemCount">{{ cart_state.item_count }}</span> items)</span>
+                <span id="summarySubtotal">${{ cart_state.subtotal }}</span>
+              </div>
+              <div class="summary-row discount-row" id="discountRow" style="display:none">
+                <span class="discount-label"><i class="fa fa-tag"></i> Discount (<span id="discountCode2"></span>)</span>
+                <span class="discount-val" id="discountVal">-$0.00</span>
+              </div>
+            </div>
+
+            <div class="checkout-delivery-card">
+              <div class="checkout-delivery-title">
+                <i class="fa fa-map-marker-alt"></i>
+                <span>Select Delivery Area</span>
+              </div>
+              <div class="ship-results">
+                <div class="ship-option{% if delivery_zone.key == 'inside_dhaka' %} selected{% endif %}">
+                  <label>
+                    <input type="radio" name="deliveryZone" value="60" data-zone="inside_dhaka"{% if delivery_zone.key == "inside_dhaka" %} checked{% endif %} />
+                    <div>
+                      <strong>Inside Dhaka</strong>
+                      <span>1-2 business days</span>
+                    </div>
+                    <strong>৳60.00</strong>
+                  </label>
+                </div>
+                <div class="ship-option{% if delivery_zone.key == 'outside_dhaka' %} selected{% endif %}">
+                  <label>
+                    <input type="radio" name="deliveryZone" value="130" data-zone="outside_dhaka"{% if delivery_zone.key == "outside_dhaka" %} checked{% endif %} />
+                    <div>
+                      <strong>Outside Dhaka</strong>
+                      <span>3-5 business days</span>
+                    </div>
+                    <strong>৳130.00</strong>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="summary-rows">
+              <div class="summary-row">
+                <span>Shipping</span>
+                <span id="summaryShipping">৳{{ delivery_zone.amount }}</span>
+              </div>
+            </div>
+
+            <div class="summary-total">
+              <span>Total</span>
+              <span id="summaryTotal">৳{{ cart_state.subtotal|add:delivery_zone.amount }}</span>
+            </div>
+
+            <a href="{% url 'frontend_checkout' %}" class="btn-checkout" id="checkoutBtn">
+              <i class="fa fa-lock"></i> Proceed to Checkout
+            </a>
+          </div>
+
+          <div class="cart-promo-banner">
+            <i class="fa fa-money-bill-wave"></i>
+            <div>
+              <strong>Cash on Delivery</strong> available for all orders!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cart-upsell-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>You May Also Like</h2>
+        <a href="{% url 'frontend_products' %}" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="products-row">
+        {% for product in recommended_products %}
+          <div
+            class="product-card"
+            data-product-id="{{ product.id }}"
+            data-description="{{ product.short_description_plain|default:'No description available.'|escape }}"
+            data-image="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+          >
+            <div class="product-badges">
+              {% if product.is_on_sale %}
+                <span class="badge-sale">-{{ product.sale_percentage }}%</span>
+              {% endif %}
+              {% if product.is_new_arrival %}
+                <span class="badge-new">NEW</span>
+              {% endif %}
+            </div>
+            <div class="product-image">
+              <img src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ product.name }}" />
+              <div class="product-actions"><button title="Quick View" type="button"><i class="fa fa-eye"></i></button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">{{ product.category_label }}</p>
+              <h4><a href="{% url 'frontend_product_detail' product.slug %}">{{ product.name }}</a></h4>
+              <div class="product-rating">
+                {% for _ in product.full_stars %}
+                  <i class="fa fa-star"></i>
+                {% endfor %}
+                {% for _ in product.empty_stars %}
+                  <i class="far fa-star"></i>
+                {% endfor %}
+                <span>({{ product.review_count }})</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">${{ product.current_price }}</span>
+                {% if product.is_on_sale %}
+                  <span class="price-old">${{ product.regular_price }}</span>
+                {% endif %}
+              </div>
+              <div class="product-card-actions">
+                <button class="add-to-cart" type="button">
+                  <i class="fa fa-shopping-cart"></i> Add to Cart
+                </button>
+                <button class="buy-now" type="button">
+                  <i class="fa fa-bolt"></i> Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="alert alert-light border mb-0">No product recommendations available right now.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block page_overlays %}
+  {% with modal_product=cart_modal_product %}
+    <div class="modal-overlay" id="quickViewModal">
+      <div class="modal-box quickview-box">
+        <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+        <div class="quickview-content">
+          <div class="quickview-image">
+            <img src="{% if modal_product and modal_product.primary_image_url %}{{ modal_product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" />
+          </div>
+          <div class="quickview-info">
+            <p class="product-cat" id="qvCat">{% if modal_product %}{{ modal_product.category_label }}{% endif %}</p>
+            <h2 id="qvName">{% if modal_product %}{{ modal_product.name }}{% else %}Product Preview{% endif %}</h2>
+            <div class="product-rating">
+              {% if modal_product %}
+                {% for _ in modal_product.full_stars %}
+                  <i class="fa fa-star"></i>
+                {% endfor %}
+                {% for _ in modal_product.empty_stars %}
+                  <i class="far fa-star"></i>
+                {% endfor %}
+              {% endif %}
+              <span id="qvReviews">{% if modal_product %}({{ modal_product.review_count }} reviews){% else %}(0 reviews){% endif %}</span>
+            </div>
+            <div class="product-price large" id="qvPrice">
+              <span class="price-current">{% if modal_product %}${{ modal_product.current_price }}{% else %}$0.00{% endif %}</span>
+              {% if modal_product and modal_product.is_on_sale %}
+                <span class="price-old">${{ modal_product.regular_price }}</span>
+              {% endif %}
+            </div>
+            <p class="qv-desc" id="qvDesc">{% if modal_product %}{{ modal_product.short_description_plain|default:"No description available." }}{% else %}No description available.{% endif %}</p>
+            <div class="qv-options">
+              <div class="qv-size">
+                <label>Size:</label>
+                <div class="size-btns">
+                  <button type="button">XS</button><button class="active" type="button">S</button><button type="button">M</button><button type="button">L</button><button type="button">XL</button>
+                </div>
+              </div>
+              <div class="qv-color">
+                <label>Color:</label>
+                <div class="color-btns">
+                  <button class="color-btn active" type="button" style="background:#8b5a3c"></button>
+                  <button class="color-btn" type="button" style="background:#1f1f1f"></button>
+                  <button class="color-btn" type="button" style="background:#c0392b"></button>
+                </div>
+              </div>
+              <div class="qv-qty">
+                <label>Quantity:</label>
+                <div class="qty-control">
+                  <button id="qvQtyMinus" type="button">-</button>
+                  <input type="number" value="1" min="1" id="qvQty" />
+                  <button id="qvQtyPlus" type="button">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="qv-actions">
+              <button class="add-to-cart full" type="button"{% if modal_product %} data-product-id="{{ modal_product.id }}"{% endif %}>Add to Cart</button>
+            </div>
+            <a href="{% if modal_product %}{% url 'frontend_product_detail' modal_product.slug %}{% else %}{% url 'frontend_product_details' %}{% endif %}" class="view-detail" id="qvDetailLink">View Full Details <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endwith %}
+{% endblock %}

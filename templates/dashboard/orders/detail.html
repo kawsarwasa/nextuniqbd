@@ -1,0 +1,569 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Order {{ order.order_id }}{% endblock %}
+{% block page_title %}Order {{ order.order_id }}{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_order_list' %}">Orders</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ order.order_id }}</li>
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .dashboard-print-sheet {
+      display: none;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3 dashboard-no-print">
+    <a href="{% url 'dashboard_order_list' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i>Back To Orders
+    </a>
+    <button type="button" class="btn btn-outline-dark" id="print-order-button">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+  </div>
+
+  <div class="dashboard-print-sheet">
+    <div class="dashboard-print-sheet__frame">
+      <div class="dashboard-print-sheet__header">
+        <div class="dashboard-print-sheet__brand">
+          <div class="dashboard-print-sheet__eyebrow">Order Print Copy</div>
+          <h1 class="dashboard-print-sheet__title">INVOICE</h1>
+          <div class="dashboard-print-sheet__muted">Prepared from the dashboard order record.</div>
+        </div>
+        <div class="dashboard-print-sheet__meta">
+          <div class="dashboard-print-sheet__meta-row">
+            <div class="dashboard-print-sheet__meta-label">Order</div>
+            <div class="dashboard-print-sheet__meta-value">{{ order.order_id }}</div>
+          </div>
+          <div class="dashboard-print-sheet__meta-row">
+            <div class="dashboard-print-sheet__meta-label">Date</div>
+            <div class="dashboard-print-sheet__meta-value">{{ order.order_date|date:"M d, Y" }}</div>
+          </div>
+          <div class="dashboard-print-sheet__meta-row">
+            <div class="dashboard-print-sheet__meta-label">Time</div>
+            <div class="dashboard-print-sheet__meta-value">{{ order.order_date|date:"h:i A" }}</div>
+          </div>
+          <div class="dashboard-print-sheet__meta-row">
+            <div class="dashboard-print-sheet__meta-label">Status</div>
+            <div class="dashboard-print-sheet__meta-value">{{ order.get_status_display }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-print-sheet__grid">
+        <div class="dashboard-print-sheet__panel">
+          <div class="dashboard-print-sheet__section-title">Customer Information</div>
+          <div class="dashboard-print-sheet__customer-name">{{ order.full_name }}</div>
+          <div class="dashboard-print-sheet__stack dashboard-print-sheet__muted">
+            <div>{{ order.phone }}</div>
+            <div>{{ order.email|default:"No email" }}</div>
+            <div>{{ order.address }}</div>
+            <div>{{ order.district }}{% if order.thana %}, {{ order.thana }}{% endif %}{% if order.postal_code %}, {{ order.postal_code }}{% endif %}</div>
+          </div>
+        </div>
+
+        <div class="dashboard-print-sheet__panel">
+          <div class="dashboard-print-sheet__section-title">Delivery Summary</div>
+          <div class="dashboard-print-sheet__stack">
+            <div><strong>Payment:</strong> {{ order.payment_method }}</div>
+            <div><strong>Zone:</strong> {{ order.delivery_label|default:"-" }}</div>
+            <div><strong>Estimate:</strong> {{ order.delivery_estimate|default:"-" }}</div>
+            <div><strong>Items:</strong> {{ order.item_count }} item{{ order.item_count|pluralize }}</div>
+          </div>
+        </div>
+      </div>
+
+      <table class="dashboard-print-sheet__table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th class="dashboard-print-sheet__text-center">Qty</th>
+            <th class="dashboard-print-sheet__text-end">Unit Price</th>
+            <th class="dashboard-print-sheet__text-end">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order_items %}
+            <tr>
+              <td>
+                <div class="dashboard-print-sheet__product">{{ item.product_name }}</div>
+                <div class="dashboard-print-sheet__muted">
+                  {% if item.product_sku %}SKU: {{ item.product_sku }}{% endif %}
+                  {% if item.category_name or item.brand_name %}
+                    {% if item.product_sku %} &middot; {% endif %}
+                    {{ item.category_name }}{% if item.brand_name %} / {{ item.brand_name }}{% endif %}
+                  {% endif %}
+                </div>
+              </td>
+              <td class="dashboard-print-sheet__text-center">{{ item.quantity }}</td>
+              <td class="dashboard-print-sheet__text-end">&#2547;{{ item.unit_price }}</td>
+              <td class="dashboard-print-sheet__text-end">&#2547;{{ item.subtotal }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="dashboard-print-sheet__text-end">Subtotal</th>
+            <td class="dashboard-print-sheet__text-end">&#2547;{{ order.subtotal_amount }}</td>
+          </tr>
+          <tr>
+            <th colspan="3" class="dashboard-print-sheet__text-end">Shipping</th>
+            <td class="dashboard-print-sheet__text-end">&#2547;{{ order.shipping_amount }}</td>
+          </tr>
+          <tr>
+            <th colspan="3" class="dashboard-print-sheet__text-end">Grand Total</th>
+            <td class="dashboard-print-sheet__text-end">&#2547;{{ order.total_amount }}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="dashboard-print-sheet__notes">
+        <div class="dashboard-print-sheet__section-title">Order Notes</div>
+        <div>{{ order.order_notes|default:"No notes provided." }}</div>
+      </div>
+
+      <div class="dashboard-print-sheet__footer">
+        <div>Printed on {% now "M d, Y h:i A" %}</div>
+        <div>Order ID {{ order.order_id }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-screen-layout">
+    <div class="card mb-4">
+      <div class="card-body p-3 p-lg-4">
+        <div class="d-flex flex-wrap justify-content-between gap-3 align-items-start">
+          <div>
+            <div class="text-muted text-uppercase small fw-semibold">Order</div>
+            <h3 class="mb-1">{{ order.order_id }}</h3>
+            <div class="text-muted small">{{ order.order_date|date:"M d, Y h:i A" }}</div>
+          </div>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="badge {{ order.status_badge_class }} text-capitalize fs-6">{{ order.get_status_display }}</span>
+            {% if perms.sitepages.change_order or request.user.is_superuser %}
+              {% if not status_form.has_available_transitions %}
+                <div class="text-muted small dashboard-no-print">
+                  This order has reached a final status.
+                </div>
+              {% else %}
+                <form method="post" class="d-flex flex-wrap gap-2 align-items-start dashboard-no-print">
+                  {% csrf_token %}
+                  <div style="min-width: 180px;">
+                    {{ status_form.status }}
+                    {% if status_form.status.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in status_form.status.errors %}{{ error }}{% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div style="min-width: 240px;">
+                    {{ status_form.note }}
+                    {% if status_form.note.errors %}
+                      <div class="invalid-feedback d-block">
+                        {% for error in status_form.note.errors %}{{ error }}{% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-circle me-1"></i>Update Status
+                  </button>
+                </form>
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+          <div class="col-sm-6 col-xl-3">
+            <div class="border rounded-3 p-3 h-100">
+              <div class="text-muted text-uppercase small fw-semibold mb-1">Customer</div>
+              <div class="fw-semibold">{{ order.full_name }}</div>
+              <div class="text-muted small">{{ order.phone }}</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="border rounded-3 p-3 h-100">
+              <div class="text-muted text-uppercase small fw-semibold mb-1">Payment</div>
+              <div class="fw-semibold">{{ order.payment_method }}</div>
+              <div class="text-muted small">{{ order.delivery_label|default:"Standard delivery" }}</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="border rounded-3 p-3 h-100">
+              <div class="text-muted text-uppercase small fw-semibold mb-1">Items</div>
+              <div class="fw-semibold">{{ order.item_count }} item{{ order.item_count|pluralize }}</div>
+              <div class="text-muted small">{{ order.delivery_estimate|default:"Delivery estimate unavailable" }}</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="border rounded-3 p-3 h-100">
+              <div class="text-muted text-uppercase small fw-semibold mb-1">Total</div>
+              <div class="fw-semibold">&#2547;{{ order.total_amount }}</div>
+              <div class="text-muted small">Subtotal &#2547;{{ order.subtotal_amount }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title mb-0">Order Items</h3>
+          </div>
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-end">Price</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in order_items %}
+                  <tr>
+                    <td>
+                      <div class="fw-semibold">{{ item.product_name }}</div>
+                      <div class="text-muted small">
+                        {% if item.product_sku %}SKU: {{ item.product_sku }}{% else %}SKU unavailable{% endif %}
+                        {% if item.category_name or item.brand_name %}
+                          &middot; {{ item.category_name }}{% if item.brand_name %} / {{ item.brand_name }}{% endif %}
+                        {% endif %}
+                      </div>
+                    </td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end">&#2547;{{ item.unit_price }}</td>
+                    <td class="text-end fw-semibold">&#2547;{{ item.subtotal }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">No order items found.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3" class="text-end">Subtotal</th>
+                  <th class="text-end">&#2547;{{ order.subtotal_amount }}</th>
+                </tr>
+                <tr>
+                  <th colspan="3" class="text-end">Shipping</th>
+                  <th class="text-end">&#2547;{{ order.shipping_amount }}</th>
+                </tr>
+                <tr>
+                  <th colspan="3" class="text-end">Total</th>
+                  <th class="text-end">&#2547;{{ order.total_amount }}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h3 class="card-title mb-0">Customer Information</h3>
+          </div>
+          <div class="card-body">
+            <dl class="row mb-0">
+              <dt class="col-sm-4 text-muted">Name</dt>
+              <dd class="col-sm-8">{{ order.full_name }}</dd>
+              <dt class="col-sm-4 text-muted">Phone</dt>
+              <dd class="col-sm-8">{{ order.phone }}</dd>
+              <dt class="col-sm-4 text-muted">Email</dt>
+              <dd class="col-sm-8">{{ order.email|default:"No email" }}</dd>
+              <dt class="col-sm-4 text-muted">Address</dt>
+              <dd class="col-sm-8">{{ order.address }}</dd>
+              <dt class="col-sm-4 text-muted">District</dt>
+              <dd class="col-sm-8">{{ order.district }}</dd>
+              <dt class="col-sm-4 text-muted">Thana</dt>
+              <dd class="col-sm-8">{{ order.thana|default:"-" }}</dd>
+              <dt class="col-sm-4 text-muted">Postal Code</dt>
+              <dd class="col-sm-8">{{ order.postal_code|default:"-" }}</dd>
+            </dl>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title mb-0">Delivery Notes</h3>
+          </div>
+          <div class="card-body">
+            <dl class="row mb-3">
+              <dt class="col-sm-5 text-muted">Delivery Zone</dt>
+              <dd class="col-sm-7">{{ order.delivery_label|default:"-" }}</dd>
+              <dt class="col-sm-5 text-muted">Estimate</dt>
+              <dd class="col-sm-7">{{ order.delivery_estimate|default:"-" }}</dd>
+              <dt class="col-sm-5 text-muted">Payment</dt>
+              <dd class="col-sm-7">{{ order.payment_method }}</dd>
+            </dl>
+            <div class="fw-semibold text-muted small mb-1">Order Notes</div>
+            <div class="mb-0">{{ order.order_notes|default:"No notes provided." }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if tracking %}
+      <div class="card mt-4 dashboard-no-print">
+        <div class="card-header">
+          <h3 class="card-title mb-0"><i class="bi bi-truck me-1"></i>Order Tracking</h3>
+        </div>
+        <div class="card-body">
+          {% include "dashboard/orders/includes/tracking_timeline.html" with tracking=tracking %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const printButton = document.getElementById('print-order-button');
+      if (printButton) {
+        printButton.addEventListener('click', function () {
+          const printSource = document.querySelector('.dashboard-print-sheet');
+          if (!printSource) {
+            return;
+          }
+
+          const printWindow = window.open('', '_blank', 'width=900,height=1200');
+          if (!printWindow) {
+            window.alert('Please allow popups to print this order.');
+            return;
+          }
+
+          const printStyles = `
+            <style>
+              @page {
+                size: A4 portrait;
+                margin: 12mm;
+              }
+
+              html, body {
+                margin: 0;
+                padding: 0;
+                background: #ffffff;
+                color: #111827;
+                font-family: "Segoe UI", Arial, sans-serif;
+                font-size: 12px;
+                line-height: 1.45;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+
+              body {
+                padding: 8mm;
+              }
+
+              .dashboard-print-sheet__frame {
+                width: 100%;
+              }
+
+              .dashboard-print-sheet__header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 16px;
+                padding-bottom: 14px;
+                border-bottom: 2px solid #111827;
+                margin-bottom: 16px;
+              }
+
+              .dashboard-print-sheet__brand {
+                max-width: 55%;
+              }
+
+              .dashboard-print-sheet__eyebrow {
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: #6b7280;
+                margin-bottom: 6px;
+              }
+
+              .dashboard-print-sheet__title {
+                font-size: 28px;
+                line-height: 1;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+                margin: 0 0 8px;
+              }
+
+              .dashboard-print-sheet__muted {
+                color: #4b5563;
+              }
+
+              .dashboard-print-sheet__meta {
+                min-width: 235px;
+                border: 1px solid #d1d5db;
+              }
+
+              .dashboard-print-sheet__meta-row {
+                display: grid;
+                grid-template-columns: 88px 1fr;
+                border-bottom: 1px solid #e5e7eb;
+              }
+
+              .dashboard-print-sheet__meta-row:last-child {
+                border-bottom: 0;
+              }
+
+              .dashboard-print-sheet__meta-label,
+              .dashboard-print-sheet__meta-value {
+                padding: 8px 10px;
+              }
+
+              .dashboard-print-sheet__meta-label {
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: #6b7280;
+                background: #f9fafb;
+              }
+
+              .dashboard-print-sheet__meta-value {
+                font-weight: 600;
+              }
+
+              .dashboard-print-sheet__grid {
+                display: grid;
+                grid-template-columns: 1.2fr 0.8fr;
+                gap: 14px;
+                margin-bottom: 16px;
+              }
+
+              .dashboard-print-sheet__panel {
+                border: 1px solid #d1d5db;
+                padding: 12px;
+                break-inside: avoid;
+              }
+
+              .dashboard-print-sheet__section-title {
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: #6b7280;
+                margin-bottom: 10px;
+              }
+
+              .dashboard-print-sheet__customer-name {
+                font-size: 16px;
+                font-weight: 700;
+                margin-bottom: 6px;
+              }
+
+              .dashboard-print-sheet__stack > div + div {
+                margin-top: 4px;
+              }
+
+              .dashboard-print-sheet__table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 14px;
+              }
+
+              .dashboard-print-sheet__table thead th {
+                padding: 9px 10px;
+                border-top: 1.5px solid #111827;
+                border-bottom: 1px solid #111827;
+                font-size: 10px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                background: #f9fafb;
+              }
+
+              .dashboard-print-sheet__table th,
+              .dashboard-print-sheet__table td {
+                vertical-align: top;
+              }
+
+              .dashboard-print-sheet__table tbody td {
+                padding: 10px;
+                border-bottom: 1px solid #e5e7eb;
+              }
+
+              .dashboard-print-sheet__table tfoot th,
+              .dashboard-print-sheet__table tfoot td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #e5e7eb;
+              }
+
+              .dashboard-print-sheet__table tfoot tr:last-child th,
+              .dashboard-print-sheet__table tfoot tr:last-child td {
+                border-bottom: 2px solid #111827;
+                font-size: 13px;
+                font-weight: 800;
+              }
+
+              .dashboard-print-sheet__text-end {
+                text-align: right;
+              }
+
+              .dashboard-print-sheet__text-center {
+                text-align: center;
+              }
+
+              .dashboard-print-sheet__product {
+                font-weight: 700;
+                margin-bottom: 3px;
+              }
+
+              .dashboard-print-sheet__notes {
+                border: 1px solid #d1d5db;
+                padding: 12px;
+                min-height: 74px;
+              }
+
+              .dashboard-print-sheet__footer {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                margin-top: 18px;
+                padding-top: 10px;
+                border-top: 1px solid #d1d5db;
+                color: #6b7280;
+                font-size: 10px;
+              }
+            </style>
+          `;
+
+          printWindow.document.open();
+          printWindow.document.write(`
+            <!doctype html>
+            <html lang="en">
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Print Order {{ order.order_id }}</title>
+                ${printStyles}
+              </head>
+              <body>
+                ${printSource.innerHTML}
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+          printWindow.focus();
+          window.setTimeout(function () {
+            printWindow.print();
+          }, 250);
+        });
+      }
+    });
+  </script>
+{% endblock %}

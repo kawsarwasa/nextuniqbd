@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SB Revo - Modern Shopping</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span><i class="fa fa-phone"></i> (+84) 4567 421 978</span>
+        <span><i class="fa fa-envelope"></i> support@sbrevo.com</span>
+      </div>
+      <div class="topbar-right">
+        <span class="promo-text"><i class="fa fa-truck"></i> Free Shipping on orders over $99</span>
+        <div class="currency-selector">
+          <select>
+            <option>USD $</option>
+            <option>AUD $</option>
+          </select>
+        </div>
+        <a href="#"><i class="fa fa-user"></i> Sign In</a>
+        <a href="#"><i class="fa fa-user-plus"></i> Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <div class="logo">
+        <a href="#">
+          <span class="logo-sb">SB</span><span class="logo-revo">Revo</span>
+        </a>
+      </div>
+
+      <div class="search-bar">
+        <select class="search-category">
+          <option>All Categories</option>
+          <option>Fashion</option>
+          <option>Electronics</option>
+          <option>Kitchen</option>
+          <option>Sports</option>
+          <option>Bags</option>
+          <option>Watches</option>
+        </select>
+        <input type="text" placeholder="Search for products..." />
+        <button class="search-btn"><i class="fa fa-search"></i></button>
+      </div>
+
+      <div class="header-actions">
+        <div class="action-item cart-icon">
+          <i class="fa fa-shopping-cart"></i>
+          <span class="badge">5</span>
+          <span class="action-label">Cart</span>
+          <div class="cart-preview">
+            <div class="cart-item">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=60&h=60&fit=crop" alt="Product" />
+              <div>
+                <p>Running Sneakers</p>
+                <span>$120.00 × 1</span>
+              </div>
+              <button class="remove-item"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="cart-item">
+              <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=60&h=60&fit=crop" alt="Product" />
+              <div>
+                <p>Smart Watch</p>
+                <span>$299.00 × 1</span>
+              </div>
+              <button class="remove-item"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="cart-total">
+              <span>Subtotal:</span>
+              <strong>$419.00</strong>
+            </div>
+            <div class="cart-buttons">
+              <a href="cart.html" class="btn-outline">View Cart</a>
+              <a href="#" class="btn-primary">Checkout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <div class="nav-all-categories">
+        <button class="all-cat-btn"><i class="fa fa-bars"></i> All Categories</button>
+        <div class="all-cat-dropdown">
+          <a href="#"><i class="fa fa-tshirt"></i> Fashion</a>
+          <a href="#"><i class="fa fa-utensils"></i> Kitchen</a>
+          <a href="#"><i class="fa fa-laptop"></i> Computer</a>
+          <a href="#"><i class="fa fa-briefcase"></i> Bags</a>
+          <a href="#"><i class="fa fa-clock"></i> Watches</a>
+          <a href="#"><i class="fa fa-mobile-alt"></i> Smartphone</a>
+          <a href="#"><i class="fa fa-spa"></i> Health & Beauty</a>
+          <a href="#"><i class="fa fa-running"></i> Sport Clothing</a>
+          <a href="#"><i class="fa fa-gem"></i> Jewelry</a>
+          <a href="#"><i class="fa fa-glasses"></i> Accessories</a>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#" class="active">Home</a></li>
+        <li class="has-dropdown">
+          <a href="#">Fashion <i class="fa fa-chevron-down"></i></a>
+          <div class="mega-menu">
+            <div class="mega-col">
+              <h4>Women</h4>
+              <a href="#">Dresses</a>
+              <a href="#">Tops & Blouses</a>
+              <a href="#">Skirts</a>
+              <a href="#">Pants</a>
+              <a href="#">Coats & Jackets</a>
+            </div>
+            <div class="mega-col">
+              <h4>Men</h4>
+              <a href="#">Shirts</a>
+              <a href="#">Trousers</a>
+              <a href="#">Suits</a>
+              <a href="#">T-Shirts</a>
+              <a href="#">Jackets</a>
+            </div>
+            <div class="mega-col">
+              <h4>Kids</h4>
+              <a href="#">Boys</a>
+              <a href="#">Girls</a>
+              <a href="#">Baby</a>
+              <a href="#">School Wear</a>
+            </div>
+            <div class="mega-col mega-banner">
+              <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&h=200&fit=crop" alt="Fashion Banner" />
+              <span>Up to 40% Off</span>
+            </div>
+          </div>
+        </li>
+        <li class="has-dropdown">
+          <a href="#">Electronics <i class="fa fa-chevron-down"></i></a>
+          <div class="mega-menu">
+            <div class="mega-col">
+              <h4>Computers</h4>
+              <a href="#">Laptops</a>
+              <a href="#">Desktops</a>
+              <a href="#">Tablets</a>
+              <a href="#">Accessories</a>
+            </div>
+            <div class="mega-col">
+              <h4>Phones</h4>
+              <a href="#">Smartphones</a>
+              <a href="#">Cases</a>
+              <a href="#">Chargers</a>
+              <a href="#">Headphones</a>
+            </div>
+          </div>
+        </li>
+        <li><a href="#">Kitchen</a></li>
+        <li><a href="#">Watches</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="#">Blog</a></li>
+        <li class="hot-deal"><a href="#">Hot Deals <span class="hot-tag">HOT</span></a></li>
+      </ul>
+
+      <div class="nav-promo">
+        <i class="fa fa-tag"></i> <strong>20% OFF</strong> Use code: <span>REVO20</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO CAROUSEL -->
+  <section class="hero-section">
+    <div class="hero-carousel" id="heroCarousel">
+      <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&h=600&fit=crop');">
+        <div class="container">
+          <div class="hero-content">
+            <p class="hero-sub">New Collection 2024</p>
+            <h1>The Ultimate<br><span>Shopping List</span></h1>
+            <p class="hero-desc">Discover the latest trends in fashion, electronics & more</p>
+            <div class="hero-buttons">
+              <a href="#" class="btn-hero-primary">Shop Now</a>
+              <a href="#" class="btn-hero-outline">See More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1400&h=600&fit=crop');">
+        <div class="container">
+          <div class="hero-content hero-right">
+            <p class="hero-sub">Limited Time Offer</p>
+            <h1>Up to <span>50% Off</span><br>Electronics</h1>
+            <p class="hero-desc">Best deals on smartphones, laptops & accessories</p>
+            <div class="hero-buttons">
+              <a href="#" class="btn-hero-primary">Explore Deals</a>
+              <a href="#" class="btn-hero-outline">View All</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1400&h=600&fit=crop');">
+        <div class="container">
+          <div class="hero-content">
+            <p class="hero-sub">Seasonal Sale</p>
+            <h1>Style Meets<br><span>Comfort</span></h1>
+            <p class="hero-desc">Explore our new arrivals in sportswear & outdoor gear</p>
+            <div class="hero-buttons">
+              <a href="#" class="btn-hero-primary">Shop Collection</a>
+              <a href="#" class="btn-hero-outline">Learn More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="carousel-btn prev" id="heroPrev"><i class="fa fa-chevron-left"></i></button>
+      <button class="carousel-btn next" id="heroNext"><i class="fa fa-chevron-right"></i></button>
+
+      <div class="carousel-dots" id="heroDots">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES BAR -->
+  <section class="features-bar">
+    <div class="container features-grid">
+      <div class="feature-item">
+        <i class="fa fa-truck"></i>
+        <div>
+          <h4>Free Shipping</h4>
+          <p>On orders over $99</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <i class="fa fa-undo-alt"></i>
+        <div>
+          <h4>Easy Returns</h4>
+          <p>30 day return policy</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <i class="fa fa-shield-alt"></i>
+        <div>
+          <h4>Secure Payment</h4>
+          <p>100% secure checkout</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <i class="fa fa-headset"></i>
+        <div>
+          <h4>24/7 Support</h4>
+          <p>Dedicated customer care</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED CATEGORIES -->
+  <section class="section categories-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Shop by Category</h2>
+        <a href="products.html" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="categories-grid">
+        <div class="category-card">
+          <div class="cat-image">
+            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop" alt="Watches" />
+            <div class="cat-overlay">
+              <a href="#" class="cat-link">Shop Now</a>
+            </div>
+          </div>
+          <h3>Watches</h3>
+          <p>142 Products</p>
+        </div>
+        <div class="category-card">
+          <div class="cat-image">
+            <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=300&fit=crop" alt="Bags" />
+            <div class="cat-overlay">
+              <a href="#" class="cat-link">Shop Now</a>
+            </div>
+          </div>
+          <h3>Bags</h3>
+          <p>98 Products</p>
+        </div>
+        <div class="category-card">
+          <div class="cat-image">
+            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop" alt="Shoes" />
+            <div class="cat-overlay">
+              <a href="#" class="cat-link">Shop Now</a>
+            </div>
+          </div>
+          <h3>Shoes</h3>
+          <p>215 Products</p>
+        </div>
+        <div class="category-card">
+          <div class="cat-image">
+            <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=300&h=300&fit=crop" alt="Fashion" />
+            <div class="cat-overlay">
+              <a href="#" class="cat-link">Shop Now</a>
+            </div>
+          </div>
+          <h3>Fashion</h3>
+          <p>387 Products</p>
+        </div>
+        <div class="category-card">
+          <div class="cat-image">
+            <img src="https://images.unsplash.com/photo-1588776814546-1ffedbe47425?w=300&h=300&fit=crop" alt="Accessories" />
+            <div class="cat-overlay">
+              <a href="#" class="cat-link">Shop Now</a>
+            </div>
+          </div>
+          <h3>Accessories</h3>
+          <p>174 Products</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMO BANNERS ROW -->
+  <section class="promo-banners">
+    <div class="container promo-grid">
+      <div class="promo-banner large">
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700&h=350&fit=crop" alt="Fashion Sale" />
+        <div class="promo-content">
+          <p>New Arrivals</p>
+          <h3>Women's Fashion<br>Collection</h3>
+          <a href="#" class="btn-promo">Shop Now</a>
+        </div>
+      </div>
+      <div class="promo-banner-col">
+        <div class="promo-banner small">
+          <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=200&fit=crop" alt="Electronics" />
+          <div class="promo-content dark">
+            <p>Up to 50% Off</p>
+            <h3>Smart Watches</h3>
+            <a href="#" class="btn-promo">Discover</a>
+          </div>
+        </div>
+        <div class="promo-banner small">
+          <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&h=200&fit=crop" alt="Sports" />
+          <div class="promo-content">
+            <p>Best Sellers</p>
+            <h3>Sport Collection</h3>
+            <a href="#" class="btn-promo">Explore</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TODAY'S DEALS / BEST SELLERS TABS -->
+  <section class="section products-section">
+    <div class="container">
+      <div class="section-tabs-header">
+        <div class="section-tabs">
+          <button class="tab-btn active" data-tab="deals">Today's Deals</button>
+          <button class="tab-btn" data-tab="bestsellers">Best Sellers</button>
+          <button class="tab-btn" data-tab="new">New Arrivals</button>
+          <button class="tab-btn" data-tab="featured">Featured</button>
+        </div>
+        <a href="products.html" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      <div class="tab-content active" id="tab-deals">
+        <div class="products-carousel-wrap">
+          <button class="prod-nav prev" data-carousel="deals"><i class="fa fa-chevron-left"></i></button>
+          <div class="products-row" id="prod-deals">
+            <div class="product-card">
+              <div class="product-badges">
+                <span class="badge-sale">-30%</span>
+                <span class="badge-hot">HOT</span>
+              </div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&h=300&fit=crop" alt="Hoodie" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">EcoSmart Fleece Hoodie</a></h4>
+                <div class="product-rating">
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                  <span>(24)</span>
+                </div>
+                <div class="product-price">
+                  <span class="price-current">$245.00</span>
+                  <span class="price-old">$350.00</span>
+                </div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-badges">
+                <span class="badge-sale">-15%</span>
+              </div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&h=300&fit=crop" alt="Perfume" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Health & Beauty</p>
+                <h4><a href="product_details.html">Luxury Perfume Set</a></h4>
+                <div class="product-rating">
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                  <span>(57)</span>
+                </div>
+                <div class="product-price">
+                  <span class="price-current">$89.00</span>
+                  <span class="price-old">$105.00</span>
+                </div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-badges">
+                <span class="badge-new">NEW</span>
+              </div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop" alt="Watch" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Watches</p>
+                <h4><a href="product_details.html">Minimalist Smart Watch</a></h4>
+                <div class="product-rating">
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                  <span>(18)</span>
+                </div>
+                <div class="product-price">
+                  <span class="price-current">$299.00</span>
+                </div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-badges">
+                <span class="badge-sale">-25%</span>
+              </div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop" alt="Sneakers" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Shoes</p>
+                <h4><a href="product_details.html">Running Pro Sneakers</a></h4>
+                <div class="product-rating">
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                  <span>(93)</span>
+                </div>
+                <div class="product-price">
+                  <span class="price-current">$89.99</span>
+                  <span class="price-old">$119.99</span>
+                </div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-badges">
+                <span class="badge-sale">-40%</span>
+                <span class="badge-hot">HOT</span>
+              </div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=300&fit=crop" alt="Bag" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Bags</p>
+                <h4><a href="product_details.html">Premium Leather Handbag</a></h4>
+                <div class="product-rating">
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                  <span>(41)</span>
+                </div>
+                <div class="product-price">
+                  <span class="price-current">$149.00</span>
+                  <span class="price-old">$249.00</span>
+                </div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+          <button class="prod-nav next" data-carousel="deals"><i class="fa fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-bestsellers">
+        <div class="products-row">
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=300&h=300&fit=crop" alt="Sneaker" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Sports</p>
+              <h4><a href="product_details.html">Athletic Training Shoes</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(128)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$79.99</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=300&h=300&fit=crop" alt="Bottle" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Kitchen</p>
+              <h4><a href="product_details.html">Hydration Water Bottle</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                <span>(72)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$34.99</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop" alt="Headphones" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Electronics</p>
+              <h4><a href="product_details.html">Wireless Headphones Pro</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                <span>(204)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$199.00</span>
+                <span class="price-old">$249.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&h=300&fit=crop" alt="Shirt" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Classic Polo Shirt</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(89)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$45.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-new">
+        <div class="products-row">
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-new">NEW</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=300&h=300&fit=crop" alt="Jacket" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Outdoor Explorer Jacket</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                <span>(12)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$189.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-new">NEW</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&h=300&fit=crop" alt="Skincare" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Health & Beauty</p>
+              <h4><a href="product_details.html">Glow Skincare Bundle</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(7)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$65.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-new">NEW</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=300&h=300&fit=crop" alt="Watch 2" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Watches</p>
+              <h4><a href="product_details.html">Chronograph Sport Watch</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                <span>(5)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$420.00</span>
+                <span class="price-old">$560.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-new">NEW</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1484820540004-14229fe36ca4?w=300&h=300&fit=crop" alt="Laptop" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Electronics</p>
+              <h4><a href="product_details.html">UltraBook Pro Laptop</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(3)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$1,299.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-featured">
+        <div class="products-row">
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-hot">FEATURED</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1547949003-9792a18a2601?w=300&h=300&fit=crop" alt="Bag2" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Bags</p>
+              <h4><a href="product_details.html">Designer Tote Bag</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(63)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$199.00</span>
+                <span class="price-old">$260.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-hot">FEATURED</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&h=300&fit=crop" alt="Sunglasses" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Accessories</p>
+              <h4><a href="product_details.html">Polarized Sunglasses</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                <span>(45)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$129.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-hot">FEATURED</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&h=300&fit=crop" alt="Beauty" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Beauty</p>
+              <h4><a href="product_details.html">Makeup Pro Kit</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(91)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$55.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-hot">FEATURED</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=300&h=300&fit=crop" alt="Camera" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Electronics</p>
+              <h4><a href="product_details.html">Instant Print Camera</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                <span>(36)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$89.00</span>
+                <span class="price-old">$110.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTDOWN SALE BANNER -->
+  <section class="sale-banner">
+    <div class="container sale-inner">
+      <div class="sale-text">
+        <p class="sale-label">Limited Time Offer</p>
+        <h2>Flash Sale — Up to <span>60% Off</span></h2>
+        <p>Don't miss out on these amazing deals. Offer ends soon!</p>
+      </div>
+      <div class="countdown" id="countdown">
+        <div class="countdown-item">
+          <span id="cd-days">00</span>
+          <p>Days</p>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span id="cd-hours">00</span>
+          <p>Hours</p>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span id="cd-mins">00</span>
+          <p>Minutes</p>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span id="cd-secs">00</span>
+          <p>Seconds</p>
+        </div>
+      </div>
+      <a href="#" class="btn-sale">Shop Flash Sale</a>
+    </div>
+  </section>
+
+  <!-- CATEGORY TABS SECTION -->
+  <section class="section cat-products-section">
+    <div class="container">
+      <div class="cat-tabs-header">
+        <div class="cat-tab-btns">
+          <button class="cat-tab-btn active" data-cattab="fashion">Fashion</button>
+          <button class="cat-tab-btn" data-cattab="electronics">Electronics</button>
+          <button class="cat-tab-btn" data-cattab="sports">Sports</button>
+        </div>
+        <div class="cat-sub-tabs">
+          <button class="sub-tab active">Bestselling</button>
+          <button class="sub-tab">Featured</button>
+          <button class="sub-tab">New Arrivals</button>
+          <button class="sub-tab">Top Reviewed</button>
+        </div>
+      </div>
+
+      <div class="cat-products-layout">
+        <div class="cat-sidebar">
+          <div class="sidebar-banner">
+            <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=300&h=500&fit=crop" alt="Fashion" />
+            <div class="sidebar-banner-text">
+              <p>Summer 2024</p>
+              <h3>Fashion<br>Lookbook</h3>
+              <a href="#" class="btn-white">View</a>
+            </div>
+          </div>
+        </div>
+        <div class="cat-products-grid" id="cat-fashion">
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=280&h=280&fit=crop" alt="Dress" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Women</p>
+              <h4><a href="product_details.html">Floral Summer Dress</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                <span>(29)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$72.00</span>
+                <span class="price-old">$95.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=280&h=280&fit=crop" alt="Sweater" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Men</p>
+              <h4><a href="product_details.html">Knit Pullover Sweater</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(44)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$58.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=280&h=280&fit=crop" alt="Jacket2" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Outerwear</p>
+              <h4><a href="product_details.html">Quilted Puffer Jacket</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                <span>(17)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$145.00</span>
+                <span class="price-old">$180.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=280&h=280&fit=crop" alt="Tshirt" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Casual</p>
+              <h4><a href="product_details.html">Graphic Print T-Shirt</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                <span>(66)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$28.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=280&h=280&fit=crop" alt="Shoes2" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Footwear</p>
+              <h4><a href="product_details.html">Classic Canvas Sneakers</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                <span>(88)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$65.00</span>
+                <span class="price-old">$80.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=280&h=280&fit=crop" alt="Handbag" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Accessories</p>
+              <h4><a href="product_details.html">Structured Leather Bag</a></h4>
+              <div class="product-rating">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                <span>(33)</span>
+              </div>
+              <div class="product-price">
+                <span class="price-current">$178.00</span>
+              </div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRANDS SECTION -->
+  <section class="brands-section">
+    <div class="container">
+      <div class="section-header center">
+        <h2>Our Brands</h2>
+        <p>Trusted by the world's leading brands</p>
+      </div>
+      <div class="brands-track">
+        <div class="brands-list" id="brandsList">
+          <div class="brand-item"><span>CommonGood</span></div>
+          <div class="brand-item"><span>OFS Studio</span></div>
+          <div class="brand-item"><span>Vega Pro</span></div>
+          <div class="brand-item"><span>NovaTech</span></div>
+          <div class="brand-item"><span>StyleCo</span></div>
+          <div class="brand-item"><span>AquaMax</span></div>
+          <div class="brand-item"><span>PureGlow</span></div>
+          <div class="brand-item"><span>SwiftGear</span></div>
+          <div class="brand-item"><span>CommonGood</span></div>
+          <div class="brand-item"><span>OFS Studio</span></div>
+          <div class="brand-item"><span>Vega Pro</span></div>
+          <div class="brand-item"><span>NovaTech</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG SECTION -->
+  <section class="section blog-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>From Our Blog</h2>
+        <a href="#" class="view-all">All Posts <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <div class="blog-image">
+            <a href="#">
+              <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop" alt="Blog 1" />
+            </a>
+            <span class="blog-cat">Fashion</span>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span><i class="fa fa-calendar"></i> March 15, 2024</span>
+              <span><i class="fa fa-user"></i> Admin</span>
+              <span><i class="fa fa-comment"></i> 12</span>
+            </div>
+            <h3><a href="#">Top 10 Fashion Trends You Need to Try This Season</a></h3>
+            <p>Discover the hottest styles taking over runways and streets this year. From bold patterns to minimalist elegance...</p>
+            <a href="#" class="read-more">Read More <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image">
+            <a href="#">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=250&fit=crop" alt="Blog 2" />
+            </a>
+            <span class="blog-cat">Tech</span>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span><i class="fa fa-calendar"></i> March 10, 2024</span>
+              <span><i class="fa fa-user"></i> Admin</span>
+              <span><i class="fa fa-comment"></i> 8</span>
+            </div>
+            <h3><a href="#">Best Wireless Headphones for Every Budget in 2024</a></h3>
+            <p>We tested dozens of headphones to find the best sound quality, comfort, and value at every price point...</p>
+            <a href="#" class="read-more">Read More <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-image">
+            <a href="#">
+              <img src="https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&h=250&fit=crop" alt="Blog 3" />
+            </a>
+            <span class="blog-cat">Sports</span>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span><i class="fa fa-calendar"></i> March 5, 2024</span>
+              <span><i class="fa fa-user"></i> Admin</span>
+              <span><i class="fa fa-comment"></i> 21</span>
+            </div>
+            <h3><a href="#">Running Gear Guide: What to Wear for Your First Marathon</a></h3>
+            <p>Planning your first marathon? Here's everything you need to know about choosing the right shoes, clothing...</p>
+            <a href="#" class="read-more">Read More <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER SECTION -->
+  <section class="newsletter-section">
+    <div class="container newsletter-inner">
+      <div class="newsletter-text">
+        <h2><i class="fa fa-envelope-open-text"></i> Subscribe to Our Newsletter</h2>
+        <p>Get the latest deals, new arrivals, and exclusive offers straight to your inbox.</p>
+      </div>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" placeholder="Enter your email address..." required />
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-col brand-col">
+          <div class="footer-logo">
+            <span class="logo-sb">SB</span><span class="logo-revo">Revo</span>
+          </div>
+          <p>Your one-stop destination for fashion, electronics, home goods, and more. Shop smart, shop Revo.</p>
+          <div class="footer-contact">
+            <p><i class="fa fa-map-marker-alt"></i> 685 Market Street, San Francisco, CA 94105</p>
+            <p><i class="fa fa-phone"></i> (+84) 4567 421 978</p>
+            <p><i class="fa fa-envelope"></i> support@sbrevo.com</p>
+          </div>
+          <div class="social-links">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="#">New Arrivals</a></li>
+            <li><a href="#">Best Sellers</a></li>
+            <li><a href="#">Today's Deals</a></li>
+            <li><a href="#">Fashion</a></li>
+            <li><a href="#">Electronics</a></li>
+            <li><a href="#">Kitchen</a></li>
+            <li><a href="#">Sports</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a href="#">My Account</a></li>
+            <li><a href="#">Order Tracking</a></li>
+            <li><a href="#">Returns & Exchanges</a></li>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Product Support</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Affiliate Program</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Brands</h4>
+          <ul>
+            <li><a href="#">CommonGood</a></li>
+            <li><a href="#">OFS Studio</a></li>
+            <li><a href="#">Vega Pro</a></li>
+            <li><a href="#">NovaTech</a></li>
+            <li><a href="#">StyleCo</a></li>
+            <li><a href="#">AquaMax</a></li>
+          </ul>
+          <h4 style="margin-top: 20px;">We Accept</h4>
+          <div class="payment-icons">
+            <i class="fab fa-cc-visa"></i>
+            <i class="fab fa-cc-mastercard"></i>
+            <i class="fab fa-cc-paypal"></i>
+            <i class="fab fa-cc-apple-pay"></i>
+            <i class="fab fa-cc-amazon-pay"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>&copy; 2024 SB Revo. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- BACK TO TOP -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <i class="fa fa-chevron-up"></i>
+  </button>
+
+  <!-- COOKIE CONSENT -->
+  <div class="cookie-banner" id="cookieBanner">
+    <p>We use cookies to enhance your experience. By continuing, you agree to our <a href="#">Cookie Policy</a>.</p>
+    <button id="acceptCookies">Accept</button>
+    <button id="declineCookies">Decline</button>
+  </div>
+
+  <!-- NEWSLETTER MODAL -->
+  <div class="modal-overlay" id="newsletterModal">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose"><i class="fa fa-times"></i></button>
+      <div class="modal-content">
+        <div class="modal-left">
+          <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&h=400&fit=crop" alt="Newsletter" />
+        </div>
+        <div class="modal-right">
+          <p class="modal-label">Special Offer</p>
+          <h2>Get <span>20% Off</span><br>Your First Order</h2>
+          <p>Subscribe to our newsletter and get an exclusive discount code.</p>
+          <form id="modalForm">
+            <input type="email" placeholder="Your email address" required />
+            <button type="submit">Get My Discount</button>
+          </form>
+          <button class="modal-skip" id="modalSkip">No thanks, I'll pay full price</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK VIEW MODAL -->
+  <div class="modal-overlay" id="quickViewModal">
+    <div class="modal-box quickview-box">
+      <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+      <div class="quickview-content">
+        <div class="quickview-image">
+          <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=400&fit=crop" alt="Quick View" id="qvImage" />
+        </div>
+        <div class="quickview-info">
+          <p class="product-cat" id="qvCat">Fashion</p>
+          <h2 id="qvName">EcoSmart Fleece Hoodie</h2>
+          <div class="product-rating">
+            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+            <span>(24 reviews)</span>
+          </div>
+          <div class="product-price large" id="qvPrice">
+            <span class="price-current">$245.00</span>
+            <span class="price-old">$350.00</span>
+          </div>
+          <p class="qv-desc">A premium quality fleece hoodie perfect for all seasons. Made from 100% sustainable materials.</p>
+          <div class="qv-options">
+            <div class="qv-size">
+              <label>Size:</label>
+              <div class="size-btns">
+                <button>XS</button><button class="active">S</button><button>M</button><button>L</button><button>XL</button>
+              </div>
+            </div>
+            <div class="qv-color">
+              <label>Color:</label>
+              <div class="color-btns">
+                <button class="color-btn active" style="background:#333"></button>
+                <button class="color-btn" style="background:#4a6da7"></button>
+                <button class="color-btn" style="background:#c0392b"></button>
+              </div>
+            </div>
+            <div class="qv-qty">
+              <label>Quantity:</label>
+              <div class="qty-control">
+                <button id="qvQtyMinus">-</button>
+                <input type="number" value="1" min="1" id="qvQty" />
+                <button id="qvQtyPlus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="qv-actions">
+            <button class="add-to-cart full">Add to Cart</button>
+          </div>
+          <a href="#" class="view-detail">View Full Details <i class="fa fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">
+    <i class="fa fa-check-circle"></i>
+    <span id="toastMsg">Item added to cart!</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,62 @@
+﻿<header class="header" id="header">
+  <div class="container header-inner">
+    <div class="logo">
+      <a href="{% url 'frontend_home' %}" class="site-logo-link">
+        {% if site_company.logo %}
+          <img src="{{ site_company.logo.url }}" alt="{{ site_company.company_name }}" class="site-logo-img" />
+        {% else %}
+          <span class="site-logo-img site-logo-fallback">{{ site_company.company_name|default:default_company_name|slice:":2" }}</span>
+        {% endif %}
+        <span class="site-logo-name">{{ site_company.company_name|default:default_company_name }}</span>
+      </a>
+    </div>
+
+    <form class="search-bar" method="get" action="{% url 'frontend_products' %}">
+      <select class="search-category" name="category" aria-label="Product category">
+        <option value="">All Categories</option>
+        {% for category in header_search_categories %}
+          <option value="{{ category.slug }}"{% if header_search_category == category.slug %} selected{% endif %}>
+            {{ category.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <input type="text" name="q" value="{{ header_search_query }}" placeholder="Search for products..." aria-label="Search for products" />
+      <button class="search-btn" type="submit"><i class="fa fa-search"></i></button>
+    </form>
+
+    <div class="header-actions">
+      <div class="action-item cart-icon">
+        <a href="{% url 'frontend_cart' %}" class="cart-page-link" aria-label="View cart">
+          <i class="fa fa-shopping-cart"></i>
+          <span class="badge">{{ cart_item_count }}</span>
+          <span class="action-label">Cart</span>
+        </a>
+        <div class="cart-preview">
+          <div id="cartPreviewItems">
+            {% for item in cart_preview_items %}
+              <div class="cart-item">
+                <img src="{% if item.image_url %}{{ item.image_url }}{% else %}/static/frontend/images/product-placeholder.svg{% endif %}" alt="{{ item.name }}" />
+                <div>
+                  <p>{{ item.name }}</p>
+                  <span>${{ item.current_price }} x {{ item.quantity }}</span>
+                </div>
+                <button class="remove-item" data-product-id="{{ item.product_id }}"><i class="fa fa-times"></i></button>
+              </div>
+            {% empty %}
+              <p class="cart-preview-empty" id="cartPreviewEmpty">Your cart is empty.</p>
+            {% endfor %}
+          </div>
+          <div class="cart-total" id="cartPreviewTotalWrap"{% if cart_is_empty %} style="display:none"{% endif %}>
+            <span>Subtotal:</span>
+            <strong id="cartPreviewSubtotal">${{ cart_subtotal }}</strong>
+          </div>
+          <div class="cart-buttons">
+            <a href="{% url 'frontend_cart' %}" class="btn-outline">View Cart</a>
+            <a href="{% url 'frontend_checkout' %}" class="btn-primary">Checkout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+

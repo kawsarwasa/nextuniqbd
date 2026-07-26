@@ -1,0 +1,59 @@
+{% load static %}
+<div class="modal-overlay" id="quickViewModal">
+  <div class="modal-box quickview-box">
+    <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+    <div class="quickview-content">
+      <div class="quickview-image">
+        <img src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" />
+      </div>
+      <div class="quickview-info">
+        <p class="product-cat" id="qvCat">{{ product.category_label }}</p>
+        <h2 id="qvName">{{ product.name }}</h2>
+        <div class="product-rating">
+          {% for _ in product.full_stars %}
+            <i class="fa fa-star"></i>
+          {% endfor %}
+          {% for _ in product.empty_stars %}
+            <i class="far fa-star"></i>
+          {% endfor %}
+          <span id="qvReviews">({{ review_summary.count }} reviews)</span>
+        </div>
+        <div class="product-price large" id="qvPrice">
+          <span class="price-current">${{ product.current_price }}</span>
+          {% if product.is_on_sale %}
+            <span class="price-old">${{ product.regular_price }}</span>
+          {% endif %}
+        </div>
+        <p class="qv-desc" id="qvDesc">{{ product.short_description_plain|default:"No description available." }}</p>
+        <div class="qv-options">
+          <div class="qv-size">
+            <label>Size:</label>
+            <div class="size-btns">
+              <button>XS</button><button class="active">S</button><button>M</button><button>L</button><button>XL</button>
+            </div>
+          </div>
+          <div class="qv-color">
+            <label>Color:</label>
+            <div class="color-btns">
+              <button class="color-btn active" style="background:#333"></button>
+              <button class="color-btn" style="background:#4a6da7"></button>
+              <button class="color-btn" style="background:#c0392b"></button>
+            </div>
+          </div>
+          <div class="qv-qty">
+            <label>Quantity:</label>
+            <div class="qty-control">
+              <button id="qvQtyMinus">-</button>
+              <input type="number" value="1" min="1" id="qvQty" />
+              <button id="qvQtyPlus">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="qv-actions">
+          <button class="add-to-cart full" data-product-id="{{ product.id }}">Add to Cart</button>
+        </div>
+        <a href="{% url 'frontend_product_detail' product.slug %}" class="view-detail" id="qvDetailLink">View Full Details <i class="fa fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</div>

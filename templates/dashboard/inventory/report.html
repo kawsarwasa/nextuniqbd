@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | {{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li><li class="breadcrumb-item active">Inventory</li>{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center"><h3 class="card-title mb-0">Inventory Report</h3><a class="btn btn-outline-secondary btn-sm" href="{% url 'dashboard_stock_history' %}">Stock History</a></div>
+    <div class="card-body border-bottom">
+      <form class="row g-2" method="get">
+        <div class="col-md-4"><input class="form-control" name="q" value="{{ filters.q }}" placeholder="Search product or SKU"></div>
+        <div class="col-md-3"><select class="form-select" name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category.pk }}"{% if filters.category == category.pk|stringformat:"s" %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
+        <div class="col-md-3"><select class="form-select" name="stock_status"><option value="">All stock statuses</option><option value="in"{% if filters.stock_status == "in" %} selected{% endif %}>In Stock</option><option value="low"{% if filters.stock_status == "low" %} selected{% endif %}>Low Stock</option><option value="out"{% if filters.stock_status == "out" %} selected{% endif %}>Out of Stock</option><option value="not_tracked"{% if filters.stock_status == "not_tracked" %} selected{% endif %}>Not Tracked</option></select></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Filter</button></div>
+      </form>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Current Stock</th><th>Threshold</th><th>Status</th>{% if can_view_cost %}<th>Latest Purchase Cost</th><th>Stock Value</th>{% endif %}<th>Purchased</th><th>Sold</th><th>Tracking</th></tr></thead>
+        <tbody>{% for product in products %}
+          <tr><td><a href="{% url 'dashboard_product_detail' product.pk %}">{{ product.name }}</a></td><td><code>{{ product.sku }}</code></td><td>{{ product.category.name }}</td><td>{{ product.stock_quantity }}</td><td>{{ product.low_stock_threshold }}</td>
+            <td>{% if not product.track_stock %}<span class="badge text-bg-secondary">Not Tracked</span>{% elif product.stock_quantity == 0 %}<span class="badge text-bg-danger">Out of Stock</span>{% elif product.is_low_stock %}<span class="badge text-bg-warning">Low Stock</span>{% else %}<span class="badge text-bg-success">In Stock</span>{% endif %}</td>
+            {% if can_view_cost %}<td>{% if product.latest_cost is not None %}{{ product.latest_cost|floatformat:2 }}{% else %}<span class="text-muted">Unavailable</span>{% endif %}</td><td>{% if product.stock_value is not None %}{{ product.stock_value|floatformat:2 }}{% else %}<span class="text-muted">Unavailable</span>{% endif %}</td>{% endif %}
+            <td>{{ product.total_purchased }}</td><td>{{ product.total_sold }}</td><td>{% if product.track_stock %}Tracked{% else %}Not tracked{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="11" class="text-center text-muted py-4">No products match the selected filters.</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+    {% if is_paginated %}<div class="card-footer"><nav><ul class="pagination pagination-sm mb-0 justify-content-end">{% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ filters.q }}&category={{ filters.category }}&stock_status={{ filters.stock_status }}">Previous</a></li>{% endif %}<li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>{% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ filters.q }}&category={{ filters.category }}&stock_status={{ filters.stock_status }}">Next</a></li>{% endif %}</ul></nav></div>{% endif %}
+  </div>
+{% endblock %}

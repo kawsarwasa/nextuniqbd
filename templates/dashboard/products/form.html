@@ -1,0 +1,586 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | {{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+  <link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet" />
+{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_product_list' %}">Products</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title mb-0">{{ page_title }}</h3>
+        </div>
+        <form method="post" enctype="multipart/form-data" novalidate class="js-product-form">
+          <div class="card-body">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                  <div class="text-danger small mt-1">{{ form.category.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.brand.id_for_label }}" class="form-label">Brand</label>
+                {{ form.brand }}
+                {% if form.brand.errors %}
+                  <div class="text-danger small mt-1">{{ form.brand.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.name.id_for_label }}" class="form-label">Name</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                  <div class="text-danger small mt-1">{{ form.name.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.sku.id_for_label }}" class="form-label">SKU</label>
+                {{ form.sku }}
+                <div class="form-text">Keep NUB and enter exactly 9 letters or numbers after it.</div>
+                {% if form.sku.errors %}
+                  <div class="text-danger small mt-1">{{ form.sku.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.regular_price.id_for_label }}" class="form-label">Regular Price</label>
+                {{ form.regular_price }}
+                {% if form.regular_price.errors %}
+                  <div class="text-danger small mt-1">{{ form.regular_price.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.current_price.id_for_label }}" class="form-label">Current Price</label>
+                {{ form.current_price }}
+                {% if form.current_price.errors %}
+                  <div class="text-danger small mt-1">{{ form.current_price.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                  <div class="text-danger small mt-1">{{ form.status.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <span class="form-label d-block">Availability</span>
+                <div class="dashboard-toggle-group" role="radiogroup" aria-label="Availability">
+                  {% for radio in form.availability %}
+                    <label class="dashboard-toggle-pill{% if radio.data.selected %} is-active{% endif %}">
+                      {{ radio.tag }}
+                      <span>{{ radio.choice_label }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+                {% if form.availability.errors %}
+                  <div class="text-danger small mt-1">{{ form.availability.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <div class="form-check mt-4 pt-1">
+                  {{ form.track_stock }}
+                  <label for="{{ form.track_stock.id_for_label }}" class="form-check-label">Track Stock</label>
+                </div>
+                <div class="form-text">When enabled, stock quantity controls availability. When disabled, the availability selection above is used.</div>
+                {% if form.track_stock.errors %}
+                  <div class="text-danger small mt-1">{{ form.track_stock.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.stock_quantity.id_for_label }}" class="form-label">
+                  {% if form.instance.pk %}Current Stock{% else %}Opening Stock{% endif %}
+                </label>
+                {{ form.stock_quantity }}
+                <div class="form-text">
+                  {% if form.instance.pk %}Changing this value records a manual stock adjustment.{% else %}A value above zero records an opening stock transaction.{% endif %}
+                </div>
+                {% if form.stock_quantity.errors %}
+                  <div class="text-danger small mt-1">{{ form.stock_quantity.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label for="{{ form.low_stock_threshold.id_for_label }}" class="form-label">Low Stock Threshold</label>
+                {{ form.low_stock_threshold }}
+                <div class="form-text">Show a warning when tracked stock is at or below this quantity.</div>
+                {% if form.low_stock_threshold.errors %}
+                  <div class="text-danger small mt-1">{{ form.low_stock_threshold.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <label for="{{ form.short_description.id_for_label }}" class="form-label">Short Description</label>
+                {{ form.short_description }}
+                {% if form.short_description.errors %}
+                  <div class="text-danger small mt-1">{{ form.short_description.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <label class="form-label">Full Description</label>
+                <div id="product-full-description-editor" class="dashboard-editor">{{ form.full_description_html.value|safe }}</div>
+                {{ form.full_description_html }}
+                {% if form.full_description_html.errors %}
+                  <div class="text-danger small mt-1">{{ form.full_description_html.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-12">
+                <label for="{{ form.new_images.id_for_label }}" class="form-label">Product Images</label>
+                <div
+                  class="dashboard-upload-panel"
+                  data-max-images="4"
+                  data-max-pixels="2000000"
+                  data-existing-images="{% if form.instance.pk %}{{ form.instance.images.count }}{% else %}0{% endif %}"
+                >
+                  <div class="d-none">
+                    {{ form.new_images }}
+                  </div>
+                  <div class="dashboard-upload-toolbar d-flex flex-wrap align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-primary js-product-image-picker">
+                      Choose Images
+                    </button>
+                    <span class="text-muted small js-product-image-selection">No images selected.</span>
+                  </div>
+                  <div class="text-danger small mb-2 d-none js-product-image-error"></div>
+                  <div class="dashboard-upload-preview row g-3 mt-1 js-product-image-preview"></div>
+                </div>
+                {% if form.new_images.help_text %}
+                  <div class="form-text">{{ form.new_images.help_text }}</div>
+                {% endif %}
+                {% if form.new_images.errors %}
+                  <div class="text-danger small mt-1">{{ form.new_images.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              {% if form.remove_images.field.choices %}
+                <div class="col-12">
+                  <label class="form-label">Existing Images</label>
+                  <div class="row g-3">
+                    {% for checkbox in form.remove_images %}
+                      {% with image_id=checkbox.data.value %}
+                        {% for image in form.instance.images.all %}
+                          {% if image.pk|stringformat:"s" == image_id %}
+                            <div class="col-md-3 col-sm-4">
+                              <label class="dashboard-image-card">
+                                <img src="{{ image.image.url }}" alt="{{ form.instance.name }}" class="dashboard-image-card__img" />
+                                <span class="dashboard-image-card__meta">{{ checkbox.tag }} Remove</span>
+                              </label>
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+                      {% endwith %}
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <a href="{% url 'dashboard_product_list' %}" class="btn btn-outline-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">{{ submit_label }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const editorElement = document.getElementById('product-full-description-editor');
+      const hiddenInput = document.getElementById('{{ form.full_description_html.id_for_label }}');
+      const form = document.querySelector('.js-product-form');
+      const imageInput = document.getElementById('{{ form.new_images.id_for_label }}');
+      const imagePickerButton = document.querySelector('.js-product-image-picker');
+      const imageSelectionLabel = document.querySelector('.js-product-image-selection');
+      const imagePreviewContainer = document.querySelector('.js-product-image-preview');
+      const imageUploadPanel = document.querySelector('.dashboard-upload-panel');
+      const imageErrorElement = document.querySelector('.js-product-image-error');
+      const removeImageInputs = Array.from(document.querySelectorAll('input[name="remove_images"]'));
+      const availabilityInputs = Array.from(document.querySelectorAll('input[name="{{ form.availability.html_name }}"]'));
+      const searchableSelects = Array.from(document.querySelectorAll('.js-searchable-select'));
+      const skuInput = document.querySelector('.js-sku-input');
+
+      if (!editorElement || !hiddenInput || !form) {
+        return;
+      }
+
+      const quill = new Quill(editorElement, {
+        theme: 'snow',
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            [{ size: ['small', false, 'large', 'huge'] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ align: [] }],
+            ['link', 'blockquote', 'code-block'],
+            ['clean'],
+          ],
+        },
+      });
+
+      form.addEventListener('submit', () => {
+        hiddenInput.value = quill.root.innerHTML;
+      });
+
+      if (skuInput) {
+        const skuPrefix = skuInput.dataset.skuPrefix || 'NUB';
+        const suffixLength = Number(skuInput.dataset.skuSuffixLength || 9);
+        const maxLength = skuPrefix.length + suffixLength;
+
+        const normalizeSku = () => {
+          const value = skuInput.value.toUpperCase();
+          const rawSuffix = value.startsWith(skuPrefix) ? value.slice(skuPrefix.length) : value;
+          const suffix = rawSuffix
+            .replace(/[^A-Z0-9]/g, '')
+            .slice(0, suffixLength);
+
+          skuInput.value = `${skuPrefix}${suffix}`;
+        };
+
+        normalizeSku();
+
+        skuInput.addEventListener('input', normalizeSku);
+        skuInput.addEventListener('focus', () => {
+          normalizeSku();
+          if (skuInput.selectionStart < skuPrefix.length) {
+            skuInput.setSelectionRange(skuPrefix.length, skuInput.value.length);
+          }
+        });
+        skuInput.addEventListener('keydown', (event) => {
+          const selectionStart = skuInput.selectionStart || 0;
+          const selectionEnd = skuInput.selectionEnd || 0;
+          const isDeletingPrefix =
+            (event.key === 'Backspace' && selectionStart <= skuPrefix.length && selectionEnd <= skuPrefix.length) ||
+            (event.key === 'Delete' && selectionStart < skuPrefix.length);
+
+          if (isDeletingPrefix) {
+            event.preventDefault();
+            skuInput.setSelectionRange(skuPrefix.length, skuPrefix.length);
+          }
+        });
+        skuInput.addEventListener('blur', normalizeSku);
+        skuInput.maxLength = maxLength;
+      }
+
+      availabilityInputs.forEach((input) => {
+        input.addEventListener('change', () => {
+          document.querySelectorAll('.dashboard-toggle-pill').forEach((pill) => {
+            const pillInput = pill.querySelector('input[type="radio"]');
+            pill.classList.toggle('is-active', Boolean(pillInput?.checked));
+          });
+        });
+      });
+
+      const closeAllSearchableSelects = () => {
+        document.querySelectorAll('.dashboard-combobox.is-open').forEach((wrapper) => {
+          wrapper.classList.remove('is-open');
+          wrapper.querySelector('.dashboard-combobox__toggle')?.setAttribute('aria-expanded', 'false');
+        });
+      };
+
+      searchableSelects.forEach((select) => {
+        const searchPlaceholder = select.dataset.searchPlaceholder || 'Search';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dashboard-combobox';
+
+        const toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.className = 'dashboard-combobox__toggle';
+        toggleButton.setAttribute('aria-haspopup', 'listbox');
+        toggleButton.setAttribute('aria-expanded', 'false');
+
+        const toggleLabel = document.createElement('span');
+        toggleLabel.className = 'dashboard-combobox__label';
+
+        const toggleIcon = document.createElement('i');
+        toggleIcon.className = 'bi bi-chevron-down dashboard-combobox__chevron';
+
+        toggleButton.appendChild(toggleLabel);
+        toggleButton.appendChild(toggleIcon);
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dashboard-combobox__dropdown';
+
+        const searchBox = document.createElement('div');
+        searchBox.className = 'dashboard-combobox__search';
+
+        const searchIcon = document.createElement('i');
+        searchIcon.className = 'bi bi-search';
+
+        const searchInput = document.createElement('input');
+        searchInput.type = 'search';
+        searchInput.className = 'form-control';
+        searchInput.placeholder = searchPlaceholder;
+
+        searchBox.appendChild(searchIcon);
+        searchBox.appendChild(searchInput);
+
+        const optionList = document.createElement('div');
+        optionList.className = 'dashboard-combobox__list';
+        optionList.setAttribute('role', 'listbox');
+
+        dropdown.appendChild(searchBox);
+        dropdown.appendChild(optionList);
+
+        select.insertAdjacentElement('afterend', wrapper);
+        wrapper.appendChild(toggleButton);
+        wrapper.appendChild(dropdown);
+        select.classList.add('dashboard-combobox__native');
+
+        const getOptions = () =>
+          Array.from(select.options).map((option) => ({
+            value: option.value,
+            label: option.text.trim(),
+            isEmptyOption: !option.value,
+          }));
+
+        const renderOptions = (query = '') => {
+          const normalizedQuery = query.trim().toLowerCase();
+          optionList.innerHTML = '';
+
+          const options = getOptions();
+          const nonEmptyOptions = options.filter(({ isEmptyOption }) => !isEmptyOption);
+          const sourceOptions = nonEmptyOptions.length ? nonEmptyOptions : options;
+
+          const filteredOptions = sourceOptions.filter(({ label, value, isEmptyOption }) => {
+            if (!normalizedQuery) {
+              return true;
+            }
+            if (isEmptyOption) {
+              return true;
+            }
+            return label.toLowerCase().includes(normalizedQuery);
+          });
+
+          filteredOptions.forEach(({ value, label }) => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'dashboard-combobox__option';
+            item.textContent = label;
+            item.dataset.value = value;
+            item.setAttribute('role', 'option');
+
+            if (select.value === value) {
+              item.classList.add('is-selected');
+            }
+
+            item.addEventListener('click', () => {
+              select.value = value;
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+              closeAllSearchableSelects();
+            });
+
+            optionList.appendChild(item);
+          });
+
+          if (!filteredOptions.length) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'dashboard-combobox__empty';
+            emptyState.textContent = 'No result found';
+            optionList.appendChild(emptyState);
+          }
+        };
+
+        const syncSelectedLabel = () => {
+          const selectedOption = select.options[select.selectedIndex];
+          const selectedLabel = selectedOption ? selectedOption.text.trim() : '';
+          toggleLabel.textContent =
+            !selectedOption || !selectedOption.value || selectedLabel === '---------'
+              ? 'Select option'
+              : selectedLabel;
+          optionList.querySelectorAll('.dashboard-combobox__option').forEach((item) => {
+            item.classList.toggle('is-selected', item.dataset.value === select.value);
+          });
+        };
+
+        toggleButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const isOpen = wrapper.classList.contains('is-open');
+          closeAllSearchableSelects();
+
+          if (!isOpen) {
+            wrapper.classList.add('is-open');
+            toggleButton.setAttribute('aria-expanded', 'true');
+            searchInput.focus();
+            searchInput.select();
+          }
+        });
+
+        searchInput.addEventListener('input', () => {
+          renderOptions(searchInput.value);
+          syncSelectedLabel();
+        });
+
+        select.addEventListener('change', () => {
+          syncSelectedLabel();
+          toggleButton.setAttribute('aria-expanded', 'false');
+        });
+
+        wrapper.addEventListener('click', (event) => {
+          event.stopPropagation();
+        });
+
+        renderOptions();
+        syncSelectedLabel();
+      });
+
+      document.addEventListener('click', () => {
+        closeAllSearchableSelects();
+      });
+
+      if (imageInput && imagePickerButton && imageSelectionLabel && imagePreviewContainer) {
+        let queuedFiles = [];
+        const maxImages = Number(imageUploadPanel?.dataset.maxImages || 4);
+        const maxPixels = Number(imageUploadPanel?.dataset.maxPixels || 2000000);
+
+        const setImageError = (message = '') => {
+          if (!imageErrorElement) {
+            return;
+          }
+
+          imageErrorElement.textContent = message;
+          imageErrorElement.classList.toggle('d-none', !message);
+        };
+
+        const getKeptExistingImageCount = () =>
+          removeImageInputs.length - removeImageInputs.filter((input) => input.checked).length;
+
+        const checkImagePixels = (file) =>
+          new Promise((resolve) => {
+            const previewUrl = URL.createObjectURL(file);
+            const previewImage = new Image();
+
+            previewImage.onload = () => {
+              const isValid = previewImage.naturalWidth * previewImage.naturalHeight <= maxPixels;
+              URL.revokeObjectURL(previewUrl);
+              resolve(isValid);
+            };
+
+            previewImage.onerror = () => {
+              URL.revokeObjectURL(previewUrl);
+              resolve(false);
+            };
+
+            previewImage.src = previewUrl;
+          });
+
+        const syncInputFiles = () => {
+          const transfer = new DataTransfer();
+          queuedFiles.forEach((file) => {
+            transfer.items.add(file);
+          });
+          imageInput.files = transfer.files;
+        };
+
+        const renderImagePreview = () => {
+          imagePreviewContainer.innerHTML = '';
+
+          if (!queuedFiles.length) {
+            imageSelectionLabel.textContent = 'No images selected.';
+            return;
+          }
+
+          imageSelectionLabel.textContent = `${queuedFiles.length} image${queuedFiles.length > 1 ? 's' : ''} selected`;
+
+          queuedFiles.forEach((file, index) => {
+            const column = document.createElement('div');
+            column.className = 'col-md-3 col-sm-4';
+
+            const card = document.createElement('div');
+            card.className = 'dashboard-upload-preview-card';
+
+            const image = document.createElement('img');
+            image.className = 'dashboard-upload-preview-card__img';
+            image.alt = file.name;
+            image.src = URL.createObjectURL(file);
+
+            image.addEventListener('load', () => {
+              URL.revokeObjectURL(image.src);
+            });
+
+            const meta = document.createElement('div');
+            meta.className = 'dashboard-upload-preview-card__meta';
+            meta.textContent = file.name;
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'dashboard-upload-preview-card__remove';
+            removeButton.innerHTML = '<i class="bi bi-x-lg"></i>';
+            removeButton.setAttribute('aria-label', `Remove ${file.name}`);
+            removeButton.addEventListener('click', () => {
+              queuedFiles = queuedFiles.filter((_, fileIndex) => fileIndex !== index);
+              syncInputFiles();
+              renderImagePreview();
+            });
+
+            card.appendChild(removeButton);
+            card.appendChild(image);
+            card.appendChild(meta);
+            column.appendChild(card);
+            imagePreviewContainer.appendChild(column);
+          });
+        };
+
+        imagePickerButton.addEventListener('click', () => {
+          setImageError('');
+          imageInput.click();
+        });
+
+        imageInput.addEventListener('change', async () => {
+          const incomingFiles = Array.from(imageInput.files || []);
+          if (!incomingFiles.length) {
+            return;
+          }
+
+          const nextQueuedFiles = [...queuedFiles];
+          let errorMessage = '';
+
+          for (const file of incomingFiles) {
+            if (getKeptExistingImageCount() + nextQueuedFiles.length >= maxImages) {
+              errorMessage = `You can upload up to ${maxImages} images per product.`;
+              break;
+            }
+
+            const isWithinPixelLimit = await checkImagePixels(file);
+            if (!isWithinPixelLimit) {
+              errorMessage = `${file.name} exceeds the 2 megapixel limit. For square photos, resize to 1400 x 1400 px or smaller.`;
+              continue;
+            }
+
+            nextQueuedFiles.push(file);
+          }
+
+          queuedFiles = nextQueuedFiles;
+          syncInputFiles();
+          renderImagePreview();
+          setImageError(errorMessage);
+        });
+
+        removeImageInputs.forEach((input) => {
+          input.addEventListener('change', () => {
+            if (getKeptExistingImageCount() + queuedFiles.length <= maxImages) {
+              setImageError('');
+            }
+          });
+        });
+      }
+    });
+  </script>
+{% endblock %}

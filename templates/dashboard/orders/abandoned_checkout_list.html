@@ -1,0 +1,174 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Abandoned Checkout{% endblock %}
+{% block page_title %}Abandoned Checkout{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Abandoned Checkout</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-warning">
+        <div class="inner">
+          <h3>{{ abandoned_checkout_total }}</h3>
+          <p>{{ filters.status|title }} Checkouts</p>
+        </div>
+        <i class="small-box-icon bi bi-cart-x"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title mb-0">Search and Filters</h3>
+    </div>
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-lg-4">
+          <label for="abandoned-search" class="form-label">Search</label>
+          <input
+            type="search"
+            class="form-control"
+            id="abandoned-search"
+            name="q"
+            value="{{ filters.q }}"
+            placeholder="Name, phone number, or email"
+          />
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label for="abandoned-date-from" class="form-label">From Date</label>
+          <input type="date" class="form-control" id="abandoned-date-from" name="date_from" value="{{ filters.date_from }}" />
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label for="abandoned-date-to" class="form-label">To Date</label>
+          <input type="date" class="form-control" id="abandoned-date-to" name="date_to" value="{{ filters.date_to }}" />
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label for="abandoned-district" class="form-label">District</label>
+          <select class="form-select" id="abandoned-district" name="district">
+            <option value="">All Districts</option>
+            {% for district in districts %}
+              <option value="{{ district }}" {% if filters.district == district %}selected{% endif %}>{{ district }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label for="abandoned-user-type" class="form-label">User Type</label>
+          <select class="form-select" id="abandoned-user-type" name="user_type">
+            <option value="">All Types</option>
+            <option value="registered" {% if filters.user_type == "registered" %}selected{% endif %}>Registered</option>
+            <option value="guest" {% if filters.user_type == "guest" %}selected{% endif %}>Guest</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label for="abandoned-status" class="form-label">Status</label>
+          <select class="form-select" id="abandoned-status" name="status">
+            {% for value, label in status_choices %}
+              <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-auto">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search me-1"></i>Apply
+          </button>
+          <a href="{% url 'dashboard_abandoned_checkout_list' %}" class="btn btn-outline-secondary">Reset</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title mb-0">Abandoned Checkout Records</h3>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Phone Number</th>
+            <th>Email</th>
+            <th>User Type</th>
+            <th class="text-end">Cart Total</th>
+            <th>Delivery Area</th>
+            <th>District</th>
+            <th>Created Time</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for checkout in abandoned_checkouts %}
+            <tr>
+              <td>#{{ checkout.pk }}</td>
+              <td class="fw-semibold">{{ checkout.full_name|default:"Guest customer" }}</td>
+              <td>{{ checkout.phone_number|default:"—" }}</td>
+              <td>{{ checkout.email|default:"—" }}</td>
+              <td>
+                {% if checkout.user_id %}
+                  <span class="badge text-bg-primary">Registered</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Guest</span>
+                {% endif %}
+              </td>
+              <td class="text-end fw-semibold">&#2547;{{ checkout.total_amount }}</td>
+              <td>{{ checkout.delivery_area_label }}</td>
+              <td>{{ checkout.district|default:"—" }}</td>
+              <td>{{ checkout.created_at|date:"M d, Y h:i A" }}</td>
+              <td>
+                <span class="badge {{ checkout.status_badge_class }}">{{ checkout.get_status_display }}</span>
+              </td>
+              <td class="text-end text-nowrap">
+                <a href="{% url 'dashboard_abandoned_checkout_detail' checkout.pk %}" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-eye me-1"></i>View
+                </a>
+                {% if checkout.status == "pending" and perms.sitepages.change_sale %}
+                  <form method="post" action="{% url 'dashboard_abandoned_checkout_status' checkout.pk 'contacted' %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="list" />
+                    <button type="submit" class="btn btn-outline-info btn-sm">Contacted</button>
+                  </form>
+                  <form method="post" action="{% url 'dashboard_abandoned_checkout_status' checkout.pk 'cancelled' %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="list" />
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cancel</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="11" class="text-center py-5 text-muted">No abandoned checkouts match the selected filters.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+      <div class="card-footer">
+        <nav aria-label="Abandoned checkout pagination">
+          <ul class="pagination pagination-sm mb-0 justify-content-end">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% endif %}
+            <li class="page-item active">
+              <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

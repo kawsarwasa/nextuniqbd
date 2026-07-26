@@ -1,0 +1,227 @@
+Media audit report
+Mode: dry-run
+MEDIA_ROOT: D:\software\project\live\media
+Total media files: 122
+Total media size: 10184883 bytes
+Referenced file count: 1
+Orphan file count: 121
+Missing referenced file count: 0
+Exact duplicate groups: 7
+Recoverable disk space: 10176175 bytes
+External URL references ignored: 0
+Unsafe database paths ignored: 0
+Protected files: 0
+
+Database references:
+  company/logos/next-uniq-bd_bbFEJXT.png
+    company.CompanyProfile.logo[pk=1] stored=company/logos/next-uniq-bd_bbFEJXT.png
+
+Referenced files:
+  company/logos/next-uniq-bd_bbFEJXT.png
+
+Orphan files:
+  blog/posts/featured/dummy-blog-01-featured.jpg
+  blog/posts/featured/dummy-blog-02-featured.jpg
+  blog/posts/featured/dummy-blog-03-featured.jpg
+  blog/posts/featured/dummy-blog-04-featured.jpg
+  blog/posts/featured/dummy-blog-05-featured.jpg
+  blog/posts/featured/dummy-blog-06-featured.jpg
+  blog/posts/featured/dummy-blog-07-featured.jpg
+  blog/posts/featured/dummy-blog-08-featured.jpg
+  blog/posts/featured/dummy-blog-09-featured.jpg
+  blog/posts/featured/dummy-blog-10-featured.jpg
+  blog/posts/gallery/dummy-blog-01-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-01-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-02-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-02-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-03-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-03-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-04-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-04-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-05-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-05-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-06-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-06-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-07-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-07-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-08-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-08-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-09-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-09-gallery-2.jpg
+  blog/posts/gallery/dummy-blog-10-gallery-1.jpg
+  blog/posts/gallery/dummy-blog-10-gallery-2.jpg
+  categories/accessories.jpg
+  categories/download-1.jpg
+  categories/download-3.jpg
+  categories/images.jpg
+  company/logos/next-uniq-bd.png
+  company/logos/next-uniq-bd_5FYaG25.png
+  company/logos/next-uniq-bd_U2EeULd.png
+  company/logos/next-uniq-bd_X5XL1Fe.png
+  hero_slides/dummy-hero-slide-01.jpg
+  hero_slides/dummy-hero-slide-02.jpg
+  hero_slides/dummy-hero-slide-03.jpg
+  hero_slides/dummy-hero-slide-04.jpg
+  hero_slides/dummy-hero-slide-05.jpg
+  hero_slides/limited-time-electronics.jpg
+  hero_slides/limited-time-electronics_jzqqpNI.jpg
+  hero_slides/new-collection-2024.jpg
+  hero_slides/new-collection-2024_3L5nx7l.jpg
+  hero_slides/premium-accessories.jpg
+  hero_slides/premium-accessories_Rq2ZKnM.jpg
+  hero_slides/seasonal-sale-sportswear.jpg
+  hero_slides/seasonal-sale-sportswear_j3bowIg.jpg
+  hero_slides/summer-hero.jpg
+  hero_slides/summer-hero_0xuzDCp.jpg
+  hero_slides/summer-hero_1JNUOIE.jpg
+  hero_slides/summer-hero_2qOIoRV.jpg
+  hero_slides/summer-hero_7Fh6XUO.jpg
+  hero_slides/summer-hero_9dq4CX4.jpg
+  hero_slides/summer-hero_Ajz7C5u.jpg
+  hero_slides/summer-hero_BJw1wP4.jpg
+  hero_slides/summer-hero_DKwRj0X.jpg
+  hero_slides/summer-hero_Dajo2F6.jpg
+  hero_slides/summer-hero_ICxTxz2.jpg
+  hero_slides/summer-hero_JvDrghW.jpg
+  hero_slides/summer-hero_MDjdUI1.jpg
+  hero_slides/summer-hero_RoUXWbL.jpg
+  hero_slides/summer-hero_TUTB46G.jpg
+  hero_slides/summer-hero_TdloD5E.jpg
+  hero_slides/summer-hero_WS80IO3.jpg
+  hero_slides/summer-hero_XOdT2Mz.jpg
+  hero_slides/summer-hero_Xa2QTg0.jpg
+  hero_slides/summer-hero_Y1tOJuf.jpg
+  hero_slides/summer-hero_YKIY7Q4.jpg
+  hero_slides/summer-hero_Za5RPqZ.jpg
+  hero_slides/summer-hero_aJPIjsL.jpg
+  hero_slides/summer-hero_agRCZDR.jpg
+  hero_slides/summer-hero_cHbtY9D.jpg
+  hero_slides/summer-hero_cdv5VxE.jpg
+  hero_slides/summer-hero_dOnou2S.jpg
+  hero_slides/summer-hero_eWKQJF3.jpg
+  hero_slides/summer-hero_g0l4BCk.jpg
+  hero_slides/summer-hero_gEUKDse.jpg
+  hero_slides/summer-hero_hj0wKST.jpg
+  hero_slides/summer-hero_iMqEAaY.jpg
+  hero_slides/summer-hero_iUXxb0A.jpg
+  hero_slides/summer-hero_iVM26qS.jpg
+  hero_slides/summer-hero_iyIcF44.jpg
+  hero_slides/summer-hero_kPS6Iru.jpg
+  hero_slides/summer-hero_lUspEjf.jpg
+  hero_slides/summer-hero_q9xLdxq.jpg
+  hero_slides/summer-hero_qq16abb.jpg
+  hero_slides/summer-hero_sEaDTWU.jpg
+  hero_slides/summer-hero_tVFuYJY.jpg
+  hero_slides/summer-hero_wUgJl1d.jpg
+  hero_slides/summer-hero_xaL3a9q.jpg
+  hero_slides/summer-hero_xpXLO9h.jpg
+  hero_slides/summer-hero_zBz8wWX.jpg
+  hero_slides/summer-hero_zP3ZtJw.jpg
+  hero_slides/summer-hero_zzDCjLf.jpg
+  hero_slides/weekend-essentials.jpg
+  hero_slides/weekend-essentials_nOvYKx7.jpg
+  products/download.jpg
+  products/download_1.jpg
+  products/download_2.jpg
+  products/download_4.jpg
+  products/download_5.jpg
+  products/dummy-product-020-1.jpg
+  products/dummy-product-020-2.jpg
+  products/dummy-product-020-3.jpg
+  products/dummy-product-020-4.jpg
+  products/dummy-product-030-1.jpg
+  products/dummy-product-030-2.jpg
+  products/dummy-product-030-3.jpg
+  products/dummy-product-030-4.jpg
+  products/images_1.jpg
+  products/images_2.jpg
+  products/images_3.jpg
+  products/photo_750685343.jpg
+  promo_banners/photo-1483985988355-763728e1935b.jfif
+  user_profiles/IMG-20260314-WA0001.jpg.jpeg
+  user_profiles/RASEL.jpg
+  user_profiles/my_pic_mYnBVno.jpg
+
+Missing referenced files:
+  (none)
+
+Exact duplicate groups:
+  SHA256 0030f9eb08c755b16b3f65efa96605e82b84ff62b8b83f7baf7e73a4ba6fe8f9
+    blog/posts/gallery/dummy-blog-02-gallery-1.jpg [unreferenced]
+    hero_slides/dummy-hero-slide-05.jpg [unreferenced]
+  SHA256 268d80817b7ca0ebdbe39ecc91699ae62c2891f2b5fbad065fb4e97e6c5e69a6
+    hero_slides/summer-hero.jpg [unreferenced]
+    hero_slides/summer-hero_0xuzDCp.jpg [unreferenced]
+    hero_slides/summer-hero_1JNUOIE.jpg [unreferenced]
+    hero_slides/summer-hero_2qOIoRV.jpg [unreferenced]
+    hero_slides/summer-hero_7Fh6XUO.jpg [unreferenced]
+    hero_slides/summer-hero_9dq4CX4.jpg [unreferenced]
+    hero_slides/summer-hero_Ajz7C5u.jpg [unreferenced]
+    hero_slides/summer-hero_BJw1wP4.jpg [unreferenced]
+    hero_slides/summer-hero_DKwRj0X.jpg [unreferenced]
+    hero_slides/summer-hero_Dajo2F6.jpg [unreferenced]
+    hero_slides/summer-hero_ICxTxz2.jpg [unreferenced]
+    hero_slides/summer-hero_JvDrghW.jpg [unreferenced]
+    hero_slides/summer-hero_MDjdUI1.jpg [unreferenced]
+    hero_slides/summer-hero_RoUXWbL.jpg [unreferenced]
+    hero_slides/summer-hero_TUTB46G.jpg [unreferenced]
+    hero_slides/summer-hero_TdloD5E.jpg [unreferenced]
+    hero_slides/summer-hero_WS80IO3.jpg [unreferenced]
+    hero_slides/summer-hero_XOdT2Mz.jpg [unreferenced]
+    hero_slides/summer-hero_Xa2QTg0.jpg [unreferenced]
+    hero_slides/summer-hero_Y1tOJuf.jpg [unreferenced]
+    hero_slides/summer-hero_YKIY7Q4.jpg [unreferenced]
+    hero_slides/summer-hero_Za5RPqZ.jpg [unreferenced]
+    hero_slides/summer-hero_aJPIjsL.jpg [unreferenced]
+    hero_slides/summer-hero_agRCZDR.jpg [unreferenced]
+    hero_slides/summer-hero_cHbtY9D.jpg [unreferenced]
+    hero_slides/summer-hero_cdv5VxE.jpg [unreferenced]
+    hero_slides/summer-hero_dOnou2S.jpg [unreferenced]
+    hero_slides/summer-hero_eWKQJF3.jpg [unreferenced]
+    hero_slides/summer-hero_g0l4BCk.jpg [unreferenced]
+    hero_slides/summer-hero_gEUKDse.jpg [unreferenced]
+    hero_slides/summer-hero_hj0wKST.jpg [unreferenced]
+    hero_slides/summer-hero_iMqEAaY.jpg [unreferenced]
+    hero_slides/summer-hero_iUXxb0A.jpg [unreferenced]
+    hero_slides/summer-hero_iVM26qS.jpg [unreferenced]
+    hero_slides/summer-hero_iyIcF44.jpg [unreferenced]
+    hero_slides/summer-hero_kPS6Iru.jpg [unreferenced]
+    hero_slides/summer-hero_lUspEjf.jpg [unreferenced]
+    hero_slides/summer-hero_q9xLdxq.jpg [unreferenced]
+    hero_slides/summer-hero_qq16abb.jpg [unreferenced]
+    hero_slides/summer-hero_sEaDTWU.jpg [unreferenced]
+    hero_slides/summer-hero_tVFuYJY.jpg [unreferenced]
+    hero_slides/summer-hero_wUgJl1d.jpg [unreferenced]
+    hero_slides/summer-hero_xaL3a9q.jpg [unreferenced]
+    hero_slides/summer-hero_xpXLO9h.jpg [unreferenced]
+    hero_slides/summer-hero_zBz8wWX.jpg [unreferenced]
+    hero_slides/summer-hero_zP3ZtJw.jpg [unreferenced]
+    hero_slides/summer-hero_zzDCjLf.jpg [unreferenced]
+  SHA256 6258c1d7fdeaa476607f3716c04916f3d79b6d8d3f53b54c88435506807fc683
+    company/logos/next-uniq-bd_U2EeULd.png [unreferenced]
+    company/logos/next-uniq-bd_X5XL1Fe.png [unreferenced]
+    company/logos/next-uniq-bd_bbFEJXT.png [referenced]
+  SHA256 6356878f15b839630585ae7db256eb3f06b044742e20d29aac8d7520f04d2cc6
+    blog/posts/gallery/dummy-blog-01-gallery-1.jpg [unreferenced]
+    hero_slides/dummy-hero-slide-02.jpg [unreferenced]
+  SHA256 7a3207c48c2c9df5221d3831ba21278369662b6b0d40242a1d6e13cfff4f47da
+    blog/posts/gallery/dummy-blog-01-gallery-2.jpg [unreferenced]
+    hero_slides/dummy-hero-slide-03.jpg [unreferenced]
+  SHA256 800b6745f8855080863efcb162af2e67abc10a5ebad27251d32f92c2d7d173d1
+    blog/posts/featured/dummy-blog-01-featured.jpg [unreferenced]
+    hero_slides/dummy-hero-slide-01.jpg [unreferenced]
+  SHA256 d0736cee55773d63bae830465c0f674e7d435a535923eb9ab275a3aadaee85de
+    blog/posts/featured/dummy-blog-02-featured.jpg [unreferenced]
+    hero_slides/dummy-hero-slide-04.jpg [unreferenced]
+
+External URL references ignored:
+  (none)
+
+Protected files:
+  (none)
+
+Files deleted:
+  (none)
+
+Database references updated:
+  (none)

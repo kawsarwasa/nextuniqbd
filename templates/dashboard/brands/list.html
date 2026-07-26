@@ -1,0 +1,138 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Brands{% endblock %}
+{% block page_title %}Brands{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Brands</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ brand_total }}</h3>
+          <p>Total Brands</p>
+        </div>
+        <i class="small-box-icon bi bi-bookmark-star"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ brand_active_total }}</h3>
+          <p>Active Brands</p>
+        </div>
+        <i class="small-box-icon bi bi-check-circle"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="small-box text-bg-dark">
+        <div class="inner">
+          <h3>{{ page_obj.paginator.count }}</h3>
+          <p>Visible In List</p>
+        </div>
+        <i class="small-box-icon bi bi-grid"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title mb-0">Brand Management</h3>
+      <a href="{% url 'dashboard_brand_add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Brand
+      </a>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Slug</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Homepage</th>
+            <th>Updated</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for brand in brands %}
+            <tr>
+              <td class="fw-semibold">{{ brand.name }}</td>
+              <td><code>{{ brand.slug }}</code></td>
+              <td class="text-muted small">{{ brand.description|default:"-"|truncatechars:80 }}</td>
+              <td>
+                {% if brand.is_active %}
+                  <span class="badge text-bg-success">Active</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if brand.show_on_homepage %}
+                  <span class="badge text-bg-info">Shown</span>
+                {% else %}
+                  <span class="badge text-bg-light">Hidden</span>
+                {% endif %}
+              </td>
+              <td>{{ brand.updated_at|date:"d M Y, h:i A" }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="{% url 'dashboard_brand_edit' brand.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <form
+                    id="delete-brand-{{ brand.pk }}"
+                    action="{% url 'dashboard_brand_delete' brand.pk %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm js-delete-trigger"
+                      data-delete-form-id="delete-brand-{{ brand.pk }}"
+                      data-delete-item-name="{{ brand.name }}"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5">
+                <div class="mb-3 text-muted">No brands created yet.</div>
+                <a href="{% url 'dashboard_brand_add' %}" class="btn btn-primary">Create your first brand</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+      <div class="card-footer">
+        <nav aria-label="Brand pagination">
+          <ul class="pagination pagination-sm mb-0 justify-content-end">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+              </li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+              </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

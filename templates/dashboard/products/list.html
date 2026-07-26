@@ -1,0 +1,279 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Products{% endblock %}
+{% block page_title %}Products{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Products</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ product_total }}</h3>
+          <p>Total Products</p>
+        </div>
+        <i class="small-box-icon bi bi-box-seam"></i>
+        <a href="{% url 'dashboard_product_list' %}" class="small-box-footer link-light">View all <i class="bi bi-arrow-right-circle"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ product_published_total }}</h3>
+          <p>Published Products</p>
+        </div>
+        <i class="small-box-icon bi bi-check2-square"></i>
+        <a href="{% url 'dashboard_product_list' %}?status=published" class="small-box-footer link-light">View published <i class="bi bi-arrow-right-circle"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-warning">
+        <div class="inner">
+          <h3>{{ product_low_stock_total }}</h3>
+          <p>Low Stock Products</p>
+        </div>
+        <i class="small-box-icon bi bi-exclamation-triangle"></i>
+        <a href="{% url 'dashboard_product_list' %}?stock_status=low" class="small-box-footer link-dark">View low stock <i class="bi bi-arrow-right-circle"></i></a>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-danger">
+        <div class="inner">
+          <h3>{{ product_out_of_stock_total }}</h3>
+          <p>Out of Stock Products</p>
+        </div>
+        <i class="small-box-icon bi bi-x-octagon"></i>
+        <a href="{% url 'dashboard_product_list' %}?stock_status=out" class="small-box-footer link-light">View out of stock <i class="bi bi-arrow-right-circle"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title mb-0">Product Management</h3>
+      <a href="{% url 'dashboard_product_add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Product
+      </a>
+    </div>
+    <div class="card-body border-bottom">
+      <form method="get" class="row g-3 align-items-end" aria-label="Filter products">
+        <div class="col-12 col-lg-4">
+          <label for="product-search" class="form-label">Search</label>
+          <input id="product-search" type="search" name="q" value="{{ filters.q }}" class="form-control" placeholder="Product name or SKU" />
+        </div>
+        <div class="col-6 col-lg-2">
+          <label for="product-category" class="form-label">Category</label>
+          <select id="product-category" name="category" class="form-select">
+            <option value="">All categories</option>
+            {% for category in categories %}
+              <option value="{{ category.pk }}"{% if filters.category == category.pk|stringformat:"s" %} selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6 col-lg-2">
+          <label for="product-brand" class="form-label">Brand</label>
+          <select id="product-brand" name="brand" class="form-select">
+            <option value="">All brands</option>
+            {% for brand in brands %}
+              <option value="{{ brand.pk }}"{% if filters.brand == brand.pk|stringformat:"s" %} selected{% endif %}>{{ brand.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-6 col-lg-2">
+          <label for="product-status" class="form-label">Status</label>
+          <select id="product-status" name="status" class="form-select">
+            <option value="">All statuses</option>
+            <option value="published"{% if filters.status == "published" %} selected{% endif %}>Published</option>
+            <option value="draft"{% if filters.status == "draft" %} selected{% endif %}>Draft</option>
+            <option value="inactive"{% if filters.status == "inactive" %} selected{% endif %}>Inactive</option>
+          </select>
+        </div>
+        <div class="col-6 col-lg-2">
+          <label for="product-stock-status" class="form-label">Stock</label>
+          <select id="product-stock-status" name="stock_status" class="form-select">
+            <option value="">All stock statuses</option>
+            <option value="in"{% if filters.stock_status == "in" %} selected{% endif %}>In Stock</option>
+            <option value="low"{% if filters.stock_status == "low" %} selected{% endif %}>Low Stock</option>
+            <option value="out"{% if filters.stock_status == "out" %} selected{% endif %}>Out of Stock</option>
+            <option value="not_tracked"{% if filters.stock_status == "not_tracked" %} selected{% endif %}>Not Tracked</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-2">
+          <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Apply Filter</button>
+          <a href="{% url 'dashboard_product_list' %}" class="btn btn-outline-secondary">Reset Filter</a>
+        </div>
+      </form>
+    </div>
+    {% if perms.category.change_product or perms.category.delete_product %}
+      <div class="card-body border-bottom py-3">
+        <form id="bulk-product-action-form" class="d-flex flex-wrap align-items-center gap-2 js-product-bulk-form" action="{% url 'dashboard_product_bulk_action' %}" method="post">
+          {% csrf_token %}
+          <label for="bulk-product-action" class="visually-hidden">Bulk action</label>
+          <select id="bulk-product-action" name="action" class="form-select" style="width: auto; min-width: 13rem;">
+            <option value="">Bulk actions</option>
+            {% if perms.category.change_product %}
+              <option value="publish">Publish selected</option>
+              <option value="draft">Move selected to Draft</option>
+              <option value="inactive">Mark selected Inactive</option>
+            {% endif %}
+            {% if perms.category.delete_product %}
+              <option value="delete">Delete selected</option>
+            {% endif %}
+          </select>
+          <button type="submit" class="btn btn-outline-primary">Apply</button>
+        </form>
+      </div>
+    {% endif %}
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th scope="col" class="text-center">
+              {% if perms.category.change_product or perms.category.delete_product %}
+                <span class="visually-hidden">Select</span><input type="checkbox" class="form-check-input js-product-select-all" aria-label="Select all products on this page" />
+              {% endif %}
+            </th>
+            <th scope="col">
+              <a class="link-dark text-decoration-none" href="?{% if sort_query %}{{ sort_query }}&amp;{% endif %}sort={{ sort_options.name.next }}">
+                Product
+                {% if sort_options.name.direction == "asc" %}<i class="bi bi-sort-up"></i>{% elif sort_options.name.direction == "desc" %}<i class="bi bi-sort-down"></i>{% else %}<i class="bi bi-arrow-down-up text-muted"></i>{% endif %}
+              </a>
+            </th>
+            <th scope="col">Category / Brand</th>
+            <th scope="col">
+              <a class="link-dark text-decoration-none" href="?{% if sort_query %}{{ sort_query }}&amp;{% endif %}sort={{ sort_options.price.next }}">
+                Price
+                {% if sort_options.price.direction == "asc" %}<i class="bi bi-sort-up"></i>{% elif sort_options.price.direction == "desc" %}<i class="bi bi-sort-down"></i>{% else %}<i class="bi bi-arrow-down-up text-muted"></i>{% endif %}
+              </a>
+            </th>
+            <th scope="col">
+              <a class="link-dark text-decoration-none" href="?{% if sort_query %}{{ sort_query }}&amp;{% endif %}sort={{ sort_options.stock.next }}">
+                Stock
+                {% if sort_options.stock.direction == "asc" %}<i class="bi bi-sort-up"></i>{% elif sort_options.stock.direction == "desc" %}<i class="bi bi-sort-down"></i>{% else %}<i class="bi bi-arrow-down-up text-muted"></i>{% endif %}
+              </a>
+            </th>
+            <th scope="col">Status</th>
+            <th scope="col">
+              <a class="link-dark text-decoration-none" href="?{% if sort_query %}{{ sort_query }}&amp;{% endif %}sort={{ sort_options.updated.next }}">
+                Updated
+                {% if sort_options.updated.direction == "asc" %}<i class="bi bi-sort-up"></i>{% elif sort_options.updated.direction == "desc" %}<i class="bi bi-sort-down"></i>{% else %}<i class="bi bi-arrow-down-up text-muted"></i>{% endif %}
+              </a>
+            </th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+            <tr>
+              <td>
+                {% if perms.category.change_product or perms.category.delete_product %}
+                  <input type="checkbox" class="form-check-input js-product-select" name="selected_products" value="{{ product.pk }}" form="bulk-product-action-form" aria-label="Select {{ product.name }}" />
+                {% endif %}
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="flex-shrink-0">
+                    {% if product.primary_image %}
+                      <img
+                        src="{{ product.primary_image.image.url }}"
+                        alt="{{ product.name }}"
+                        class="dashboard-category-thumb"
+                      />
+                    {% else %}
+                      <div class="dashboard-category-thumb dashboard-category-thumb--placeholder">
+                        <i class="bi bi-image"></i>
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div style="min-width: 0; max-width: 18rem;">
+                    <div class="fw-semibold text-truncate" title="{{ product.name }}">{{ product.name }}</div>
+                    <code class="text-muted small">{{ product.sku }}</code>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ product.category.name|default:"Uncategorized" }}</div>
+                <div class="text-muted small">{{ product.brand.name|default:"No brand" }}</div>
+              </td>
+              <td>
+                <div class="fw-semibold">${{ product.current_price }}</div>
+                {% if product.regular_price > product.current_price %}
+                  <div class="small text-muted text-nowrap">
+                    <span class="text-decoration-line-through">${{ product.regular_price }}</span>
+                    <span class="badge text-bg-success ms-1">{{ product.discount_percentage }}% off</span>
+                  </div>
+                {% endif %}
+              </td>
+              <td>
+                {% if not product.track_stock %}
+                  <span class="badge text-bg-secondary">Not Tracked</span>
+                {% elif product.stock_quantity == 0 %}
+                  <span class="badge text-bg-danger">Out of Stock</span>
+                {% elif product.is_low_stock %}
+                  <span class="badge text-bg-warning">Low Stock: {{ product.stock_quantity }}</span>
+                {% else %}
+                  <span class="badge text-bg-success">In Stock: {{ product.stock_quantity }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if product.status == "published" %}
+                  <span class="badge text-bg-success">Published</span>
+                {% elif product.status == "draft" %}
+                  <span class="badge text-bg-warning">Draft</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                <time datetime="{{ product.updated_at|date:'c' }}">{{ product.updated_at|date:"d M Y, h:i A" }}</time>
+              </td>
+              <td class="text-end">
+                <div class="dropdown">
+                  <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Actions for {{ product.name }}">
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{% url 'dashboard_product_detail' product.pk %}"><i class="bi bi-eye me-2"></i>View Details</a></li>
+                    {% if perms.category.change_product %}
+                      <li><a class="dropdown-item" href="{% url 'dashboard_product_edit' product.pk %}"><i class="bi bi-pencil-square me-2"></i>Edit Product</a></li>
+                    {% endif %}
+                    <li><a class="dropdown-item" href="{% url 'frontend_product_detail' product.slug %}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right me-2"></i>View on Website</a></li>
+                    {% if perms.category.add_product %}
+                      <li>
+                        <form action="{% url 'dashboard_product_duplicate' product.pk %}" method="post">
+                          {% csrf_token %}
+                          <button type="submit" class="dropdown-item"><i class="bi bi-copy me-2"></i>Duplicate Product</button>
+                        </form>
+                      </li>
+                    {% endif %}
+                    {% if perms.category.delete_product %}
+                      <li><hr class="dropdown-divider" /></li>
+                      <li>
+                        <form id="delete-product-{{ product.pk }}" action="{% url 'dashboard_product_delete' product.pk %}" method="post">
+                          {% csrf_token %}
+                          <button type="button" class="dropdown-item text-danger js-delete-trigger" data-delete-form-id="delete-product-{{ product.pk }}" data-delete-item-name="{{ product.name }}"><i class="bi bi-trash me-2"></i>Delete</button>
+                        </form>
+                      </li>
+                    {% endif %}
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-5">
+                <div class="mb-3 text-muted">No products created yet.</div>
+                <a href="{% url 'dashboard_product_add' %}" class="btn btn-primary">Create your first product</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "dashboard/includes/pagination.html" with page_obj=page_obj label="Product pagination" %}
+  </div>
+{% endblock %}

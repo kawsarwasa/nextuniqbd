@@ -1,0 +1,96 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Purchases{% endblock %}
+{% block page_title %}Purchases{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Purchases</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-6 col-12">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ purchase_total }}</h3>
+          <p>Total Purchases</p>
+        </div>
+        <i class="small-box-icon bi bi-cart-plus"></i>
+      </div>
+    </div>
+    <div class="col-lg-6 col-12">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>&#2547;{{ purchase_amount_total }}</h3>
+          <p>Purchase Value</p>
+        </div>
+        <i class="small-box-icon bi bi-cash-stack"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title mb-0">Purchase Management</h3>
+      {% if perms.purchase.add_purchase %}
+        <a href="{% url 'dashboard_purchase_add' %}" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus-circle me-1"></i>Add Purchase
+        </a>
+      {% endif %}
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Purchase ID</th>
+            <th>Date</th>
+            <th>Supplier</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for purchase in purchases %}
+            <tr>
+              <td class="fw-semibold">{{ purchase.purchase_id }}</td>
+              <td>{{ purchase.purchase_date|date:"M d, Y h:i A" }}</td>
+              <td>
+                <div class="fw-semibold">{{ purchase.supplier_name|default:"No supplier" }}</div>
+                <div class="text-muted small">{{ purchase.supplier_phone|default:"" }}</div>
+              </td>
+              <td>{{ purchase.items.count }}</td>
+              <td class="fw-semibold">&#2547;{{ purchase.total_amount }}</td>
+              <td class="text-end">
+                {% if perms.purchase.view_purchase %}
+                  <a href="{% url 'dashboard_purchase_detail' purchase.pk %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-eye me-1"></i>View
+                  </a>
+                {% endif %}
+                {% if perms.purchase.change_purchase %}
+                  <a href="{% url 'dashboard_purchase_edit' purchase.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square me-1"></i>Edit
+                  </a>
+                {% endif %}
+                {% if perms.purchase.delete_purchase %}
+                  <form method="post" action="{% url 'dashboard_purchase_delete' purchase.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                      <i class="bi bi-trash3 me-1"></i>Delete
+                    </button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-5 text-muted">No purchases found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "dashboard/includes/pagination.html" with page_obj=page_obj label="Purchase pagination" %}
+  </div>
+{% endblock %}

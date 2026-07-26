@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Products - SB Revo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span><i class="fa fa-phone"></i> (+84) 4567 421 978</span>
+        <span><i class="fa fa-envelope"></i> support@sbrevo.com</span>
+      </div>
+      <div class="topbar-right">
+        <span class="promo-text"><i class="fa fa-truck"></i> Free Shipping on orders over $99</span>
+        <div class="currency-selector">
+          <select><option>USD $</option><option>AUD $</option></select>
+        </div>
+        <a href="#"><i class="fa fa-user"></i> Sign In</a>
+        <a href="#"><i class="fa fa-user-plus"></i> Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <div class="logo">
+        <a href="index.html"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></a>
+      </div>
+      <div class="search-bar">
+        <select class="search-category">
+          <option>All Categories</option>
+          <option>Fashion</option>
+          <option>Electronics</option>
+          <option>Kitchen</option>
+          <option>Sports</option>
+          <option>Watches</option>
+          <option>Bags</option>
+          <option>Beauty</option>
+        </select>
+        <input type="text" id="headerSearch" placeholder="Search for products..." />
+        <button class="search-btn"><i class="fa fa-search"></i></button>
+      </div>
+      <div class="header-actions">
+        <div class="action-item cart-icon">
+          <i class="fa fa-shopping-cart"></i>
+          <span class="badge" id="cartBadge">3</span>
+          <span class="action-label">Cart</span>
+          <div class="cart-preview">
+            <div class="cart-item">
+              <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=60&h=60&fit=crop" alt="Product" />
+              <div><p>EcoSmart Fleece Hoodie</p><span>$245.00 x 1</span></div>
+              <button class="remove-item"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="cart-total"><span>Subtotal:</span><strong>$723.98</strong></div>
+            <div class="cart-buttons">
+              <a href="cart.html" class="btn-outline">View Cart</a>
+              <a href="checkout.html" class="btn-primary">Checkout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <div class="nav-all-categories">
+        <button class="all-cat-btn"><i class="fa fa-bars"></i> All Categories</button>
+        <div class="all-cat-dropdown">
+          <a href="#"><i class="fa fa-tshirt"></i> Fashion</a>
+          <a href="#"><i class="fa fa-utensils"></i> Kitchen</a>
+          <a href="#"><i class="fa fa-laptop"></i> Computer</a>
+          <a href="#"><i class="fa fa-briefcase"></i> Bags</a>
+          <a href="#"><i class="fa fa-clock"></i> Watches</a>
+          <a href="#"><i class="fa fa-mobile-alt"></i> Smartphone</a>
+          <a href="#"><i class="fa fa-spa"></i> Health &amp; Beauty</a>
+          <a href="#"><i class="fa fa-running"></i> Sport Clothing</a>
+          <a href="#"><i class="fa fa-gem"></i> Jewelry</a>
+          <a href="#"><i class="fa fa-glasses"></i> Accessories</a>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li class="has-dropdown">
+          <a href="#">Fashion <i class="fa fa-chevron-down"></i></a>
+          <div class="mega-menu">
+            <div class="mega-col"><h4>Women</h4><a href="#">Dresses</a><a href="#">Tops &amp; Blouses</a><a href="#">Skirts</a></div>
+            <div class="mega-col"><h4>Men</h4><a href="#">Shirts</a><a href="#">Trousers</a><a href="#">Suits</a></div>
+            <div class="mega-col"><h4>Kids</h4><a href="#">Boys</a><a href="#">Girls</a><a href="#">Baby</a></div>
+            <div class="mega-col mega-banner"><img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&h=150&fit=crop" alt="" /><span>Up to 40% Off</span></div>
+          </div>
+        </li>
+        <li><a href="#">Electronics</a></li>
+        <li><a href="#">Kitchen</a></li>
+        <li><a href="#">Watches</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li class="hot-deal"><a href="#">Hot Deals <span class="hot-tag">HOT</span></a></li>
+      </ul>
+      <div class="nav-promo">
+        <i class="fa fa-tag"></i> <strong>20% OFF</strong> Use code: <span>REVO20</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">All Products</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- PRODUCTS PAGE -->
+  <section class="products-page-section">
+    <div class="container">
+      <div class="products-page-layout">
+
+        <!-- ===== LEFT SIDEBAR FILTERS ===== -->
+        <aside class="filter-sidebar" id="filterSidebar">
+
+          <div class="filter-sidebar-header">
+            <h3><i class="fa fa-sliders-h"></i> Filters</h3>
+            <button class="filter-clear-all" id="clearAllFilters">Clear All</button>
+          </div>
+
+          <!-- Active Filters -->
+          <div class="active-filters-wrap" id="activeFiltersWrap" style="display:none">
+            <p class="active-filters-label">Active Filters:</p>
+            <div class="active-filters" id="activeFilters"></div>
+          </div>
+
+          <!-- Category -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="category">
+              <span><i class="fa fa-th-large"></i> Category</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-category">
+              <ul class="filter-checklist">
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Fashion" /> Fashion <span class="filter-count">42</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Electronics" /> Electronics <span class="filter-count">28</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Health & Beauty" /> Health &amp; Beauty <span class="filter-count">19</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Sports" /> Sports <span class="filter-count">24</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Bags" /> Bags <span class="filter-count">15</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Watches" /> Watches <span class="filter-count">11</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Kitchen" /> Kitchen <span class="filter-count">17</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="Accessories" /> Accessories <span class="filter-count">21</span></label></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Brand -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="brand">
+              <span><i class="fa fa-tag"></i> Brand</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-brand">
+              <ul class="filter-checklist">
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="CommonGood" /> CommonGood <span class="filter-count">18</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="OFS Studio" /> OFS Studio <span class="filter-count">12</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="Vega Pro" /> Vega Pro <span class="filter-count">9</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="NovaTech" /> NovaTech <span class="filter-count">14</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="Lumis" /> Lumis <span class="filter-count">7</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="EcoWear" /> EcoWear <span class="filter-count">11</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="SportEdge" /> SportEdge <span class="filter-count">8</span></label></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="price">
+              <span><i class="fa fa-dollar-sign"></i> Price Range</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-price">
+              <div class="price-range-wrap">
+                <div class="price-range-display">
+                  <span id="priceMin">$0</span>
+                  <span id="priceMax">$500</span>
+                </div>
+                <div class="price-slider-track">
+                  <div class="price-slider-fill" id="sliderFill"></div>
+                  <input type="range" class="price-range-input" id="rangeMin" min="0" max="500" value="0" step="5" />
+                  <input type="range" class="price-range-input" id="rangeMax" min="0" max="500" value="500" step="5" />
+                </div>
+                <div class="price-range-inputs-row">
+                  <input type="number" class="price-input-field" id="priceMinInput" value="0" min="0" max="500" placeholder="Min" />
+                  <span>—</span>
+                  <input type="number" class="price-input-field" id="priceMaxInput" value="500" min="0" max="500" placeholder="Max" />
+                </div>
+              </div>
+              <ul class="filter-checklist price-preset-list" style="margin-top:10px">
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="0" data-max="50" /> Under $50</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="50" data-max="100" /> $50 – $100</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="100" data-max="200" /> $100 – $200</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="200" data-max="350" /> $200 – $350</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="350" data-max="500" /> Over $350</label></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Colour -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="colour">
+              <span><i class="fa fa-palette"></i> Colour</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-colour">
+              <div class="colour-swatches">
+                <button class="colour-swatch-btn" data-colour="Black" style="background:#1a1a1a" title="Black"></button>
+                <button class="colour-swatch-btn" data-colour="White" style="background:#fff;border-color:#ccc" title="White"></button>
+                <button class="colour-swatch-btn" data-colour="Grey" style="background:#9e9e9e" title="Grey"></button>
+                <button class="colour-swatch-btn" data-colour="Navy" style="background:#1a237e" title="Navy"></button>
+                <button class="colour-swatch-btn" data-colour="Blue" style="background:#1976d2" title="Blue"></button>
+                <button class="colour-swatch-btn" data-colour="Red" style="background:#d32f2f" title="Red"></button>
+                <button class="colour-swatch-btn" data-colour="Pink" style="background:#e91e8c" title="Pink"></button>
+                <button class="colour-swatch-btn" data-colour="Green" style="background:#388e3c" title="Green"></button>
+                <button class="colour-swatch-btn" data-colour="Yellow" style="background:#f9a825" title="Yellow"></button>
+                <button class="colour-swatch-btn" data-colour="Orange" style="background:#ff5c00" title="Orange"></button>
+                <button class="colour-swatch-btn" data-colour="Brown" style="background:#795548" title="Brown"></button>
+                <button class="colour-swatch-btn" data-colour="Purple" style="background:#7b1fa2" title="Purple"></button>
+              </div>
+              <div class="selected-colours" id="selectedColoursWrap" style="display:none">
+                <span>Selected: </span><span id="selectedColours"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sizes -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="sizes">
+              <span><i class="fa fa-ruler"></i> Size</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-sizes">
+              <div class="size-filter-grid">
+                <button class="size-filter-btn" data-size="XS">XS</button>
+                <button class="size-filter-btn" data-size="S">S</button>
+                <button class="size-filter-btn" data-size="M">M</button>
+                <button class="size-filter-btn" data-size="L">L</button>
+                <button class="size-filter-btn" data-size="XL">XL</button>
+                <button class="size-filter-btn" data-size="XXL">XXL</button>
+                <button class="size-filter-btn" data-size="6">6</button>
+                <button class="size-filter-btn" data-size="7">7</button>
+                <button class="size-filter-btn" data-size="8">8</button>
+                <button class="size-filter-btn" data-size="9">9</button>
+                <button class="size-filter-btn" data-size="10">10</button>
+                <button class="size-filter-btn" data-size="11">11</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="rating">
+              <span><i class="fa fa-star"></i> Customer Rating</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-rating">
+              <ul class="filter-checklist rating-list">
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="4" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="3" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="2" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="1" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Availability -->
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="availability">
+              <span><i class="fa fa-box"></i> Availability</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-availability">
+              <ul class="filter-checklist">
+                <li><label><input type="checkbox" class="filter-cb" data-filter="availability" value="in_stock" checked /> In Stock <span class="filter-count">156</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="availability" value="on_sale" /> On Sale <span class="filter-count">38</span></label></li>
+                <li><label><input type="checkbox" class="filter-cb" data-filter="availability" value="new_arrival" /> New Arrivals <span class="filter-count">24</span></label></li>
+              </ul>
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- ===== RIGHT: PRODUCTS GRID ===== -->
+        <div class="products-page-main">
+
+          <!-- Toolbar -->
+          <div class="products-toolbar">
+            <div class="toolbar-left">
+              <button class="mobile-filter-btn" id="mobileFilterBtn"><i class="fa fa-sliders-h"></i> Filters</button>
+              <span class="products-count"><strong id="visibleCount">24</strong> products found</span>
+            </div>
+            <div class="toolbar-right">
+              <div class="sort-wrap">
+                <label>Sort by:</label>
+                <select id="sortSelect" class="sort-select">
+                  <option value="default">Default</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Best Rating</option>
+                  <option value="newest">Newest</option>
+                  <option value="name-asc">Name A–Z</option>
+                </select>
+              </div>
+              <div class="view-toggle">
+                <button class="view-btn active" id="gridViewBtn" title="Grid view"><i class="fa fa-th"></i></button>
+                <button class="view-btn" id="listViewBtn" title="List view"><i class="fa fa-list"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Grid -->
+          <div class="plp-grid" id="plpGrid">
+
+            <!-- 24 product cards with data attributes for filtering -->
+            <div class="product-card" data-category="Fashion" data-brand="CommonGood" data-price="245" data-rating="4.5" data-colours="Charcoal,Black,Navy" data-sizes="S,M,L,XL" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-30%</span><span class="badge-hot">HOT</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=300&h=300&fit=crop" alt="EcoSmart Fleece Hoodie" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">EcoSmart Fleece Hoodie</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(24)</span></div>
+                <div class="product-price"><span class="price-current">$245.00</span><span class="price-old">$350.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Health & Beauty" data-brand="Lumis" data-price="89" data-rating="5" data-colours="Yellow,Pink" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-15%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=300&h=300&fit=crop" alt="Luxury Perfume Set" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Health &amp; Beauty</p>
+                <h4><a href="product_details.html">Luxury Perfume Set</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(57)</span></div>
+                <div class="product-price"><span class="price-current">$89.00</span><span class="price-old">$105.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Watches" data-brand="NovaTech" data-price="299" data-rating="4.5" data-colours="Black,Silver,Brown" data-sizes="OneSize" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop" alt="Smart Watch" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Watches</p>
+                <h4><a href="product_details.html">Minimalist Smart Watch</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(41)</span></div>
+                <div class="product-price"><span class="price-current">$299.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Sports" data-brand="Vega Pro" data-price="149" data-rating="4" data-colours="Black,White,Red,Blue" data-sizes="7,8,9,10,11">
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop" alt="Running Sneakers" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Sports</p>
+                <h4><a href="product_details.html">Running Pro Sneakers</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(89)</span></div>
+                <div class="product-price"><span class="price-current">$149.00</span><span class="price-old">$199.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Bags" data-brand="OFS Studio" data-price="189" data-rating="4.5" data-colours="Brown,Black,Tan" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-25%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=300&fit=crop" alt="Leather Handbag" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Bags</p>
+                <h4><a href="product_details.html">Premium Leather Handbag</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(41)</span></div>
+                <div class="product-price"><span class="price-current">$189.00</span><span class="price-old">$249.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Electronics" data-brand="NovaTech" data-price="199" data-rating="4.5" data-colours="Black,White,Silver" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-hot">HOT</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop" alt="Headphones" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Electronics</p>
+                <h4><a href="product_details.html">Wireless Headphones Pro</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(204)</span></div>
+                <div class="product-price"><span class="price-current">$199.00</span><span class="price-old">$249.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Fashion" data-brand="EcoWear" data-price="65" data-rating="4" data-colours="White,Navy,Grey,Black" data-sizes="S,M,L,XL,XXL" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop" alt="Classic Polo" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">Classic Polo Shirt</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(31)</span></div>
+                <div class="product-price"><span class="price-current">$65.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Fashion" data-brand="CommonGood" data-price="210" data-rating="5" data-colours="Black,Navy,Olive,Red" data-sizes="XS,S,M,L,XL" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-20%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=300&h=300&fit=crop" alt="Outdoor Jacket" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">Outdoor Explorer Jacket</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(28)</span></div>
+                <div class="product-price"><span class="price-current">$210.00</span><span class="price-old">$265.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Health & Beauty" data-brand="Lumis" data-price="78" data-rating="4.5" data-colours="Pink,White" data-sizes="OneSize">
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300&h=300&fit=crop" alt="Skincare Bundle" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Health &amp; Beauty</p>
+                <h4><a href="product_details.html">Glow Skincare Bundle</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(63)</span></div>
+                <div class="product-price"><span class="price-current">$78.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Watches" data-brand="Vega Pro" data-price="385" data-rating="5" data-colours="Black,Silver,Gold" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-10%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=300&h=300&fit=crop" alt="Chronograph Watch" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Watches</p>
+                <h4><a href="product_details.html">Chronograph Sport Watch</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(19)</span></div>
+                <div class="product-price"><span class="price-current">$385.00</span><span class="price-old">$429.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Electronics" data-brand="NovaTech" data-price="1299" data-rating="5" data-colours="Silver,Grey,Black" data-sizes="OneSize" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop" alt="Laptop" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Electronics</p>
+                <h4><a href="product_details.html">UltraBook Pro Laptop</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(47)</span></div>
+                <div class="product-price"><span class="price-current">$1,299.00</span><span class="price-old">$1,499.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Bags" data-brand="OFS Studio" data-price="119" data-rating="4" data-colours="Black,Tan,Navy" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-18%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&h=300&fit=crop" alt="Tote Bag" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Bags</p>
+                <h4><a href="product_details.html">Designer Tote Bag</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(22)</span></div>
+                <div class="product-price"><span class="price-current">$119.00</span><span class="price-old">$145.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Accessories" data-brand="Vega Pro" data-price="129" data-rating="4.5" data-colours="Black,Brown,Gold" data-sizes="OneSize">
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&h=300&fit=crop" alt="Sunglasses" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Accessories</p>
+                <h4><a href="product_details.html">Polarized Sunglasses</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(45)</span></div>
+                <div class="product-price"><span class="price-current">$129.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Sports" data-brand="SportEdge" data-price="35" data-rating="4" data-colours="Black,Blue,Grey,Green" data-sizes="S,M,L,XL">
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop" alt="Sports Bottle" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Sports</p>
+                <h4><a href="product_details.html">Hydration Water Bottle</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(112)</span></div>
+                <div class="product-price"><span class="price-current">$35.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Fashion" data-brand="EcoWear" data-price="95" data-rating="4.5" data-colours="Pink,White,Blue,Purple" data-sizes="XS,S,M,L" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300&h=300&fit=crop" alt="Summer Dress" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">Floral Summer Dress</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(38)</span></div>
+                <div class="product-price"><span class="price-current">$95.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Fashion" data-brand="CommonGood" data-price="145" data-rating="4" data-colours="Grey,Navy,Brown,Black" data-sizes="S,M,L,XL,XXL" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-12%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=300&h=300&fit=crop" alt="Pullover Sweater" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">Knit Pullover Sweater</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(51)</span></div>
+                <div class="product-price"><span class="price-current">$145.00</span><span class="price-old">$165.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Fashion" data-brand="EcoWear" data-price="275" data-rating="5" data-colours="Black,Navy,Olive,Camel" data-sizes="XS,S,M,L,XL" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-22%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=300&h=300&fit=crop" alt="Puffer Jacket" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">Quilted Puffer Jacket</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(17)</span></div>
+                <div class="product-price"><span class="price-current">$275.00</span><span class="price-old">$349.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Fashion" data-brand="EcoWear" data-price="45" data-rating="4" data-colours="White,Black,Grey,Red,Blue,Yellow" data-sizes="XS,S,M,L,XL,XXL" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&h=300&fit=crop" alt="Graphic T-Shirt" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Fashion</p>
+                <h4><a href="product_details.html">Graphic Print T-Shirt</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(76)</span></div>
+                <div class="product-price"><span class="price-current">$45.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Sports" data-brand="Vega Pro" data-price="85" data-rating="4.5" data-colours="White,Black,Blue,Red" data-sizes="6,7,8,9,10,11" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-15%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=300&h=300&fit=crop" alt="Canvas Sneakers" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Sports</p>
+                <h4><a href="product_details.html">Classic Canvas Sneakers</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(134)</span></div>
+                <div class="product-price"><span class="price-current">$85.00</span><span class="price-old">$100.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Bags" data-brand="OFS Studio" data-price="155" data-rating="5" data-colours="Black,Brown,Tan" data-sizes="OneSize" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=300&h=300&fit=crop" alt="Leather Bag" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Bags</p>
+                <h4><a href="product_details.html">Structured Leather Bag</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(29)</span></div>
+                <div class="product-price"><span class="price-current">$155.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Electronics" data-brand="NovaTech" data-price="79" data-rating="4" data-colours="Black,White" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-20%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=300&h=300&fit=crop" alt="Earbuds" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Electronics</p>
+                <h4><a href="product_details.html">True Wireless Earbuds</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(88)</span></div>
+                <div class="product-price"><span class="price-current">$79.00</span><span class="price-old">$99.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Health & Beauty" data-brand="Lumis" data-price="42" data-rating="4.5" data-colours="Pink,Purple,White" data-sizes="OneSize">
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&h=300&fit=crop" alt="Makeup Kit" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Health &amp; Beauty</p>
+                <h4><a href="product_details.html">Makeup Pro Kit</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><span>(72)</span></div>
+                <div class="product-price"><span class="price-current">$42.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Electronics" data-brand="NovaTech" data-price="159" data-rating="5" data-colours="Black,White,Red" data-sizes="OneSize" data-new="true">
+              <div class="product-badges"><span class="badge-new">NEW</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=300&h=300&fit=crop" alt="Instant Camera" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Electronics</p>
+                <h4><a href="product_details.html">Instant Print Camera</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(36)</span></div>
+                <div class="product-price"><span class="price-current">$159.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+            <div class="product-card" data-category="Kitchen" data-brand="CommonGood" data-price="55" data-rating="4" data-colours="Black,Silver,Red,White" data-sizes="OneSize" data-sale="true">
+              <div class="product-badges"><span class="badge-sale">-10%</span></div>
+              <div class="product-image">
+                <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=300&fit=crop" alt="Coffee Maker" loading="lazy" />
+                <div class="product-actions">
+                  <button title="Quick View"><i class="fa fa-eye"></i></button>
+                  
+                </div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">Kitchen</p>
+                <h4><a href="product_details.html">Premium Coffee Maker</a></h4>
+                <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(93)</span></div>
+                <div class="product-price"><span class="price-current">$55.00</span><span class="price-old">$61.00</span></div>
+                <button class="add-to-cart">Add to Cart</button>
+              </div>
+            </div>
+
+          </div><!-- /.plp-grid -->
+
+          <!-- No Results -->
+          <div class="plp-no-results" id="plpNoResults" style="display:none">
+            <i class="fa fa-search"></i>
+            <h3>No products found</h3>
+            <p>Try adjusting your filters or search term to find what you're looking for.</p>
+            <button class="plp-no-results-clear" id="noResultsClear">Clear All Filters</button>
+          </div>
+
+          <!-- Pagination -->
+          <div class="plp-pagination" id="plpPagination">
+            <a href="#" class="page-btn active">1</a>
+            <a href="#" class="page-btn">2</a>
+            <a href="#" class="page-btn">3</a>
+            <a href="#" class="page-btn">4</a>
+            <span class="page-dots">...</span>
+            <a href="#" class="page-btn">12</a>
+            <a href="#" class="page-btn page-next"><i class="fa fa-chevron-right"></i></a>
+          </div>
+
+        </div><!-- /.products-page-main -->
+      </div><!-- /.products-page-layout -->
+    </div>
+  </section>
+
+  <!-- Mobile Filter Overlay -->
+  <div class="mobile-filter-overlay" id="mobileFilterOverlay"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-col brand-col">
+          <div class="footer-logo"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></div>
+          <p>Your one-stop destination for fashion, electronics, home goods, and more. Shop smart, shop Revo.</p>
+          <div class="footer-contact">
+            <p><i class="fa fa-map-marker-alt"></i> 685 Market Street, San Francisco, CA 94105</p>
+            <p><i class="fa fa-phone"></i> (+84) 4567 421 978</p>
+            <p><i class="fa fa-envelope"></i> support@sbrevo.com</p>
+          </div>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-pinterest-p"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Shop</h4><ul><li><a href="#">New Arrivals</a></li><li><a href="#">Best Sellers</a></li><li><a href="#">Fashion</a></li><li><a href="#">Electronics</a></li><li><a href="#">Sports</a></li></ul></div>
+        <div class="footer-col"><h4>Customer Service</h4><ul><li><a href="#">My Account</a></li><li><a href="#">Order Tracking</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping Info</a></li><li><a href="#">FAQ</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="blog.html">Blog</a></li><li><a href="#">Careers</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms</a></li></ul></div>
+        <div class="footer-col">
+          <h4>Brands</h4><ul><li><a href="#">CommonGood</a></li><li><a href="#">OFS Studio</a></li><li><a href="#">Vega Pro</a></li><li><a href="#">NovaTech</a></li></ul>
+          <h4 style="margin-top:20px">We Accept</h4>
+          <div class="payment-icons"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>&copy; 2024 SB Revo. All rights reserved.</p>
+        <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Sitemap</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop"><i class="fa fa-chevron-up"></i></button>
+  <div class="modal-overlay" id="quickViewModal">
+    <div class="modal-box quickview-box">
+      <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+      <div class="quickview-content">
+        <div class="quickview-image">
+          <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=400&fit=crop" alt="Quick View" id="qvImage" />
+        </div>
+        <div class="quickview-info">
+          <p class="product-cat" id="qvCat">Fashion</p>
+          <h2 id="qvName">EcoSmart Fleece Hoodie</h2>
+          <div class="product-rating">
+            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+            <span>(24 reviews)</span>
+          </div>
+          <div class="product-price large" id="qvPrice">
+            <span class="price-current">$245.00</span>
+            <span class="price-old">$350.00</span>
+          </div>
+          <p class="qv-desc">A premium quality fleece hoodie perfect for all seasons. Made from sustainable materials and designed for everyday comfort.</p>
+          <div class="qv-options">
+            <div class="qv-size">
+              <label>Size:</label>
+              <div class="size-btns">
+                <button>XS</button><button class="active">S</button><button>M</button><button>L</button><button>XL</button>
+              </div>
+            </div>
+            <div class="qv-color">
+              <label>Color:</label>
+              <div class="color-btns">
+                <button class="color-btn active" style="background:#333"></button>
+                <button class="color-btn" style="background:#4a6da7"></button>
+                <button class="color-btn" style="background:#c0392b"></button>
+              </div>
+            </div>
+            <div class="qv-qty">
+              <label>Quantity:</label>
+              <div class="qty-control">
+                <button id="qvQtyMinus">-</button>
+                <input type="number" value="1" min="1" id="qvQty" />
+                <button id="qvQtyPlus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="qv-actions">
+            <button class="add-to-cart full">Add to Cart</button>
+          </div>
+          <a href="product_details.html" class="view-detail">View Full Details <i class="fa fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><i class="fa fa-check-circle"></i><span id="toastMsg">Item added to cart!</span></div>
+
+  <script src="script.js"></script>
+  <script>
+  (function () {
+    const grid = document.getElementById('plpGrid');
+    const allCards = Array.from(grid.querySelectorAll('.product-card'));
+    const countEl = document.getElementById('visibleCount');
+    const noResults = document.getElementById('plpNoResults');
+    const pagination = document.getElementById('plpPagination');
+
+    // Active filter state
+    const state = {
+      categories: new Set(),
+      brands: new Set(),
+      colours: new Set(),
+      sizes: new Set(),
+      priceMin: 0,
+      priceMax: 9999,
+      rating: 0
+    };
+
+    // ── Price slider ──────────────────────────────────────
+    const rangeMin = document.getElementById('rangeMin');
+    const rangeMax = document.getElementById('rangeMax');
+    const priceMinEl = document.getElementById('priceMin');
+    const priceMaxEl = document.getElementById('priceMax');
+    const priceMinInput = document.getElementById('priceMinInput');
+    const priceMaxInput = document.getElementById('priceMaxInput');
+    const sliderFill = document.getElementById('sliderFill');
+
+    function updateSliderFill() {
+      const min = parseInt(rangeMin.value);
+      const max = parseInt(rangeMax.value);
+      const total = 500;
+      sliderFill.style.left = (min / total * 100) + '%';
+      sliderFill.style.width = ((max - min) / total * 100) + '%';
+    }
+
+    function syncPrice() {
+      let min = parseInt(rangeMin.value);
+      let max = parseInt(rangeMax.value);
+      if (min > max - 20) { min = max - 20; rangeMin.value = min; }
+      priceMinEl.textContent = '$' + min;
+      priceMaxEl.textContent = '$' + max;
+      priceMinInput.value = min;
+      priceMaxInput.value = max;
+      state.priceMin = min;
+      state.priceMax = max;
+      updateSliderFill();
+      applyFilters();
+    }
+
+    rangeMin.addEventListener('input', syncPrice);
+    rangeMax.addEventListener('input', syncPrice);
+    priceMinInput.addEventListener('change', () => { rangeMin.value = priceMinInput.value; syncPrice(); });
+    priceMaxInput.addEventListener('change', () => { rangeMax.value = priceMaxInput.value; syncPrice(); });
+
+    document.querySelectorAll('.price-preset').forEach(r => {
+      r.addEventListener('change', function () {
+        rangeMin.value = this.dataset.min;
+        rangeMax.value = this.dataset.max;
+        syncPrice();
+      });
+    });
+
+    updateSliderFill();
+
+    // ── Checkboxes (category, brand, availability) ────────
+    document.querySelectorAll('.filter-cb').forEach(cb => {
+      cb.addEventListener('change', function () {
+        const key = this.dataset.filter;
+        const val = this.value;
+        if (key === 'category') { this.checked ? state.categories.add(val) : state.categories.delete(val); }
+        else if (key === 'brand') { this.checked ? state.brands.add(val) : state.brands.delete(val); }
+        applyFilters();
+      });
+    });
+
+    // ── Colour swatches ───────────────────────────────────
+    document.querySelectorAll('.colour-swatch-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const colour = this.dataset.colour;
+        this.classList.toggle('active');
+        if (this.classList.contains('active')) { state.colours.add(colour); }
+        else { state.colours.delete(colour); }
+        const wrap = document.getElementById('selectedColoursWrap');
+        const list = document.getElementById('selectedColours');
+        if (state.colours.size > 0) {
+          wrap.style.display = 'block';
+          list.textContent = Array.from(state.colours).join(', ');
+        } else { wrap.style.display = 'none'; }
+        applyFilters();
+      });
+    });
+
+    // ── Size buttons ──────────────────────────────────────
+    document.querySelectorAll('.size-filter-btn').forEach(btn => {
+      btn.addEventListener('click', function () {
+        this.classList.toggle('active');
+        const size = this.dataset.size;
+        if (this.classList.contains('active')) { state.sizes.add(size); }
+        else { state.sizes.delete(size); }
+        applyFilters();
+      });
+    });
+
+    // ── Rating radios ─────────────────────────────────────
+    document.querySelectorAll('.filter-rating-rb').forEach(rb => {
+      rb.addEventListener('change', function () {
+        state.rating = parseInt(this.value);
+        applyFilters();
+      });
+    });
+
+    // ── Apply all filters ─────────────────────────────────
+    function applyFilters() {
+      let visible = 0;
+      allCards.forEach(card => {
+        const price = parseFloat(card.dataset.price);
+        const rating = parseFloat(card.dataset.rating);
+        const cardCats = card.dataset.category || '';
+        const cardBrand = card.dataset.brand || '';
+        const cardColours = (card.dataset.colours || '').split(',');
+        const cardSizes = (card.dataset.sizes || '').split(',');
+
+        let show = true;
+        if (state.categories.size > 0 && !state.categories.has(cardCats)) show = false;
+        if (state.brands.size > 0 && !state.brands.has(cardBrand)) show = false;
+        if (price < state.priceMin || price > state.priceMax) show = false;
+        if (state.colours.size > 0 && !Array.from(state.colours).some(c => cardColours.includes(c))) show = false;
+        if (state.sizes.size > 0 && !Array.from(state.sizes).some(s => cardSizes.includes(s))) show = false;
+        if (state.rating > 0 && rating < state.rating) show = false;
+
+        card.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+
+      countEl.textContent = visible;
+      noResults.style.display = visible === 0 ? 'flex' : 'none';
+      pagination.style.display = visible === 0 ? 'none' : 'flex';
+      updateActiveFiltersBar();
+    }
+
+    // ── Active filter tags ────────────────────────────────
+    function updateActiveFiltersBar() {
+      const wrap = document.getElementById('activeFiltersWrap');
+      const container = document.getElementById('activeFilters');
+      const tags = [];
+
+      state.categories.forEach(v => tags.push({ label: v, clear: () => { state.categories.delete(v); document.querySelector(`.filter-cb[data-filter="category"][value="${v}"]`).checked = false; applyFilters(); } }));
+      state.brands.forEach(v => tags.push({ label: v, clear: () => { state.brands.delete(v); document.querySelector(`.filter-cb[data-filter="brand"][value="${v}"]`).checked = false; applyFilters(); } }));
+      state.colours.forEach(v => tags.push({ label: v, clear: () => { state.colours.delete(v); document.querySelector(`.colour-swatch-btn[data-colour="${v}"]`).classList.remove('active'); applyFilters(); } }));
+      state.sizes.forEach(v => tags.push({ label: 'Size: ' + v, clear: () => { state.sizes.delete(v); document.querySelector(`.size-filter-btn[data-size="${v}"]`).classList.remove('active'); applyFilters(); } }));
+      if (state.rating > 0) tags.push({ label: state.rating + '★ & up', clear: () => { state.rating = 0; document.querySelectorAll('.filter-rating-rb').forEach(r => r.checked = false); applyFilters(); } });
+      if (state.priceMin > 0 || state.priceMax < 500) tags.push({ label: '$' + state.priceMin + ' – $' + state.priceMax, clear: () => { state.priceMin = 0; state.priceMax = 500; rangeMin.value = 0; rangeMax.value = 500; document.querySelectorAll('.price-preset').forEach(r => r.checked = false); syncPrice(); } });
+
+      container.innerHTML = '';
+      tags.forEach(tag => {
+        const el = document.createElement('button');
+        el.className = 'active-filter-tag';
+        el.innerHTML = tag.label + ' <i class="fa fa-times"></i>';
+        el.addEventListener('click', tag.clear);
+        container.appendChild(el);
+      });
+
+      wrap.style.display = tags.length > 0 ? 'block' : 'none';
+    }
+
+    // ── Clear all ─────────────────────────────────────────
+    function clearAll() {
+      state.categories.clear(); state.brands.clear(); state.colours.clear(); state.sizes.clear();
+      state.priceMin = 0; state.priceMax = 500; state.rating = 0;
+      document.querySelectorAll('.filter-cb, .filter-rating-rb, .price-preset').forEach(el => el.checked = false);
+      document.querySelectorAll('.colour-swatch-btn, .size-filter-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('selectedColoursWrap').style.display = 'none';
+      rangeMin.value = 0; rangeMax.value = 500;
+      syncPrice();
+      applyFilters();
+    }
+
+    document.getElementById('clearAllFilters').addEventListener('click', clearAll);
+    document.getElementById('noResultsClear').addEventListener('click', clearAll);
+
+    // ── Sort ──────────────────────────────────────────────
+    document.getElementById('sortSelect').addEventListener('change', function () {
+      const val = this.value;
+      const cards = Array.from(grid.querySelectorAll('.product-card'));
+      cards.sort((a, b) => {
+        if (val === 'price-asc') return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+        if (val === 'price-desc') return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+        if (val === 'rating') return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+        if (val === 'name-asc') return a.querySelector('h4').textContent.localeCompare(b.querySelector('h4').textContent);
+        return 0;
+      });
+      cards.forEach(c => grid.appendChild(c));
+    });
+
+    // ── Grid / List view toggle ───────────────────────────
+    document.getElementById('gridViewBtn').addEventListener('click', function () {
+      grid.classList.remove('plp-list-view');
+      this.classList.add('active');
+      document.getElementById('listViewBtn').classList.remove('active');
+    });
+    document.getElementById('listViewBtn').addEventListener('click', function () {
+      grid.classList.add('plp-list-view');
+      this.classList.add('active');
+      document.getElementById('gridViewBtn').classList.remove('active');
+    });
+
+    // ── Collapsible filter groups ─────────────────────────
+    document.querySelectorAll('.filter-group-title').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const target = this.dataset.filterToggle;
+        const body = document.getElementById('filter-' + target);
+        const arrow = this.querySelector('.filter-arrow');
+        body.classList.toggle('collapsed');
+        arrow.style.transform = body.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0)';
+      });
+    });
+
+    // ── Mobile filter drawer ──────────────────────────────
+    const sidebar = document.getElementById('filterSidebar');
+    const overlay = document.getElementById('mobileFilterOverlay');
+
+    document.getElementById('mobileFilterBtn').addEventListener('click', function () {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+
+    overlay.addEventListener('click', function () {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+
+  })();
+  </script>
+</body>
+</html>
+

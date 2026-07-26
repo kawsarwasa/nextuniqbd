@@ -1,0 +1,77 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Role Permissions{% endblock %}
+{% block page_title %}Permissions{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_role_list' %}">Roles & Permissions</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ managed_role.name }}</li>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="card dashboard-permission-card">
+      <div class="card-header dashboard-permission-card__header">
+        <div>
+          <div class="dashboard-permission-card__name text-uppercase">User Role: {{ managed_role.name }}</div>
+          <div class="dashboard-permission-card__meta">Permissions Management</div>
+          {% if managed_role_profile.description %}
+            <div class="dashboard-permission-card__email">{{ managed_role_profile.description }}</div>
+          {% endif %}
+        </div>
+        <div class="text-md-end">
+          <div class="small mb-2"><i class="bi bi-calendar-event me-1"></i>{{ permission_snapshot_at }}</div>
+          {% if managed_role_profile.is_active %}
+            <span class="badge text-bg-success">Active</span>
+          {% else %}
+            <span class="badge text-bg-secondary">Inactive</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle dashboard-permission-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th class="text-center">View</th>
+                <th class="text-center">Edit</th>
+                <th class="text-center">Update</th>
+                <th class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in role_permission_rows %}
+                <tr>
+                  <td class="fw-semibold">{{ row.label }}</td>
+                  {% for action, cell in row.permissions.items %}
+                  <td class="text-center">
+                      {% if cell.permission_ids %}
+                        <label class="dashboard-permission-switch dashboard-permission-switch--compact">
+                          <input type="checkbox" name="permission_cells" value="{{ cell.input_value }}"{% if cell.checked %} checked{% endif %}>
+                          <span class="dashboard-permission-switch__slider"></span>
+                        </label>
+                      {% else %}
+                        <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="{% url 'dashboard_role_list' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-floppy me-1"></i>Save Changes
+        </button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

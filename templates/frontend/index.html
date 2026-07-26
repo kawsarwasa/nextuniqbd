@@ -1,0 +1,467 @@
+﻿{% extends "frontend/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }}{% endblock %}
+
+{% block extra_head %}
+  {% if hero_slides %}
+    {% with first_slide=hero_slides.0 %}
+      <link rel="preload" as="image" href="{{ first_slide.image.url }}" fetchpriority="high" />
+    {% endwith %}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- HERO CAROUSEL -->
+  <section class="hero-section">
+    <div class="hero-carousel" id="heroCarousel">
+      {% if hero_slides %}
+        {% for slide in hero_slides %}
+          <div
+            class="hero-slide{% if forloop.first %} active{% endif %}"
+            {% if forloop.first %}style="background-image: url('{{ slide.image.url }}');"{% else %}data-background-image="{{ slide.image.url }}"{% endif %}
+          >
+            <div class="container">
+              <div class="{{ slide.content_css_class }}"{% if slide.content_inline_style %} style="{{ slide.content_inline_style }}"{% endif %}>
+                {% if slide.eyebrow %}
+                  <p class="hero-sub">{{ slide.eyebrow }}</p>
+                {% endif %}
+                <h1>{{ slide.title_html|safe }}</h1>
+                {% if slide.description %}
+                  <p class="hero-desc">{{ slide.description }}</p>
+                {% endif %}
+                {% if slide.primary_button_label or slide.secondary_button_label %}
+                  <div class="hero-buttons">
+                    {% if slide.primary_button_label %}
+                      <a href="{{ slide.primary_button_url|default:'#' }}" class="btn-hero-primary">{{ slide.primary_button_label }}</a>
+                    {% endif %}
+                    {% if slide.secondary_button_label %}
+                      <a href="{{ slide.secondary_button_url|default:'#' }}" class="btn-hero-outline">{{ slide.secondary_button_label }}</a>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&h=600&fit=crop');">
+          <div class="container">
+            <div class="hero-content">
+              <p class="hero-sub">New Collection 2024</p>
+              <h1>The Ultimate<br><span>Shopping List</span></h1>
+              <p class="hero-desc">Discover the latest trends in fashion, electronics & more</p>
+              <div class="hero-buttons">
+                <a href="#" class="btn-hero-primary">Shop Now</a>
+                <a href="#" class="btn-hero-outline">See More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <button class="carousel-btn prev" id="heroPrev"><i class="fa fa-chevron-left"></i></button>
+      <button class="carousel-btn next" id="heroNext"><i class="fa fa-chevron-right"></i></button>
+
+      <div class="carousel-dots" id="heroDots">
+        {% if hero_slides %}
+          {% for slide in hero_slides %}
+            <span class="dot{% if forloop.first %} active{% endif %}"></span>
+          {% endfor %}
+        {% else %}
+          <span class="dot active"></span>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES BAR -->
+  <section class="features-bar">
+    <div class="container features-grid">
+      <div class="feature-item">
+        <i class="fa fa-truck"></i>
+        <div>
+          <h4>Free Shipping</h4>
+          <p>On orders over $99</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <i class="fa fa-undo-alt"></i>
+        <div>
+          <h4>Easy Returns</h4>
+          <p>30 day return policy</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <i class="fa fa-shield-alt"></i>
+        <div>
+          <h4>Secure Payment</h4>
+          <p>100% secure checkout</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <i class="fa fa-headset"></i>
+        <div>
+          <h4>24/7 Support</h4>
+          <p>Dedicated customer care</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED CATEGORIES -->
+  <section class="section categories-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Shop by Category</h2>
+        <a href="{% url 'frontend_products' %}" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="categories-grid">
+        {% for category in homepage_categories %}
+          <div class="category-card">
+            <div class="cat-image">
+              {% if category.image %}
+                <img src="{{ category.image.url }}" alt="{{ category.name }}" width="600" height="600" loading="lazy" decoding="async" />
+              {% else %}
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop" alt="{{ category.name }}" width="300" height="300" loading="lazy" decoding="async" />
+              {% endif %}
+              <div class="cat-overlay">
+                <a href="{{ category.home_url }}" class="cat-link">Shop Now</a>
+              </div>
+            </div>
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.published_product_count }} Product{{ category.published_product_count|pluralize }}</p>
+          </div>
+        {% empty %}
+          <div class="category-card">
+            <div class="cat-image">
+              <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop" alt="Category placeholder" width="300" height="300" loading="lazy" decoding="async" />
+            </div>
+            <h3>No Categories</h3>
+            <p>Add dashboard categories and enable "Show on homepage"</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  {% if homepage_promo_banners.large or homepage_promo_banners.small %}
+    <!-- PROMO BANNERS ROW -->
+    <section class="promo-banners">
+      <div class="container promo-grid">
+        {% if homepage_promo_banners.large %}
+          <div class="promo-banner large">
+            <img src="{{ homepage_promo_banners.large.display_image_url }}" alt="{{ homepage_promo_banners.large.title }}" loading="lazy" decoding="async" />
+            <div class="promo-content{% if homepage_promo_banners.large.use_dark_overlay %} dark{% endif %}">
+              {% if homepage_promo_banners.large.eyebrow %}
+                <p>{{ homepage_promo_banners.large.eyebrow }}</p>
+              {% endif %}
+              <h3>{{ homepage_promo_banners.large.title }}</h3>
+              {% if homepage_promo_banners.large.button_label %}
+                <a href="{{ homepage_promo_banners.large.button_url|default:'#' }}" class="btn-promo">{{ homepage_promo_banners.large.button_label }}</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+        {% if homepage_promo_banners.small %}
+          <div class="promo-banner-col">
+            {% for banner in homepage_promo_banners.small %}
+              <div class="promo-banner small">
+                <img src="{{ banner.display_image_url }}" alt="{{ banner.title }}" loading="lazy" decoding="async" />
+                <div class="promo-content{% if banner.use_dark_overlay %} dark{% endif %}">
+                  {% if banner.eyebrow %}
+                    <p>{{ banner.eyebrow }}</p>
+                  {% endif %}
+                  <h3>{{ banner.title }}</h3>
+                  {% if banner.button_label %}
+                    <a href="{{ banner.button_url|default:'#' }}" class="btn-promo">{{ banner.button_label }}</a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- TODAY'S DEALS / BEST SELLERS TABS -->
+  <section class="section products-section">
+    <div class="container">
+      <div class="section-tabs-header">
+        <div class="section-tabs">
+          {% for tab in homepage_product_tabs %}
+            <button class="tab-btn{% if forloop.first %} active{% endif %}" data-tab="{{ tab.key }}">{{ tab.label }}</button>
+          {% endfor %}
+        </div>
+        <a href="{% url 'frontend_products' %}" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      {% for tab in homepage_product_tabs %}
+        <div class="tab-content{% if forloop.first %} active{% endif %}" id="tab-{{ tab.key }}">
+          {% if tab.key == "deals" %}
+            <div class="products-carousel-wrap">
+              <button class="prod-nav prev" data-carousel="prod-{{ tab.key }}"><i class="fa fa-chevron-left"></i></button>
+              <div class="products-row" id="prod-{{ tab.key }}">
+                {% for product in tab.products %}
+                  {% include "frontend/partials/home/product_card.html" with product=product extra_badge_label=tab.extra_badge_label %}
+                {% empty %}
+                  <div class="alert alert-light border mb-0">No published products available right now.</div>
+                {% endfor %}
+              </div>
+              <button class="prod-nav next" data-carousel="prod-{{ tab.key }}"><i class="fa fa-chevron-right"></i></button>
+            </div>
+          {% else %}
+            <div class="products-row">
+              {% for product in tab.products %}
+                {% include "frontend/partials/home/product_card.html" with product=product extra_badge_label=tab.extra_badge_label %}
+              {% empty %}
+                <div class="alert alert-light border mb-0">No published products available right now.</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- COUNTDOWN SALE BANNER -->
+  <section class="sale-banner">
+    <div class="container sale-inner">
+      <div class="sale-text">
+        <p class="sale-label">Limited Time Offer</p>
+        <h2>Flash Sale â€” Up to <span>60% Off</span></h2>
+        <p>Don't miss out on these amazing deals. Offer ends soon!</p>
+      </div>
+      <div class="countdown" id="countdown">
+        <div class="countdown-item">
+          <span id="cd-days">00</span>
+          <p>Days</p>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span id="cd-hours">00</span>
+          <p>Hours</p>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span id="cd-mins">00</span>
+          <p>Minutes</p>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-item">
+          <span id="cd-secs">00</span>
+          <p>Seconds</p>
+        </div>
+      </div>
+      <a href="#" class="btn-sale">Shop Flash Sale</a>
+    </div>
+  </section>
+
+  <!-- CATEGORY SORTED PRODUCTS -->
+  <section class="section products-section category-sorted-section">
+    <div class="container">
+      <div class="section-tabs-header">
+        <div class="section-tabs">
+          {% for tab in homepage_category_product_tabs %}
+            <button class="tab-btn{% if forloop.first %} active{% endif %}" data-tab="{{ tab.key }}">{{ tab.label }}</button>
+          {% endfor %}
+        </div>
+        <a href="{% url 'frontend_products' %}" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+
+      {% for tab in homepage_category_product_tabs %}
+        <div class="tab-content{% if forloop.first %} active{% endif %}" id="tab-{{ tab.key }}">
+          <div class="products-carousel-wrap">
+            <button class="prod-nav prev" type="button" data-carousel="prod-{{ tab.key }}" aria-label="Previous products">
+              <i class="fa fa-chevron-left"></i>
+            </button>
+            <div class="products-row" id="prod-{{ tab.key }}">
+              {% for product in tab.products %}
+                {% include "frontend/partials/home/product_card.html" with product=product extra_badge_label=tab.extra_badge_label %}
+              {% empty %}
+                <div class="alert alert-light border mb-0">No published products available in category sort order 1 to 4.</div>
+              {% endfor %}
+            </div>
+            <button class="prod-nav next" type="button" data-carousel="prod-{{ tab.key }}" aria-label="Next products">
+              <i class="fa fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- BRANDS SECTION -->
+  <section class="brands-section">
+    <div class="container">
+      <div class="section-header center">
+        <h2>Our Brands</h2>
+        <p>Trusted by the world's leading brands</p>
+      </div>
+      <div class="brands-track">
+        <div class="brands-list" id="brandsList">
+          {% if homepage_brands %}
+            {% for brand in homepage_brands %}
+              <a href="{{ brand.home_url }}" class="brand-item">{% if brand.logo %}<img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">{% else %}<span>{{ brand.name }}</span>{% endif %}</a>
+            {% endfor %}
+            {% for brand in homepage_brands %}
+              <a href="{{ brand.home_url }}" class="brand-item">{% if brand.logo %}<img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">{% else %}<span>{{ brand.name }}</span>{% endif %}</a>
+            {% endfor %}
+          {% else %}
+            <div class="brand-item"><span>No homepage brands</span></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOG SECTION -->
+  <section class="section blog-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>From Our Blog</h2>
+        <a href="{% url 'frontend_blog' %}" class="view-all">All Posts <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="blog-grid">
+        {% for post in homepage_blog_posts %}
+          <div class="blog-card">
+            <div class="blog-image">
+              <a href="{% url 'frontend_blog_detail' post.slug %}">
+                <img src="{% if post.primary_image_url %}{{ post.primary_image_url }}{% else %}https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop{% endif %}" alt="{{ post.title }}" width="400" height="250" loading="lazy" decoding="async" />
+              </a>
+              <span class="blog-cat">{{ post.category.name }}</span>
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa fa-calendar"></i> {{ post.published_display }}</span>
+                <span><i class="fa fa-user"></i> {{ post.author_name }}</span>
+                <span><i class="fa fa-comment"></i> {{ post.comment_count }}</span>
+              </div>
+              <h3><a href="{% url 'frontend_blog_detail' post.slug %}">{{ post.title }}</a></h3>
+              <p>{{ post.excerpt_plain|truncatechars:140 }}</p>
+              <a href="{% url 'frontend_blog_detail' post.slug %}" class="read-more">Read More <i class="fa fa-arrow-right"></i></a>
+            </div>
+          </div>
+        {% empty %}
+          <div class="blog-card">
+            <div class="blog-image">
+              <a href="{% url 'frontend_blog' %}">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop" alt="No blog posts" width="400" height="250" loading="lazy" decoding="async" />
+              </a>
+              <span class="blog-cat">Blog</span>
+            </div>
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa fa-calendar"></i> No posts yet</span>
+              </div>
+              <h3><a href="{% url 'frontend_blog' %}">Publish blog posts from the dashboard</a></h3>
+              <p>The homepage blog section will fill automatically after you publish posts in the dashboard.</p>
+              <a href="{% url 'frontend_blog' %}" class="read-more">Read More <i class="fa fa-arrow-right"></i></a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER SECTION -->
+  <section class="newsletter-section">
+    <div class="container newsletter-inner">
+      <div class="newsletter-text">
+        <h2><i class="fa fa-envelope-open-text"></i> Subscribe to Our Newsletter</h2>
+        <p>Get the latest deals, new arrivals, and exclusive offers straight to your inbox.</p>
+      </div>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" placeholder="Enter your email address..." required />
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </section>
+{% endblock %}
+
+{% block page_overlays %}
+<!-- COOKIE CONSENT -->
+  <div class="cookie-banner" id="cookieBanner">
+    <p>We use cookies to enhance your experience. By continuing, you agree to our <a href="#">Cookie Policy</a>.</p>
+    <button id="acceptCookies">Accept</button>
+    <button id="declineCookies">Decline</button>
+  </div>
+
+  <!-- NEWSLETTER MODAL -->
+  <div class="modal-overlay" id="newsletterModal">
+    <div class="modal-box">
+      <button class="modal-close" id="modalClose"><i class="fa fa-times"></i></button>
+      <div class="modal-content">
+        <div class="modal-left">
+          <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&h=400&fit=crop" alt="Newsletter" />
+        </div>
+        <div class="modal-right">
+          <p class="modal-label">Special Offer</p>
+          <h2>Get <span>20% Off</span><br>Your First Order</h2>
+          <p>Subscribe to our newsletter and get an exclusive discount code.</p>
+          <form id="modalForm">
+            <input type="email" placeholder="Your email address" required />
+            <button type="submit">Get My Discount</button>
+          </form>
+          <button class="modal-skip" id="modalSkip">No thanks, I'll pay full price</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK VIEW MODAL -->
+  <div class="modal-overlay" id="quickViewModal">
+    <div class="modal-box quickview-box">
+      <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+      <div class="quickview-content">
+        <div class="quickview-image">
+          <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=400&fit=crop" alt="Quick View" id="qvImage" />
+        </div>
+        <div class="quickview-info">
+          <p class="product-cat" id="qvCat">Fashion</p>
+          <h2 id="qvName">EcoSmart Fleece Hoodie</h2>
+          <div class="product-rating">
+            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+            <span id="qvReviews">(24 reviews)</span>
+          </div>
+          <div class="product-price large" id="qvPrice">
+            <span class="price-current">$245.00</span>
+            <span class="price-old">$350.00</span>
+          </div>
+          <p class="qv-desc" id="qvDesc">A premium quality fleece hoodie perfect for all seasons. Made from 100% sustainable materials.</p>
+          <div class="qv-options">
+            <div class="qv-size">
+              <label>Size:</label>
+              <div class="size-btns">
+                <button>XS</button><button class="active">S</button><button>M</button><button>L</button><button>XL</button>
+              </div>
+            </div>
+            <div class="qv-color">
+              <label>Color:</label>
+              <div class="color-btns">
+                <button class="color-btn active" style="background:#333"></button>
+                <button class="color-btn" style="background:#4a6da7"></button>
+                <button class="color-btn" style="background:#c0392b"></button>
+              </div>
+            </div>
+            <div class="qv-qty">
+              <label>Quantity:</label>
+              <div class="qty-control">
+                <button id="qvQtyMinus">-</button>
+                <input type="number" value="1" min="1" id="qvQty" />
+                <button id="qvQtyPlus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="qv-actions">
+            <button class="add-to-cart full">Add to Cart</button>
+          </div>
+          <a href="#" class="view-detail" id="qvDetailLink">View Full Details <i class="fa fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+

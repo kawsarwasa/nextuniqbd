@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}
+{% load finance_tags %}
+{% block title %}{{ site_company.company_name|default:default_company_name }} | {{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li><li class="breadcrumb-item"><a href="{% url 'finance:dashboard' %}">Accounts</a></li><li class="breadcrumb-item"><a href="{% url 'finance:due_list' %}">Due</a></li><li class="breadcrumb-item active" aria-current="page">{% if form.instance.pk %}Edit{% else %}Add{% endif %}</li>{% endblock %}
+{% block content %}
+  <div class="row justify-content-center"><div class="col-12 col-xl-10"><div class="card"><div class="card-header"><h3 class="card-title"><i class="bi bi-receipt me-2" aria-hidden="true"></i>{{ page_title }}</h3></div><form method="post" novalidate><div class="card-body">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row"><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.due_date %}</div><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.due_type %}<div class="form-text mt-n2 mb-3">Receivable: money the business will receive. Payable: money the business needs to pay.</div></div></div>
+    <div class="row"><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.party_name %}</div><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.phone %}</div></div>
+    <div class="row"><div class="col-12 col-md-6"><label class="form-label" for="{{ form.original_amount.id_for_label }}">{{ form.original_amount.label }}<span class="text-danger" aria-hidden="true">*</span></label><div class="input-group"><span class="input-group-text">৳</span>{{ form.original_amount }}</div>{% if form.original_amount.errors %}<div class="invalid-feedback d-block">{{ form.original_amount.errors }}</div>{% endif %}</div><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.due_deadline %}</div></div>
+    {% include "dashboard/finance/includes/form_field.html" with field=form.description %}
+    <div class="row"><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.reference %}</div><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.notes %}</div></div>
+  </div><div class="card-footer d-flex flex-wrap justify-content-between gap-2"><a class="btn btn-outline-secondary" href="{% if form.instance.pk %}{% url 'finance:due_detail' form.instance.pk %}{% else %}{% url 'finance:due_list' %}{% endif %}">Cancel</a><button class="btn btn-primary" type="submit">{{ submit_label }}</button></div></form></div></div></div>
+{% endblock %}

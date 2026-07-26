@@ -1,0 +1,429 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .dashboard-product-preview {
+        min-height: 420px;
+    }
+
+    .dashboard-product-preview__image {
+        max-height: 400px;
+        object-fit: contain;
+    }
+
+    .dashboard-product-thumbs {
+        gap: 0.75rem;
+    }
+
+    .dashboard-product-thumb {
+        padding: 0.25rem;
+        border: 2px solid transparent;
+        background: #ffffff;
+        transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .dashboard-product-thumb:hover,
+    .dashboard-product-thumb.is-active {
+        border-color: var(--bs-primary);
+        transform: translateY(-2px);
+    }
+
+    .dashboard-product-thumb img {
+        width: 64px;
+        height: 64px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .dashboard-review-summary {
+        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+    }
+
+    .dashboard-review-score {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .dashboard-review-stars,
+    .dashboard-review-card__stars {
+        color: #f59e0b;
+    }
+
+    .dashboard-review-bars {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .dashboard-review-bar-row {
+        display: grid;
+        grid-template-columns: 70px 1fr 48px;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .dashboard-review-bar-track {
+        height: 0.5rem;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .dashboard-review-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+    }
+
+    .dashboard-review-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .dashboard-review-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 1rem;
+        background: #fff;
+        padding: 1.25rem;
+    }
+
+    .dashboard-review-card__header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .dashboard-review-card__avatar {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-weight: 700;
+    }
+
+    .dashboard-review-card__meta {
+        flex: 1 1 220px;
+    }
+
+    .dashboard-review-card__date {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Product Details</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard_product_list' %}">Products</a></li>
+                        <li class="breadcrumb-item active">{{ product.name }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="card card-solid shadow-sm">
+            <div class="card-body">
+                <div class="row">
+                    <!-- Left Column: Image Gallery -->
+                    <div class="col-12 col-sm-5">
+                        <h3 class="d-inline-block d-sm-none mb-3">{{ product.name }}</h3>
+                        <div class="col-12 text-center rounded border bg-light p-2 mb-3 dashboard-product-preview d-flex align-items-center justify-content-center">
+                            {% if product.images.all %}
+                                <img
+                                    src="{{ product.images.first.image.url }}"
+                                    class="product-image img-fluid dashboard-product-preview__image"
+                                    alt="{{ product.name }}"
+                                    id="dashboardMainProductImage"
+                                >
+                            {% else %}
+                                <div class="d-flex justify-content-center align-items-center" style="height: 380px;">
+                                    <span class="text-muted"><i class="fas fa-image fa-4x"></i><br>No Image Available</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12 product-image-thumbs dashboard-product-thumbs d-flex flex-wrap justify-content-center">
+                            {% for image in product.images.all %}
+                                <button
+                                    type="button"
+                                    class="product-image-thumb dashboard-product-thumb rounded js-product-gallery-thumb{% if forloop.first %} is-active{% endif %}"
+                                    data-image-src="{{ image.image.url }}"
+                                    data-image-alt="{{ product.name }} image {{ forloop.counter }}"
+                                    aria-label="Preview image {{ forloop.counter }} for {{ product.name }}"
+                                    {% if forloop.first %}aria-current="true"{% endif %}
+                                >
+                                    <img src="{{ image.image.url }}" alt="{{ product.name }} thumbnail {{ forloop.counter }}">
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Product Metadata -->
+                    <div class="col-12 col-sm-7 pl-md-4">
+                        <h3 class="my-3 text-dark">{{ product.name }}</h3>
+                        <p class="text-muted">{{ product.short_description|default:"No short description provided." }}</p>
+
+                        <hr>
+
+                        <dl class="row text-md">
+                            <dt class="col-sm-4 text-muted">SKU</dt>
+                            <dd class="col-sm-8 font-weight-bold">{{ product.sku }}</dd>
+
+                            <dt class="col-sm-4 text-muted">Category</dt>
+                            <dd class="col-sm-8">{{ product.category.name|default:"-" }}</dd>
+
+                            <dt class="col-sm-4 text-muted">Brand</dt>
+                            <dd class="col-sm-8">{{ product.brand.name|default:"-" }}</dd>
+
+                            <dt class="col-sm-4 text-muted">Availability</dt>
+                            <dd class="col-sm-8">
+                                {% if product.track_stock %}
+                                    <span class="badge bg-{% if product.stock_quantity %}success{% else %}danger{% endif %} px-2 py-1">{{ product.stock_status_label }}</span>
+                                {% elif product.availability == "In Stock" %}
+                                    <span class="badge bg-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> In Stock</span>
+                                {% else %}
+                                    <span class="badge bg-danger px-2 py-1"><i class="fas fa-times-circle mr-1"></i> Out of Stock</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Tracking</dt>
+                            <dd class="col-sm-8">
+                                {% if product.track_stock %}
+                                    <span class="badge bg-primary px-2 py-1">Tracked</span>
+                                {% else %}
+                                    <span class="badge bg-secondary px-2 py-1">Not Tracked</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Current Stock</dt>
+                            <dd class="col-sm-8">{% if product.track_stock %}{{ product.stock_quantity }}{% else %}Not tracked{% endif %}</dd>
+
+                            <dt class="col-sm-4 text-muted">Low-stock Threshold</dt>
+                            <dd class="col-sm-8">{% if product.track_stock %}{{ product.low_stock_threshold }}{% else %}—{% endif %}</dd>
+
+                            <dt class="col-sm-4 text-muted">Total Purchased</dt>
+                            <dd class="col-sm-8">{{ stock_totals.purchased }}</dd>
+
+                            <dt class="col-sm-4 text-muted">Total Sold</dt>
+                            <dd class="col-sm-8">{{ stock_totals.sold }}</dd>
+
+                            <dt class="col-sm-4 text-muted">Total Returned</dt>
+                            <dd class="col-sm-8">{{ stock_totals.returned }}</dd>
+
+                            <dt class="col-sm-4 text-muted">Stock Status</dt>
+                            <dd class="col-sm-8">
+                                {% if not product.track_stock %}
+                                    <span class="badge bg-secondary px-2 py-1">Not Tracked</span>
+                                {% elif product.stock_quantity == 0 %}
+                                    <span class="badge bg-danger px-2 py-1">Out of Stock</span>
+                                {% elif product.is_low_stock %}
+                                    <span class="badge bg-warning text-dark px-2 py-1">Low Stock ({{ product.stock_quantity }})</span>
+                                {% else %}
+                                    <span class="badge bg-success px-2 py-1">In Stock</span>
+                                {% endif %}
+                            </dd>
+
+                            <dt class="col-sm-4 text-muted">Status</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge bg-primary px-2 py-1">{{ product.get_status_display|default:product.status|title }}</span>
+                            </dd>
+                        </dl>
+
+                        <div class="bg-gray-light py-3 px-4 mt-4 rounded">
+                            <h2 class="mb-0 text-success font-weight-bold">
+                                ${{ product.current_price|default:product.regular_price|default:"0.00" }}
+                            </h2>
+                            {% if product.current_price and product.regular_price and product.current_price < product.regular_price %}
+                            <h5 class="mt-1 text-muted">
+                                <small>Regular Price: <del>${{ product.regular_price }}</del></small>
+                            </h5>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-4 pt-2">
+                            <a href="{% url 'dashboard_product_edit' product.pk %}" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm mr-2">
+                                <i class="fas fa-edit mr-2"></i> Edit Product
+                            </a>
+                            <a href="{% url 'dashboard_product_list' %}" class="btn btn-default btn-lg rounded-pill px-4 shadow-sm">
+                                <i class="fas fa-arrow-left mr-2"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div class="card card-outline card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title mb-0">Recent Stock Transactions</h3>
+                            </div>
+                            <div class="card-body table-responsive p-0">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>When</th>
+                                            <th>Type</th>
+                                            <th>Change</th>
+                                            <th>Balance</th>
+                                            <th>Reference</th>
+                                            <th>Created By</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for transaction in stock_transactions %}
+                                            <tr>
+                                                <td>{{ transaction.created_at|date:"d M Y, h:i A" }}</td>
+                                                <td>{{ transaction.get_transaction_type_display }}</td>
+                                                <td class="{% if transaction.quantity_change > 0 %}text-success{% else %}text-danger{% endif %}">{{ transaction.quantity_change }}</td>
+                                                <td>{{ transaction.balance_after }}</td>
+                                                <td>{{ transaction.reference|default:"—" }}</td>
+                                                <td>{{ transaction.created_by|default:"—" }}</td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr><td colspan="6" class="text-center text-muted py-4">No stock transactions recorded yet.</td></tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <nav class="w-100 border-bottom">
+                            <div class="nav nav-tabs border-0" id="product-tab" role="tablist">
+                                <button class="nav-link active font-weight-bold text-dark border-0 border-bottom border-primary" id="product-desc-tab" data-bs-toggle="tab" data-bs-target="#product-desc" type="button" role="tab" aria-controls="product-desc" aria-selected="true" style="border-bottom-width: 3px !important;">Full Description</button>
+                                <button class="nav-link font-weight-bold text-dark border-0" id="product-review-tab" data-bs-toggle="tab" data-bs-target="#product-reviews" type="button" role="tab" aria-controls="product-reviews" aria-selected="false">Reviews ({{ review_summary.count }})</button>
+                            </div>
+                        </nav>
+                        <div class="tab-content p-4 border rounded-bottom border-top-0 bg-white" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="product-desc" role="tabpanel" aria-labelledby="product-desc-tab">
+                                {{ product.full_description|safe|default:"<span class='text-muted font-italic'>No full description available.</span>" }}
+                            </div>
+                            <div class="tab-pane fade" id="product-reviews" role="tabpanel" aria-labelledby="product-review-tab">
+                                <div class="row g-4">
+                                    <div class="col-lg-4">
+                                        <div class="dashboard-review-summary rounded-4 border p-4 h-100">
+                                            <div class="dashboard-review-score">{{ review_summary.average|floatformat:1 }}</div>
+                                            <div class="dashboard-review-stars fs-5 mb-2">
+                                                {% for _ in "12345" %}
+                                                    {% if forloop.counter <= product.average_rating %}
+                                                        <i class="bi bi-star-fill"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                            <p class="text-muted mb-4">Based on {{ review_summary.count }} review{{ review_summary.count|pluralize }}</p>
+                                            <div class="dashboard-review-bars">
+                                                {% for item in review_summary.breakdown %}
+                                                    <div class="dashboard-review-bar-row">
+                                                        <span>{{ item.rating }} star{{ item.rating|pluralize }}</span>
+                                                        <div class="dashboard-review-bar-track">
+                                                            <div class="dashboard-review-bar-fill" style="width: {{ item.percentage }}%;"></div>
+                                                        </div>
+                                                        <span class="text-muted">{{ item.percentage }}%</span>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="dashboard-review-list">
+                                            {% for review in reviews %}
+                                                <article class="dashboard-review-card shadow-sm">
+                                                    <div class="dashboard-review-card__header">
+                                                        <div class="dashboard-review-card__avatar">{{ review.reviewer_initials }}</div>
+                                                        <div class="dashboard-review-card__meta">
+                                                            <div class="fw-semibold">{{ review.reviewer_name }}</div>
+                                                            <div class="dashboard-review-card__stars">
+                                                                {% for _ in review.full_stars %}
+                                                                    <i class="bi bi-star-fill"></i>
+                                                                {% endfor %}
+                                                                {% for _ in review.empty_stars_range %}
+                                                                    <i class="bi bi-star"></i>
+                                                                {% endfor %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="dashboard-review-card__date">{{ review.review_date|date:"F d, Y" }}</div>
+                                                        {% if review.verified_purchase %}
+                                                            <span class="badge text-bg-success">Verified Purchase</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <h5 class="mb-2">{{ review.title }}</h5>
+                                                    <p class="mb-3 text-muted">{{ review.body }}</p>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <span class="badge text-bg-light">Helpful Yes: {{ review.helpful_yes }}</span>
+                                                        <span class="badge text-bg-light">Helpful No: {{ review.helpful_no }}</span>
+                                                    </div>
+                                                </article>
+                                            {% empty %}
+                                                <div class="alert alert-light border mb-0">No reviews added for this product yet.</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainImage = document.getElementById('dashboardMainProductImage');
+        const thumbs = Array.from(document.querySelectorAll('.js-product-gallery-thumb'));
+
+        if (!mainImage || !thumbs.length) {
+            return;
+        }
+
+        thumbs.forEach((thumb) => {
+            thumb.addEventListener('click', () => {
+                const imageSrc = thumb.dataset.imageSrc;
+                const imageAlt = thumb.dataset.imageAlt || mainImage.alt;
+
+                if (!imageSrc) {
+                    return;
+                }
+
+                mainImage.src = imageSrc;
+                mainImage.alt = imageAlt;
+
+                thumbs.forEach((item) => {
+                    item.classList.remove('is-active');
+                    item.removeAttribute('aria-current');
+                });
+
+                thumb.classList.add('is-active');
+                thumb.setAttribute('aria-current', 'true');
+            });
+        });
+    });
+</script>
+{% endblock %}

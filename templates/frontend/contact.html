@@ -1,0 +1,160 @@
+﻿{% extends "frontend/base.html" %}
+
+{% block title %}Contact Us - SB Revo{% endblock %}
+
+{% block content %}
+<div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Contact Us</span>
+      </nav>
+    </div>
+  </div>
+
+  <section class="contact-hero">
+    <div class="container contact-hero-inner">
+      <div class="contact-hero-copy">
+        <span class="about-section-label">Support That Feels Personal</span>
+        <h1>Letâ€™s Talk About Your Next Order</h1>
+        <p>Questions about delivery, products, bulk orders, or account help? Our team is ready to respond with the same care and speed that shapes the SB Revo shopping experience.</p>
+        <div class="contact-hero-points">
+          <span><i class="fa fa-check-circle"></i> Fast support replies</span>
+          <span><i class="fa fa-check-circle"></i> Helpful order assistance</span>
+          <span><i class="fa fa-check-circle"></i> Friendly product guidance</span>
+        </div>
+      </div>
+      <div class="contact-hero-card">
+        <div class="contact-mini-card">
+          <i class="fa fa-headset"></i>
+          <div>
+            <strong>Customer Care</strong>
+            <p>Available every day for shopping and order support.</p>
+          </div>
+        </div>
+        <div class="contact-mini-card">
+          <i class="fa fa-phone-volume"></i>
+          <div>
+            <strong>(+84) 4567 421 978</strong>
+            <p>Call for urgent order questions.</p>
+          </div>
+        </div>
+        <div class="contact-mini-card">
+          <i class="fa fa-envelope-open-text"></i>
+          <div>
+            <strong>support@sbrevo.com</strong>
+            <p>Email for product and account help.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section section">
+    <div class="container">
+      <div class="contact-layout">
+        <div class="contact-sidebar">
+          <div class="contact-info-card">
+            <span class="about-section-label">Reach Us</span>
+            <h2>We make support simple.</h2>
+            <p>Tell us what you need and our team will guide you with clear answers, quick follow-up, and the right next step.</p>
+
+            <div class="contact-info-list">
+              <div class="contact-info-item">
+                <div class="contact-info-icon"><i class="fa fa-map-marker-alt"></i></div>
+                <div>
+                  <h4>Store Office</h4>
+                  <p>685 Market Street, San Francisco, CA 94105</p>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-info-icon"><i class="fa fa-clock"></i></div>
+                <div>
+                  <h4>Working Hours</h4>
+                  <p>Monday to Saturday, 9:00 AM to 8:00 PM</p>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-info-icon"><i class="fa fa-truck-fast"></i></div>
+                <div>
+                  <h4>Order Help</h4>
+                  <p>Tracking, returns, shipping updates, and product questions.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-map-card">
+            <div class="contact-map-badge">Main Support Zone</div>
+            <h3>San Francisco Service Hub</h3>
+            <p>Our support, fulfillment coordination, and order verification teams work together here to keep every purchase moving smoothly.</p>
+          </div>
+        </div>
+
+        <div class="contact-form-card">
+          <div class="contact-form-header">
+            <span class="about-section-label">Send a Message</span>
+            <h2>Contact Us</h2>
+            <p>Fill in your details below. This is a static frontend form for now, ready to connect with Django later.</p>
+          </div>
+
+          <form class="contact-form">
+            <div class="contact-form-grid">
+              <div class="contact-field">
+                <label for="contactName">Name</label>
+                <input id="contactName" type="text" placeholder="Enter your full name" />
+              </div>
+              <div class="contact-field">
+                <label for="contactPhone">Phone</label>
+                <input id="contactPhone" type="tel" placeholder="Enter your phone number" />
+              </div>
+              <div class="contact-field">
+                <label for="contactEmail">Email</label>
+                <input id="contactEmail" type="email" placeholder="Enter your email address" />
+              </div>
+              <div class="contact-field">
+                <label for="contactArea">Area</label>
+                <input id="contactArea" type="text" placeholder="Enter your area or city" />
+              </div>
+            </div>
+
+            <div class="contact-field">
+              <label for="contactMessage">Message</label>
+              <textarea id="contactMessage" rows="7" placeholder="Write your message here"></textarea>
+            </div>
+
+            <div class="contact-form-footer">
+              <p><i class="fa fa-shield-alt"></i> Your details are safe and will only be used for support follow-up.</p>
+              <button type="submit" class="btn-cta-primary"><i class="fa fa-paper-plane"></i> Send Message</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="contact-support-strip">
+        <div class="contact-support-box">
+          <i class="fa fa-comments"></i>
+          <h4>Live Chat Ready</h4>
+          <p>Quick product and order questions answered fast.</p>
+        </div>
+        <div class="contact-support-box">
+          <i class="fa fa-box-open"></i>
+          <h4>Order Assistance</h4>
+          <p>Need tracking, return, or exchange support? We can help.</p>
+        </div>
+        <div class="contact-support-box">
+          <i class="fa fa-store"></i>
+          <h4>Business Inquiries</h4>
+          <p>Reach out for partnerships, bulk buying, and vendor requests.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block page_overlays %}
+{% endblock %}
+
+
+

@@ -1,0 +1,99 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Users{% endblock %}
+{% block page_title %}Users{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Users</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ user_total }}</h3>
+          <p>Total Users</p>
+        </div>
+        <i class="small-box-icon bi bi-people"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ user_active_total }}</h3>
+          <p>Active Users</p>
+        </div>
+        <i class="small-box-icon bi bi-person-check"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="small-box text-bg-dark">
+        <div class="inner">
+          <h3>{{ role_total }}</h3>
+          <p>Total Roles</p>
+        </div>
+        <i class="small-box-icon bi bi-shield-lock"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title mb-0">User Management</h3>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+              <td class="fw-semibold">{{ user.display_name }}</td>
+              <td>{{ user.email|default:user.username }}</td>
+              <td>
+                {% if user.primary_role %}
+                  <div class="d-flex flex-column gap-1">
+                    <span class="badge text-bg-primary text-uppercase align-self-start">{{ user.primary_role.name }}</span>
+                    {% if user.primary_role_profile and not user.primary_role_profile.is_active %}
+                      <span class="badge text-bg-secondary align-self-start">Role Inactive</span>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <span class="badge text-bg-secondary">Unassigned</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="post" action="{% url 'dashboard_user_status' user.pk %}" class="dashboard-inline-switch-form">
+                  {% csrf_token %}
+                  <label class="dashboard-permission-switch mb-0">
+                    <input type="checkbox" name="is_active" class="js-auto-submit" {% if user.is_active %}checked{% endif %}>
+                    <span class="dashboard-permission-switch__slider"></span>
+                    <span class="dashboard-permission-switch__label">{% if user.is_active %}Active{% else %}Inactive{% endif %}</span>
+                  </label>
+                </form>
+              </td>
+              <td class="text-end">
+                <a href="{% url 'dashboard_user_permissions' user.pk %}" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-sliders me-1"></i>Permissions
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted">No users found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

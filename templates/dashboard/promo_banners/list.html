@@ -1,0 +1,147 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Promo Banners{% endblock %}
+{% block page_title %}Promo Banners{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Promo Banners</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ promo_banner_total }}</h3>
+          <p>Total Banners</p>
+        </div>
+        <i class="small-box-icon bi bi-megaphone"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ promo_banner_active_large_total }}/1</h3>
+          <p>Active Large Banner</p>
+        </div>
+        <i class="small-box-icon bi bi-aspect-ratio"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="small-box text-bg-dark">
+        <div class="inner">
+          <h3>{{ promo_banner_active_small_total }}/2</h3>
+          <p>Active Small Banners</p>
+        </div>
+        <i class="small-box-icon bi bi-grid-1x2"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title mb-0">Homepage Promo Banner Management</h3>
+      <a href="{% url 'dashboard_promo_banner_add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Banner
+      </a>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Placement</th>
+            <th>Eyebrow</th>
+            <th>Title</th>
+            <th>Button</th>
+            <th>Sort</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for banner in promo_banners %}
+            <tr>
+              <td>
+                {% if banner.display_image_url %}
+                  <img src="{{ banner.display_image_url }}" alt="{{ banner.name }}" class="dashboard-category-thumb" />
+                {% else %}
+                  <div class="dashboard-category-thumb dashboard-category-thumb--placeholder">
+                    <i class="bi bi-image"></i>
+                  </div>
+                {% endif %}
+              </td>
+              <td class="fw-semibold">{{ banner.name }}</td>
+              <td>{{ banner.get_placement_display }}</td>
+              <td>{{ banner.eyebrow|default:"-" }}</td>
+              <td>{{ banner.title }}</td>
+              <td>
+                {% if banner.button_label %}
+                  <div class="fw-semibold">{{ banner.button_label }}</div>
+                  <div class="text-muted small">{{ banner.button_url|default:"#" }}</div>
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td>{{ banner.sort_order }}</td>
+              <td>
+                {% if banner.is_active %}
+                  <span class="badge text-bg-success">Active</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="{% url 'dashboard_promo_banner_edit' banner.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <form
+                    id="delete-promo-banner-{{ banner.pk }}"
+                    action="{% url 'dashboard_promo_banner_delete' banner.pk %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm js-delete-trigger"
+                      data-delete-form-id="delete-promo-banner-{{ banner.pk }}"
+                      data-delete-item-name="{{ banner.name }}"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="text-center py-5">
+                <div class="mb-3 text-muted">No promo banners created yet.</div>
+                <a href="{% url 'dashboard_promo_banner_add' %}" class="btn btn-primary">Create your first banner</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+      <div class="card-footer">
+        <nav aria-label="Promo banner pagination">
+          <ul class="pagination pagination-sm mb-0 justify-content-end">
+            {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

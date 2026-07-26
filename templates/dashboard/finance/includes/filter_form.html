@@ -1,0 +1,23 @@
+<div class="card mb-4">
+  <div class="card-header"><h3 class="card-title"><i class="bi bi-funnel me-2" aria-hidden="true"></i>{{ filter_title|default:'Filters' }}</h3></div>
+  <div class="card-body">
+    <form method="get" action="{{ filter_action }}" class="row g-3">
+      {% for filter_field in filter_fields %}
+        <div class="col-12 col-md-{{ filter_field.width|default:'3' }}">
+          <label class="form-label" for="{{ filter_field.id }}">{{ filter_field.label }}</label>
+          {% if filter_field.options %}
+            <select name="{{ filter_field.name }}" id="{{ filter_field.id }}" class="form-select">
+              {% for option in filter_field.options %}<option value="{{ option.0 }}"{% if option.0 == filter_field.value %} selected{% endif %}>{{ option.1 }}</option>{% endfor %}
+            </select>
+          {% else %}
+            <input type="{{ filter_field.type|default:'text' }}" name="{{ filter_field.name }}" id="{{ filter_field.id }}" value="{{ filter_field.value }}" placeholder="{{ filter_field.placeholder }}" class="form-control">
+          {% endif %}
+        </div>
+      {% endfor %}
+      <div class="col-12 d-flex flex-wrap gap-2 align-items-end">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1" aria-hidden="true"></i>Filter</button>
+        {% if reset_url %}<a class="btn btn-outline-secondary" href="{{ reset_url }}">Reset</a>{% endif %}
+      </div>
+    </form>
+  </div>
+</div>

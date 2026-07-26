@@ -1,0 +1,130 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | {{ page_title }}{% endblock %}
+{% block page_title %}Purchase Details{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_purchase_list' %}">Purchases</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ purchase.purchase_id }}</li>
+{% endblock %}
+
+{% block content %}
+  <div class="purchase-page purchase-detail-page">
+    <div class="purchase-page__hero mb-4">
+      <div>
+        <div class="purchase-page__eyebrow"><i class="bi bi-receipt-cutoff me-2"></i>Purchase record</div>
+        <h2 class="purchase-page__title mb-1">Purchase {{ purchase.purchase_id }}</h2>
+        <p class="purchase-page__subtitle mb-0">Created {{ purchase.purchase_date|date:"M d, Y h:i A" }}</p>
+      </div>
+      <a href="{% url 'dashboard_purchase_list' %}" class="btn btn-light purchase-page__back">
+        <i class="bi bi-arrow-left me-1"></i>Back to purchases
+      </a>
+    </div>
+
+    <div class="row g-4 align-items-start">
+      <div class="col-xl-4">
+        <div class="card purchase-card">
+          <div class="card-header purchase-card__header">
+            <div class="purchase-card__heading">
+              <span class="purchase-card__icon"><i class="bi bi-person-vcard"></i></span>
+              <span>
+                <span class="purchase-card__eyebrow">Supplier</span>
+                <span class="purchase-card__title">Supplier details</span>
+              </span>
+            </div>
+          </div>
+          <div class="card-body purchase-card__body">
+            <dl class="purchase-detail-list mb-0">
+              <div>
+                <dt>Supplier name</dt>
+                <dd>{{ purchase.supplier_name|default:"No supplier recorded" }}</dd>
+              </div>
+              <div>
+                <dt>Phone number</dt>
+                <dd>{{ purchase.supplier_phone|default:"—" }}</dd>
+              </div>
+              <div>
+                <dt>Address</dt>
+                <dd>{{ purchase.supplier_address|default:"—"|linebreaksbr }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="card purchase-card mt-4">
+          <div class="card-body purchase-card__body">
+            <div class="purchase-detail-total">
+              <span>Total purchase amount</span>
+              <strong>&#2547;{{ purchase.total_amount }}</strong>
+            </div>
+            <div class="purchase-detail-meta mt-3">
+              <span><i class="bi bi-box-seam me-2"></i>{{ purchase.items.count }} item{{ purchase.items.count|pluralize }}</span>
+              <span><i class="bi bi-calendar3 me-2"></i>{{ purchase.purchase_date|date:"M d, Y" }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-8">
+        <div class="card purchase-card">
+          <div class="card-header purchase-card__header">
+            <div class="purchase-card__heading">
+              <span class="purchase-card__icon purchase-card__icon--blue"><i class="bi bi-cart-check"></i></span>
+              <span>
+                <span class="purchase-card__eyebrow">Products received</span>
+                <span class="purchase-card__title">Purchase items</span>
+              </span>
+            </div>
+            {% if perms.purchase.change_purchase %}
+              <a href="{% url 'dashboard_purchase_edit' purchase.pk %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil-square me-1"></i>Edit purchase
+              </a>
+            {% endif %}
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0 purchase-detail-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th class="text-end">Quantity</th>
+                    <th class="text-end">Unit price</th>
+                    <th class="text-end">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in purchase.items.all %}
+                    <tr>
+                      <td>
+                        <div class="fw-semibold">{{ item.product_name }}</div>
+                        {% if item.product %}<div class="small text-muted">SKU: {{ item.product.sku }}</div>{% endif %}
+                      </td>
+                      <td class="text-end">{{ item.quantity }}</td>
+                      <td class="text-end">&#2547;{{ item.unit_price }}</td>
+                      <td class="text-end fw-semibold">&#2547;{{ item.subtotal }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr><td colspan="4" class="text-center py-5 text-muted">No product lines recorded.</td></tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="3" class="text-end">Total</th>
+                    <th class="text-end">&#2547;{{ purchase.total_amount }}</th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer purchase-detail-footer">
+            <a href="{% url 'dashboard_purchase_list' %}" class="btn btn-outline-secondary">Back to purchases</a>
+            {% if perms.purchase.change_purchase %}
+              <a href="{% url 'dashboard_purchase_edit' purchase.pk %}" class="btn btn-primary"><i class="bi bi-pencil-square me-1"></i>Edit purchase</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

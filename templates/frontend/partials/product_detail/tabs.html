@@ -1,0 +1,129 @@
+<section class="pd-tabs-section">
+  <div class="container">
+    <div class="pd-tabs-nav">
+      <button class="pd-tab-btn{% if not review_form_open %} active{% endif %}" data-pdtab="description">Description</button>
+      <button class="pd-tab-btn{% if review_form_open %} active{% endif %}" data-pdtab="reviews" id="tab-reviews">Reviews ({{ review_summary.count }})</button>
+    </div>
+
+    <div class="pd-tab-content{% if not review_form_open %} active{% endif %}" id="pdtab-description">
+      <div class="pd-description-grid">
+        <div class="pd-desc-text">
+          <h3>Product Description</h3>
+          <p>{{ product.short_description_plain|default:"No short description available yet." }}</p>
+          <div class="pd-description-html">
+            {{ product.full_description_html|safe }}
+          </div>
+        </div>
+        <div class="pd-desc-specs">
+          <h3>Specifications</h3>
+          <table class="specs-table">
+            {% for row in product.specification_rows %}
+              <tr><td>{{ row.label }}</td><td>{{ row.value }}</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pd-tab-content{% if review_form_open %} active{% endif %}" id="pdtab-reviews">
+      <div class="reviews-layout">
+        <div class="reviews-summary">
+          <div class="avg-rating">
+            <span class="avg-score">{{ review_summary.average|floatformat:1 }}</span>
+            <div class="avg-stars">
+              {% for _ in product.full_stars %}
+                <i class="fa fa-star"></i>
+              {% endfor %}
+              {% for _ in product.empty_stars %}
+                <i class="far fa-star"></i>
+              {% endfor %}
+            </div>
+            <p>Based on {{ review_summary.count }} reviews</p>
+          </div>
+          <div class="rating-bars">
+            {% for item in review_summary.breakdown %}
+              <div class="rating-bar-row"><span>{{ item.rating }} star{{ item.rating|pluralize }}</span><div class="rbar"><div class="rbar-fill" style="width:{{ item.percentage }}%"></div></div><span>{{ item.percentage }}%</span></div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="reviews-list">
+          {% if reviews %}
+            {% for review in reviews %}
+              <div class="review-item">
+                <div class="review-header">
+                  <div class="reviewer-avatar">{{ review.reviewer_initials }}</div>
+                  <div>
+                    <strong>{{ review.reviewer_name }}</strong>
+                    <div class="review-stars">
+                      {% for _ in review.full_stars %}
+                        <i class="fa fa-star"></i>
+                      {% endfor %}
+                      {% for _ in review.empty_stars_range %}
+                        <i class="far fa-star"></i>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <span class="review-date">{{ review.review_date|date:"F d, Y" }}</span>
+                  {% if review.verified_purchase %}
+                    <span class="verified-badge"><i class="fa fa-check-circle"></i> Verified Purchase</span>
+                  {% endif %}
+                </div>
+                <h5>{{ review.title }}</h5>
+                <p>{{ review.body }}</p>
+                <div class="review-helpful"><span>Was this helpful?</span><button>Yes ({{ review.helpful_yes }})</button><button>No ({{ review.helpful_no }})</button></div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="review-item">
+              <p>No reviews yet for this product.</p>
+            </div>
+          {% endif %}
+
+          <div class="write-review-form">
+            <h4>Write a Review</h4>
+            {% if review_form_errors %}
+              <div class="alert alert-danger mb-3">Please fix the highlighted review fields and submit again.</div>
+            {% endif %}
+            <form id="reviewForm" method="post" action="">
+              {% csrf_token %}
+              <div class="review-form-row">
+                <div>
+                  <input type="text" name="reviewer_name" value="{{ review_form_data.reviewer_name }}" placeholder="Your Name *" required />
+                  {% if review_form_errors.reviewer_name %}<small class="text-danger">{{ review_form_errors.reviewer_name }}</small>{% endif %}
+                </div>
+                <div>
+                  <input type="email" name="reviewer_email" value="{{ review_form_data.reviewer_email }}" placeholder="Your Email *" required />
+                  {% if review_form_errors.reviewer_email %}<small class="text-danger">{{ review_form_errors.reviewer_email }}</small>{% endif %}
+                </div>
+              </div>
+              <div class="review-rating-pick">
+                <label>Your Rating:</label>
+                <div class="star-pick" id="starPick">
+                  <i class="far fa-star" data-val="1"></i>
+                  <i class="far fa-star" data-val="2"></i>
+                  <i class="far fa-star" data-val="3"></i>
+                  <i class="far fa-star" data-val="4"></i>
+                  <i class="far fa-star" data-val="5"></i>
+                </div>
+                <input type="hidden" id="reviewRatingInput" name="rating" value="{{ review_form_data.rating }}" />
+                <div id="reviewRatingError"{% if not review_form_errors.rating %} style="display:none"{% endif %}>
+                  <small class="text-danger">{{ review_form_errors.rating }}</small>
+                </div>
+              </div>
+              <div>
+                <input type="text" name="title" value="{{ review_form_data.title }}" placeholder="Review Title *" required />
+                {% if review_form_errors.title %}<small class="text-danger">{{ review_form_errors.title }}</small>{% endif %}
+              </div>
+              <div>
+                <textarea name="body" placeholder="Write your review here..." rows="4" required>{{ review_form_data.body }}</textarea>
+                {% if review_form_errors.body %}<small class="text-danger">{{ review_form_errors.body }}</small>{% endif %}
+              </div>
+              <button type="submit" class="btn-submit-review">Submit Review</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

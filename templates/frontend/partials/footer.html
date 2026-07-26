@@ -1,0 +1,74 @@
+﻿<footer class="footer">
+  <div class="footer-top">
+    <div class="container footer-grid{% if not footer_brands %} footer-grid--without-brands{% endif %}">
+      <div class="footer-col brand-col">
+        <div class="footer-logo">
+          {% if site_company.logo %}
+            <img src="{{ site_company.logo.url }}" alt="{{ site_company.company_name }}" class="footer-logo-img" />
+          {% else %}
+            <span class="footer-logo-img footer-logo-fallback">{{ site_company.company_name|default:default_company_name|slice:":2" }}</span>
+          {% endif %}
+          <span class="footer-logo-name">{{ site_company.company_name|default:default_company_name }}</span>
+        </div>
+        <p>Your one-stop destination for fashion, electronics, home goods, and more. Shop smart, shop Revo.</p>
+        <div class="footer-contact">
+          <p><i class="fa fa-map-marker-alt"></i> 9, Shahid Tajuddin Road, Moghbazar, Dhaka, Bangladesh</p>
+          <p><i class="fa fa-phone"></i> (+88) 01883 385 687</p>
+          <p><i class="fa fa-envelope"></i> nextuniqbd@gmail.com</p>
+        </div>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-pinterest-p"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Customer Service</h4>
+        <ul>
+          <li><a href="{% url 'frontend_about' %}">My Account</a></li>
+          <li><a href="{% url 'frontend_cart' %}">Order Tracking</a></li>
+          <li><a href="{% url 'frontend_checkout' %}">Returns &amp; Exchanges</a></li>
+          <li><a href="{% url 'frontend_checkout' %}">Shipping Info</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="{% url 'frontend_about' %}">About Us</a></li>
+          <li><a href="{% url 'frontend_blog' %}">Blog</a></li>
+          <li><a href="{% url 'frontend_contact' %}">Contact Us</a></li>
+          <li><a href="{% url 'frontend_privacy_policy' %}">Privacy Policy</a></li>
+        </ul>
+      </div>
+      {% if footer_brands %}
+      <div class="footer-col">
+        <h4>Brands</h4>
+        <ul>
+          {% for brand in footer_brands %}
+            <li><a href="{% url 'frontend_products' %}?brand={{ brand.slug }}">{{ brand.name }}</a></li>
+          {% endfor %}
+        </ul>
+        <h4 style="margin-top:20px">We Accept</h4>
+        <div class="payment-icons">
+          <i class="fab fa-cc-visa"></i>
+          <i class="fab fa-cc-mastercard"></i>
+          <i class="fab fa-cc-paypal"></i>
+          <i class="fab fa-cc-apple-pay"></i>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>&copy; 2026 Next Uniq BD. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="{% url 'frontend_privacy_policy' %}">Privacy Policy</a>
+        <a href="#">Terms of Use</a>
+        <a href="#">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>

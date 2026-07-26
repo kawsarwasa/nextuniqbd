@@ -1,0 +1,144 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}About Us | Trusted Alternative Products and Reliable Service{% endblock %}
+
+{% block extra_head %}
+  <meta name="description" content="Learn about our seven years of experience, carefully selected alternative products, transparent service, quality commitment, and customer-focused support." />
+{% endblock %}
+
+{% block content %}
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">About Us</span>
+      </nav>
+    </div>
+  </div>
+
+  <section class="about-hero" aria-labelledby="about-page-title">
+    <div class="about-hero-overlay">
+      <div class="container about-hero-content">
+        <span class="about-hero-eyebrow">Established service. Clear standards.</span>
+        <h1 id="about-page-title">About Us</h1>
+        <h2>Built on Experience. Driven by Trust.</h2>
+        <p>For more than seven years, we have been serving customers with quality products, honest information, and dependable support. Our goal is to make every purchase simple, transparent, and reliable.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-story section">
+    <div class="container">
+      <div class="about-story-inner about-story-layout">
+        <div class="about-story-text">
+          <span class="about-section-label">Our Story</span>
+          <h2>A Business Built on Trust and Experience</h2>
+          <p>For over seven years, we have been actively involved in this industry and serving customers through online platforms. During this journey, we have developed a strong understanding of customer expectations, product quality, and the importance of dependable service.</p>
+          <p>We offer carefully selected alternative products that provide customers with practical and reliable choices. Every product is presented with clear and honest information so customers can make confident purchasing decisions.</p>
+          <p>Our business is not focused only on completing sales. We aim to build long-term relationships by providing quality products, fair value, responsive communication, and responsible after-sales support.</p>
+        </div>
+        <aside class="about-experience-panel" aria-label="Experience highlights">
+          <div class="about-experience-icon"><i class="fa fa-calendar-check"></i></div>
+          <strong>7+ Years</strong>
+          <span>of practical business experience</span>
+          <div class="about-experience-list">
+            <span><i class="fa fa-check"></i> Online customer service</span>
+            <span><i class="fa fa-check"></i> Quality-focused products</span>
+            <span><i class="fa fa-check"></i> Trusted support</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-experience-section">
+    <div class="container">
+      <div class="about-section-header">
+        <span class="about-section-label">Experience</span>
+        <h2>Seven Years of Practical Experience</h2>
+        <p>Our years of experience have helped us understand what customers truly value: product quality, accurate information, fair pricing, timely delivery, and reliable support.</p>
+      </div>
+      <div class="about-highlight-grid">
+        <div class="about-highlight-card"><i class="fa fa-calendar-days"></i><strong>7+ Years of Experience</strong><span>Practical knowledge shaped by real customer needs.</span></div>
+        <div class="about-highlight-card"><i class="fa fa-comments"></i><strong>Online Customer Service</strong><span>Clear, responsive communication from question to delivery.</span></div>
+        <div class="about-highlight-card"><i class="fa fa-box-open"></i><strong>Quality-Focused Products</strong><span>Alternative products selected for usefulness and value.</span></div>
+        <div class="about-highlight-card"><i class="fa fa-handshake"></i><strong>Trusted Support</strong><span>Responsible help before and after every purchase.</span></div>
+      </div>
+      <p class="about-experience-note">We continuously improve our product selection and customer service based on real customer needs and market experience.</p>
+    </div>
+  </section>
+
+  <section class="about-values section">
+    <div class="container">
+      <div class="about-section-header">
+        <span class="about-section-label">Our Values</span>
+        <h2>What We Stand For</h2>
+        <p>Our standards guide every product decision and every customer interaction.</p>
+      </div>
+      <div class="values-grid">
+        <article class="value-card"><div class="value-icon"><i class="fa fa-circle-check"></i></div><h3>Honesty</h3><p>We believe customers deserve accurate information. We do not use misleading descriptions, exaggerated claims, or hidden conditions.</p></article>
+        <article class="value-card"><div class="value-icon"><i class="fa fa-award"></i></div><h3>Quality</h3><p>We carefully select products based on quality, usefulness, reliability, and customer value.</p></article>
+        <article class="value-card"><div class="value-icon"><i class="fa fa-shield-heart"></i></div><h3>Trust</h3><p>Customer trust is one of our most valuable achievements. We work hard to protect that trust in every interaction.</p></article>
+        <article class="value-card"><div class="value-icon"><i class="fa fa-headset"></i></div><h3>Responsibility</h3><p>We remain committed to helping customers before, during, and after their purchase.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-quality-section section">
+    <div class="container about-quality-layout">
+      <div class="about-quality-mark" aria-hidden="true"><i class="fa fa-shield-halved"></i></div>
+      <div>
+        <span class="about-section-label">Quality Commitment</span>
+        <h2>Our Commitment to Product Quality</h2>
+        <p>We do not sell counterfeit, deceptive, or intentionally low-quality products. Our priority is to offer dependable alternative products that provide genuine value to customers.</p>
+        <p>Before presenting a product, we aim to review its quality, features, usability, and suitability. We also provide clear product information so customers understand what they are purchasing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-trust-section">
+    <div class="container">
+      <div class="about-section-header about-section-header--light">
+        <span class="about-section-label">Customer Trust</span>
+        <h2>Why Customers Choose Us</h2>
+      </div>
+      <div class="about-trust-grid">
+        <div><i class="fa fa-check"></i> More than seven years of business experience</div>
+        <div><i class="fa fa-check"></i> Honest and transparent product information</div>
+        <div><i class="fa fa-check"></i> Carefully selected alternative products</div>
+        <div><i class="fa fa-check"></i> Fair and reasonable pricing</div>
+        <div><i class="fa fa-check"></i> Responsive customer communication</div>
+        <div><i class="fa fa-check"></i> Reliable support before and after purchase</div>
+        <div><i class="fa fa-check"></i> A customer-first approach</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-service-section section">
+    <div class="container about-service-layout">
+      <div class="about-service-icon"><i class="fa fa-message"></i></div>
+      <div>
+        <span class="about-section-label">Customer Service</span>
+        <h2>Support You Can Rely On</h2>
+        <p>Good service does not end after an order is placed. We aim to support customers throughout their buying journey—from answering questions and helping with product selection to providing assistance after delivery.</p>
+        <p>Every customer matters to us, and every concern is handled with care, respect, and responsibility.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-cta section">
+    <div class="container">
+      <div class="about-cta-inner">
+        <i class="fa fa-handshake about-cta-icon"></i>
+        <span class="about-section-label">Growing Through Customer Trust</span>
+        <h2>Looking for reliable and quality-focused products?</h2>
+        <p>The trust and support of our customers have helped us grow over the past seven years. We remain committed to improving our products, service quality, and overall customer experience. Explore our available products or contact us for more information—we are ready to help you find the right option.</p>
+        <div class="about-cta-btns">
+          <a href="{% url 'frontend_products' %}" class="btn-cta-primary"><i class="fa fa-bag-shopping"></i> Explore Products</a>
+          <a href="{% url 'frontend_contact' %}" class="btn-cta-outline"><i class="fa fa-envelope"></i> Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

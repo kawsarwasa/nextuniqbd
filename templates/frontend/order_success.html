@@ -1,0 +1,40 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Order Success - SB Revo{% endblock %}
+
+{% block content %}
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Order Success</span>
+      </nav>
+    </div>
+  </div>
+
+  <section class="checkout-section">
+    <div class="container">
+      <div class="order-confirm-card" style="position:static;transform:none;max-width:760px;margin:0 auto;">
+        <div class="order-confirm-icon"><i class="fa fa-check-circle"></i></div>
+        <h2>Order Placed Successfully!</h2>
+        <p class="confirm-subtitle">Thank you for your order. We will confirm it shortly by phone.</p>
+        <div class="confirm-order-number">Order #<span>{{ order.order_id }}</span></div>
+        <div class="confirm-details">
+          <div class="confirm-detail-row"><i class="fa fa-calendar-alt"></i><span>Order Date: <strong>{{ order.order_date|date:"M d, Y h:i A" }}</strong></span></div>
+          <div class="confirm-detail-row"><i class="fa fa-truck"></i><span>Estimated Delivery: <strong>{{ order.delivery_estimate }}</strong></span></div>
+          <div class="confirm-detail-row"><i class="fa fa-money-bill-wave"></i><span>Payment: <strong>{{ order.payment_method }}</strong></span></div>
+          <div class="confirm-detail-row"><i class="fa fa-receipt"></i><span>Total: <strong>৳{{ order.total_amount }}</strong></span></div>
+        </div>
+        <div class="confirm-actions">
+          <a href="{% url 'frontend_products' %}" class="btn-confirm-shop">Continue Shopping</a>
+          {% if can_view_dashboard_orders %}
+            <a href="{% url 'dashboard_order_detail' order.order_id %}" class="btn-confirm-track">View Order</a>
+          {% else %}
+            <a href="{% url 'frontend_home' %}" class="btn-confirm-track">Back Home</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

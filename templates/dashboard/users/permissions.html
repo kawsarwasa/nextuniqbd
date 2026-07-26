@@ -1,0 +1,129 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | User Permissions{% endblock %}
+{% block page_title %}User Permissions{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_user_list' %}">Users</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ managed_user_display_name }}</li>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="card dashboard-permission-card">
+      <div class="card-header dashboard-permission-card__header">
+        <div>
+          <div class="dashboard-permission-card__name">{{ managed_user_display_name }}</div>
+          <div class="dashboard-permission-card__email">{{ managed_user.email|default:managed_user.username }}</div>
+          <div class="dashboard-permission-card__meta">Permissions Management</div>
+        </div>
+        <div>
+          {% if managed_user.is_active %}
+            <span class="badge text-bg-success">Active</span>
+          {% else %}
+            <span class="badge text-bg-secondary">Inactive</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row g-4 align-items-end mb-4">
+          <div class="col-lg-6">
+            <label class="form-label" for="id_role">Role</label>
+            <select
+              name="role"
+              id="id_role"
+              class="form-select js-user-role-selector"
+              data-redirect-url="{% url 'dashboard_user_permissions' managed_user.pk %}"
+            >
+              {% for role in available_roles %}
+                <option value="{{ role.pk }}"{% if selected_role and role.pk == selected_role.pk %} selected{% endif %}>
+                  {{ role.name }}{% if role.profile and not role.profile.is_active %} (inactive){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+            {% if selected_role_profile and not selected_role_profile.is_active %}
+              <div class="form-text text-danger">This role is inactive and cannot be assigned until it is reactivated.</div>
+            {% endif %}
+            <div class="form-text">Role permissions are shown here. Checked switches coming from the selected role are read-only. Use unchecked switches for special-case direct user access.</div>
+          </div>
+          <div class="col-lg-2">
+            <label class="form-label d-block">Active Status</label>
+            <label class="dashboard-permission-switch">
+              <input type="checkbox" name="is_active"{% if managed_user.is_active %} checked{% endif %}>
+              <span class="dashboard-permission-switch__slider"></span>
+              <span class="dashboard-permission-switch__label">Allow login</span>
+            </label>
+          </div>
+          <div class="col-lg-2">
+            <label class="form-label d-block">Staff Status</label>
+            <label class="dashboard-permission-switch">
+              <input type="checkbox" name="is_staff"{% if managed_user.is_staff %} checked{% endif %}{% if managed_user.is_superuser %} disabled{% endif %}>
+              <span class="dashboard-permission-switch__slider"></span>
+              <span class="dashboard-permission-switch__label">Dashboard staff</span>
+            </label>
+            {% if managed_user.is_superuser %}
+              <div class="form-text">Superusers always remain staff.</div>
+            {% endif %}
+          </div>
+          <div class="col-lg-2 text-lg-end ms-lg-auto">
+            <div class="text-muted small">Direct user permissions: {{ direct_permission_count }}</div>
+            {% if selected_role %}
+              <a href="{% url 'dashboard_role_permissions' selected_role.pk %}" class="btn btn-link btn-sm px-0 mt-2">
+                Manage Role Permissions
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle dashboard-permission-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th class="text-center">View</th>
+                <th class="text-center">Edit</th>
+                <th class="text-center">Update</th>
+                <th class="text-center">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in user_permission_rows %}
+                <tr>
+                  <td class="fw-semibold">{{ row.label }}</td>
+                  {% for action, cell in row.permissions.items %}
+                  <td class="text-center">
+                      {% if cell.permission_ids %}
+                        <label class="dashboard-permission-switch dashboard-permission-switch--compact{% if cell.readonly %} dashboard-permission-switch--readonly{% endif %}">
+                          <input
+                            type="checkbox"
+                            name="permission_cells"
+                            value="{{ cell.input_value }}"
+                            {% if cell.checked %} checked{% endif %}
+                            {% if cell.readonly %} disabled{% endif %}
+                          >
+                          <span class="dashboard-permission-switch__slider"></span>
+                        </label>
+                      {% else %}
+                        <span class="text-muted">-</span>
+                      {% endif %}
+                    </td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <a href="{% url 'dashboard_user_list' %}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Back
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-floppy me-1"></i>Save Changes
+        </button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

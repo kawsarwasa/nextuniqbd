@@ -1,0 +1,27 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}{% if product %}{{ product.name }} - SB Revo{% else %}Product Details - SB Revo{% endif %}{% endblock %}
+
+{% block content %}
+  {% include "frontend/partials/product_detail/breadcrumb.html" %}
+  {% include "frontend/partials/product_detail/main.html" %}
+  {% include "frontend/partials/product_detail/tabs.html" %}
+  {% include "frontend/partials/product_detail/related_products.html" %}
+  {% include "frontend/partials/product_detail/recently_viewed.html" %}
+{% endblock %}
+
+{% block page_overlays %}
+  {% include "frontend/partials/product_detail/quick_view_modal.html" %}
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      {% if review_submitted %}
+        window.sbRevoShowToast?.('Your review has been submitted successfully.', 'success');
+      {% elif review_form_errors %}
+        window.sbRevoShowToast?.('Please fix the review form errors and submit again.', 'error');
+      {% endif %}
+    });
+  </script>
+{% endblock %}

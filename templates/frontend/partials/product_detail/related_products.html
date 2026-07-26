@@ -1,0 +1,62 @@
+{% load static %}
+<section class="section related-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Related Products</h2>
+      <a href="{% url 'frontend_products' %}" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+    </div>
+    {% if related_products %}
+      <div class="related-carousel-wrap">
+        <button class="prod-nav prev" id="relPrev"><i class="fa fa-chevron-left"></i></button>
+        <div class="products-row" id="relatedRow">
+          {% for item in related_products %}
+            <div class="product-card" data-product-id="{{ item.id }}" data-description="{{ item.short_description_plain|default:'No description available.'|escape }}">
+              <div class="product-badges">
+                {% if item.is_on_sale %}
+                  <span class="badge-sale">-{{ item.sale_percentage }}%</span>
+                {% endif %}
+                {% if item.is_new_arrival %}
+                  <span class="badge-new">NEW</span>
+                {% endif %}
+              </div>
+              <div class="product-image">
+                <img src="{% if item.primary_image_url %}{{ item.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ item.name }}" />
+                <div class="product-actions"><button title="Quick View" type="button"><i class="fa fa-eye"></i></button></div>
+              </div>
+              <div class="product-info">
+                <p class="product-cat">{{ item.category_label }}</p>
+                <h4><a href="{% url 'frontend_product_detail' item.slug %}">{{ item.name }}</a></h4>
+                <div class="product-rating">
+                  {% for _ in item.full_stars %}
+                    <i class="fa fa-star"></i>
+                  {% endfor %}
+                  {% for _ in item.empty_stars %}
+                    <i class="far fa-star"></i>
+                  {% endfor %}
+                  <span>({{ item.review_count }})</span>
+                </div>
+                <div class="product-price">
+                  <span class="price-current">${{ item.current_price }}</span>
+                  {% if item.is_on_sale %}
+                    <span class="price-old">${{ item.regular_price }}</span>
+                  {% endif %}
+                </div>
+                <div class="product-card-actions">
+                  <button class="add-to-cart" type="button">
+                    <i class="fa fa-shopping-cart"></i> Add to Cart
+                  </button>
+                  <button class="buy-now" type="button">
+                    <i class="fa fa-bolt"></i> Buy Now
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <button class="prod-nav next" id="relNext"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    {% else %}
+      <div class="alert alert-light border mb-0">No related products available right now.</div>
+    {% endif %}
+  </div>
+</section>

@@ -1,0 +1,160 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Roles & Permissions{% endblock %}
+{% block page_title %}Roles & Permissions{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Roles & Permissions</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ role_total }}</h3>
+          <p>Total Roles</p>
+        </div>
+        <i class="small-box-icon bi bi-shield-lock"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ role_active_total }}</h3>
+          <p>Active Roles</p>
+        </div>
+        <i class="small-box-icon bi bi-shield-check"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="small-box text-bg-secondary">
+        <div class="inner">
+          <h3>{{ role_inactive_total }}</h3>
+          <p>Inactive Roles</p>
+        </div>
+        <i class="small-box-icon bi bi-shield-x"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h3 class="card-title mb-0">{% if editing_role %}Edit Role{% else %}Create Role{% endif %}</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            {% if editing_role %}
+              <input type="hidden" name="role_id" value="{{ editing_role.pk }}">
+            {% endif %}
+
+            <div class="mb-3">
+              <label class="form-label" for="{{ form.name.id_for_label }}">Role Name</label>
+              {{ form.name }}
+              {% if form.name.help_text %}
+                <div class="form-text">{{ form.name.help_text }}</div>
+              {% endif %}
+              {% for error in form.name.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+              {{ form.description }}
+              {% for error in form.description.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-4">
+              <label class="dashboard-permission-switch">
+                {{ form.is_active }}
+                <span class="dashboard-permission-switch__slider"></span>
+                <span class="dashboard-permission-switch__label">Active role</span>
+              </label>
+              {% for error in form.is_active.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary flex-grow-1">
+                {% if editing_role %}
+                  Update Role
+                {% else %}
+                  Create Role
+                {% endif %}
+              </button>
+              {% if editing_role %}
+                <a href="{% url 'dashboard_role_list' %}" class="btn btn-outline-secondary">Cancel</a>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title mb-0">All Roles</h3>
+        </div>
+        <div class="card-body table-responsive p-0">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Status</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for role in roles %}
+                <tr>
+                  <td>
+                    <div class="fw-semibold text-uppercase">{{ role.name }}</div>
+                    {% if role.profile.description %}
+                      <div class="text-muted small">{{ role.profile.description }}</div>
+                    {% endif %}
+                    {% if role.profile.is_system %}
+                      <span class="badge text-bg-dark mt-1">System</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <form method="post" action="{% url 'dashboard_role_status' role.pk %}" class="dashboard-inline-switch-form">
+                      {% csrf_token %}
+                      <label class="dashboard-permission-switch mb-0">
+                        <input type="checkbox" name="is_active" class="js-auto-submit" {% if role.profile.is_active %}checked{% endif %}>
+                        <span class="dashboard-permission-switch__slider"></span>
+                        <span class="dashboard-permission-switch__label">{% if role.profile.is_active %}Active{% else %}Inactive{% endif %}</span>
+                      </label>
+                    </form>
+                  </td>
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                      <a href="{% url 'dashboard_role_list' %}?edit={{ role.pk }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                      </a>
+                      <a href="{% url 'dashboard_role_permissions' role.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-sliders me-1"></i>Manage Permissions
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center py-5 text-muted">No roles found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

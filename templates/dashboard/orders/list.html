@@ -1,0 +1,139 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Orders{% endblock %}
+{% block page_title %}Orders{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Orders</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ order_total }}</h3>
+          <p>{% if request.user.is_staff %}All Orders{% else %}My Orders{% endif %}</p>
+        </div>
+        <i class="small-box-icon bi bi-bag-check"></i>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-warning">
+        <div class="inner">
+          <h3>{{ pending_order_total }}</h3>
+          <p>Pending Orders</p>
+        </div>
+        <i class="small-box-icon bi bi-hourglass-split"></i>
+      </div>
+    </div>
+    {% if perms.sitepages.view_sale %}
+      <div class="col-lg-3 col-6">
+        <div class="small-box text-bg-success">
+          <div class="inner">
+            <h3>{{ sale_total }}</h3>
+            <p>Sales Generated</p>
+          </div>
+          <i class="small-box-icon bi bi-receipt"></i>
+          <a href="{% url 'dashboard_sale_list' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+            View sales <i class="bi bi-link-45deg"></i>
+          </a>
+        </div>
+      </div>
+    {% endif %}
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-danger">
+        <div class="inner">
+          <h3>{{ cancelled_order_total }}</h3>
+          <p>Cancelled Orders</p>
+        </div>
+        <i class="small-box-icon bi bi-x-circle"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title mb-0">Order Management</h3>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ order.order_id }}</div>
+                <div class="text-muted small">{{ order.order_date|date:"M d, Y h:i A" }}</div>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ order.full_name }}</div>
+                <div class="text-muted small">{{ order.phone }}{% if order.email %} &middot; {{ order.email }}{% endif %}</div>
+              </td>
+              <td>
+                <div class="fw-semibold">&#2547;{{ order.total_amount }}</div>
+                <div class="text-muted small">{{ order.item_count }} item{{ order.item_count|pluralize }}</div>
+              </td>
+              <td><span class="badge {{ order.status_badge_class }} text-capitalize">{{ order.get_status_display }}</span></td>
+              <td class="text-end">
+                {% if request.user.is_staff or request.user.is_superuser %}
+                <button
+                  type="button"
+                  class="btn btn-outline-info btn-sm js-order-tracking-trigger"
+                  data-order-tracking-url="{% url 'dashboard_order_tracking' order.order_id %}"
+                  title="Track Order"
+                  aria-label="Track order {{ order.order_id }}"
+                >
+                  <i class="bi bi-truck"></i><span class="d-none d-xl-inline ms-1">Track</span>
+                </button>
+                {% endif %}
+                <a href="{% url 'dashboard_order_detail' order.order_id %}" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-eye me-1"></i>View
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted">No orders found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "dashboard/includes/pagination.html" with page_obj=page_obj label="Order pagination" %}
+  </div>
+
+  <div class="modal fade" id="dashboardOrderTrackingModal" tabindex="-1" aria-labelledby="dashboardOrderTrackingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content order-tracking-modal">
+        <div class="modal-header">
+          <div>
+            <div class="text-muted text-uppercase small fw-semibold">Order tracking</div>
+            <h5 class="modal-title mb-0" id="dashboardOrderTrackingModalLabel">Loading order...</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body js-order-tracking-body">
+          <div class="d-flex justify-content-center align-items-center py-5 text-muted gap-2">
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Loading tracking history...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a class="btn btn-outline-primary js-order-tracking-detail d-none" href="#">
+            <i class="bi bi-box-arrow-up-right me-1"></i>View Order Details
+          </a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

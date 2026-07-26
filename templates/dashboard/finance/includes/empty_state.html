@@ -1,0 +1,6 @@
+<div class="text-center text-body-secondary py-4">
+  <i class="bi {{ icon|default:'bi-inbox' }} fs-2 d-block mb-2" aria-hidden="true"></i>
+  <p class="mb-1 fw-semibold">{{ title|default:'Nothing to show' }}</p>
+  {% if message %}<p class="small mb-3">{{ message }}</p>{% endif %}
+  {% if add_url and can_add %}<a class="btn btn-primary btn-sm" href="{{ add_url }}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>{{ add_label|default:'Add' }}</a>{% endif %}
+</div>

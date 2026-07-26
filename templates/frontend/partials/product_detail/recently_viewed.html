@@ -1,0 +1,48 @@
+{% load static %}
+<section class="section recently-viewed-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Recently Viewed</h2>
+    </div>
+    {% if recently_viewed_products %}
+      <div class="products-row recently-row">
+        {% for item in recently_viewed_products %}
+          <div class="product-card" data-product-id="{{ item.id }}" data-description="{{ item.short_description_plain|default:'No description available.'|escape }}">
+            <div class="product-badges">
+              {% if item.is_on_sale %}
+                <span class="badge-sale">-{{ item.sale_percentage }}%</span>
+              {% endif %}
+              {% if item.is_new_arrival %}
+                <span class="badge-new">NEW</span>
+              {% endif %}
+            </div>
+            <div class="product-image">
+              <img src="{% if item.primary_image_url %}{{ item.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ item.name }}" />
+              <div class="product-actions"><button title="Quick View" type="button"><i class="fa fa-eye"></i></button></div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">{{ item.category_label }}</p>
+              <h4><a href="{% url 'frontend_product_detail' item.slug %}">{{ item.name }}</a></h4>
+              <div class="product-price">
+                <span class="price-current">${{ item.current_price }}</span>
+                {% if item.is_on_sale %}
+                  <span class="price-old">${{ item.regular_price }}</span>
+                {% endif %}
+              </div>
+              <div class="product-card-actions">
+                <button class="add-to-cart" type="button">
+                  <i class="fa fa-shopping-cart"></i> Add to Cart
+                </button>
+                <button class="buy-now" type="button">
+                  <i class="fa fa-bolt"></i> Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-light border mb-0">No recently viewed products available right now.</div>
+    {% endif %}
+  </div>
+</section>

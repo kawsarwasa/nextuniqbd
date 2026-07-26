@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout - SB Revo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span><i class="fa fa-phone"></i> (+84) 4567 421 978</span>
+        <span><i class="fa fa-envelope"></i> support@sbrevo.com</span>
+      </div>
+      <div class="topbar-right">
+        <span class="promo-text"><i class="fa fa-truck"></i> Free Shipping on orders over $99</span>
+        <a href="#"><i class="fa fa-user"></i> Sign In</a>
+        <a href="#"><i class="fa fa-user-plus"></i> Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <div class="logo">
+        <a href="index.html"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></a>
+      </div>
+      <div class="search-bar">
+        <select class="search-category"><option>All Categories</option><option>Fashion</option><option>Electronics</option></select>
+        <input type="text" placeholder="Search for products..." />
+        <button class="search-btn"><i class="fa fa-search"></i></button>
+      </div>
+      <div class="header-actions">
+        <div class="action-item"><a href="cart.html" style="display:flex;flex-direction:column;align-items:center;gap:2px;color:inherit"><i class="fa fa-shopping-cart"></i><span class="badge">3</span><span class="action-label">Cart</span></a></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <div class="nav-all-categories"><button class="all-cat-btn"><i class="fa fa-bars"></i> All Categories</button></div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">Fashion</a></li>
+        <li><a href="#">Electronics</a></li>
+        <li><a href="#">Kitchen</a></li>
+        <li><a href="#">Watches</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li class="hot-deal"><a href="#">Hot Deals <span class="hot-tag">HOT</span></a></li>
+      </ul>
+      <div class="nav-promo"><i class="fa fa-tag"></i> <strong>20% OFF</strong> Use code: <span>REVO20</span></div>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <a href="cart.html">Shopping Cart</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Checkout</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- CART STEPS -->
+  <div class="cart-steps-bar">
+    <div class="container">
+      <div class="cart-steps">
+        <div class="cart-step done">
+          <div class="step-icon"><i class="fa fa-check"></i></div>
+          <span>1. Shopping Cart</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="cart-step active">
+          <div class="step-icon"><i class="fa fa-map-marker-alt"></i></div>
+          <span>2. Checkout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MAIN -->
+  <section class="checkout-section">
+    <div class="container">
+      <div class="checkout-layout">
+
+        <!-- LEFT: FORM -->
+        <div class="checkout-form-col">
+
+          <!-- Shipping Info -->
+          <div class="checkout-form-card">
+            <h3 class="checkout-section-title"><i class="fa fa-map-marker-alt"></i> Shipping Information</h3>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Full Name <span class="req">*</span></label>
+                <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number <span class="req">*</span></label>
+                <input type="text" class="form-control" id="phone" placeholder="01XXXXXXXXX" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="email" placeholder="your@email.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Full Address <span class="req">*</span></label>
+              <textarea class="form-control" id="address" rows="3" placeholder="House no, Road no, Area..."></textarea>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group district-search-group">
+                <label class="form-label">District <span class="req">*</span></label>
+                <div class="district-search" id="districtSearch">
+                  <input
+                    type="text"
+                    class="form-control district-search-input"
+                    id="district"
+                    placeholder="Search district"
+                    autocomplete="off"
+                  />
+                  <button type="button" class="district-search-toggle" id="districtToggle" aria-label="Show district list">
+                    <i class="fa fa-chevron-down"></i>
+                  </button>
+                  <div class="district-dropdown" id="districtDropdown"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Area / Thana</label>
+                <input type="text" class="form-control" id="thana" placeholder="Enter area or thana" />
+              </div>
+            </div>
+            <div class="form-group checkout-postal-group">
+              <label class="form-label">Postal Code</label>
+              <input type="text" class="form-control" id="postal" placeholder="e.g. 1212" />
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="checkout-form-card">
+            <h3 class="checkout-section-title"><i class="fa fa-credit-card"></i> Payment Method</h3>
+            <div class="cod-option">
+              <div class="cod-icon"><i class="fa fa-money-bill-wave"></i></div>
+              <div class="cod-info">
+                <strong>Cash on Delivery (COD)</strong>
+                <p>Pay when your order arrives at your doorstep. No online payment required.</p>
+              </div>
+              <div class="cod-check"><i class="fa fa-check-circle"></i></div>
+            </div>
+          </div>
+
+          <!-- Order Notes -->
+          <div class="checkout-form-card">
+            <h3 class="checkout-section-title"><i class="fa fa-sticky-note"></i> Order Notes <span style="font-weight:400;font-size:13px;color:var(--text-muted)">(Optional)</span></h3>
+            <div class="form-group checkout-notes-group">
+              <textarea class="form-control" id="orderNotes" rows="3" placeholder="Any special instructions for your order..."></textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY -->
+        <div class="checkout-summary-col">
+          <div class="order-summary-card">
+            <h3 class="summary-title">Order Summary</h3>
+
+            <div class="checkout-order-items">
+              <div class="checkout-order-item">
+                <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=60&h=60&fit=crop" alt="Hoodie" />
+                <div class="checkout-item-info">
+                  <p>EcoSmart Fleece Hoodie</p>
+                  <span>Charcoal &middot; M &middot; Qty: 1</span>
+                </div>
+                <strong>$245.00</strong>
+              </div>
+              <div class="checkout-order-item">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=60&h=60&fit=crop" alt="Sneakers" />
+                <div class="checkout-item-info">
+                  <p>Running Pro Sneakers</p>
+                  <span>Black &middot; 10 &middot; Qty: 2</span>
+                </div>
+                <strong>$179.98</strong>
+              </div>
+              <div class="checkout-order-item">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=60&h=60&fit=crop" alt="Watch" />
+                <div class="checkout-item-info">
+                  <p>Minimalist Smart Watch</p>
+                  <span>Silver &middot; Black Band &middot; Qty: 1</span>
+                </div>
+                <strong>$299.00</strong>
+              </div>
+            </div>
+
+            <div class="summary-rows checkout-summary-rows">
+              <div class="summary-row">
+                <span>Subtotal (3 items)</span>
+                <span>&#2547;723.98</span>
+              </div>
+            </div>
+
+            <div class="summary-rows">
+              <div class="summary-row">
+                <span>Shipping</span>
+                <span id="checkoutShipping">&#2547;60</span>
+              </div>
+            </div>
+
+            <div class="summary-total">
+              <span>Total</span>
+              <span id="checkoutTotal">&#2547;783.98</span>
+            </div>
+
+            <button class="btn-place-order" id="placeOrderBtn">
+              <i class="fa fa-lock"></i> Place Order - Cash on Delivery
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ORDER CONFIRMATION OVERLAY -->
+  <div class="order-confirm-overlay" id="orderConfirmOverlay">
+    <div class="order-confirm-card">
+      <div class="order-confirm-icon"><i class="fa fa-check-circle"></i></div>
+      <h2>Order Placed Successfully!</h2>
+      <p class="confirm-subtitle">Thank you for your order! We'll confirm it shortly via phone.</p>
+      <div class="confirm-order-number">Order #<span id="orderNumber">RV-00000</span></div>
+      <div class="confirm-details">
+        <div class="confirm-detail-row"><i class="fa fa-truck"></i><span>Estimated Delivery: <strong>2-4 business days</strong></span></div>
+        <div class="confirm-detail-row"><i class="fa fa-money-bill-wave"></i><span>Payment: <strong>Cash on Delivery</strong></span></div>
+        <div class="confirm-detail-row"><i class="fa fa-phone"></i><span>We'll call you to confirm your order.</span></div>
+      </div>
+      <div class="confirm-actions">
+        <a href="index.html" class="btn-confirm-shop">Continue Shopping</a>
+        <a href="#" class="btn-confirm-track">Track Your Order</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-col brand-col">
+          <div class="footer-logo"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></div>
+          <p>Your one-stop destination for fashion, electronics, home goods, and more.</p>
+          <div class="footer-contact">
+            <p><i class="fa fa-map-marker-alt"></i> 685 Market Street, San Francisco, CA 94105</p>
+            <p><i class="fa fa-phone"></i> (+84) 4567 421 978</p>
+            <p><i class="fa fa-envelope"></i> support@sbrevo.com</p>
+          </div>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Shop</h4><ul><li><a href="index.html">New Arrivals</a></li><li><a href="index.html">Best Sellers</a></li><li><a href="#">Fashion</a></li><li><a href="#">Electronics</a></li></ul></div>
+        <div class="footer-col"><h4>Customer Service</h4><ul><li><a href="#">My Account</a></li><li><a href="#">Order Tracking</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping Info</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="blog.html">Blog</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>&copy; 2024 SB Revo. All rights reserved.</p>
+        <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop"><i class="fa fa-chevron-up"></i></button>
+  <div class="toast" id="toast"><i class="fa fa-check-circle"></i><span id="toastMsg">Done!</span></div>
+
+  <script src="script.js"></script>
+  <script>
+    const districts = [
+      'Bagerhat', 'Bandarban', 'Barguna', 'Barishal', 'Bhola', 'Bogura', 'Brahmanbaria',
+      'Chandpur', 'Chapainawabganj', 'Chattogram', 'Chuadanga', "Cox's Bazar", 'Cumilla',
+      'Dhaka', 'Dinajpur', 'Faridpur', 'Feni', 'Gaibandha', 'Gazipur', 'Gopalganj',
+      'Habiganj', 'Jamalpur', 'Jashore', 'Jhalokathi', 'Jhenaidah', 'Joypurhat',
+      'Khagrachhari', 'Khulna', 'Kishoreganj', 'Kurigram', 'Kushtia', 'Lakshmipur',
+      'Lalmonirhat', 'Madaripur', 'Magura', 'Manikganj', 'Meherpur', 'Moulvibazar',
+      'Munshiganj', 'Mymensingh', 'Naogaon', 'Narail', 'Narayanganj', 'Narsingdi',
+      'Natore', 'Netrokona', 'Nilphamari', 'Noakhali', 'Pabna', 'Panchagarh',
+      'Patuakhali', 'Pirojpur', 'Rajbari', 'Rajshahi', 'Rangamati', 'Rangpur',
+      'Satkhira', 'Shariatpur', 'Sherpur', 'Sirajganj', 'Sunamganj', 'Sylhet',
+      'Tangail', 'Thakurgaon'
+    ];
+
+    const districtInput = document.getElementById('district');
+    const districtSearch = document.getElementById('districtSearch');
+    const districtDropdown = document.getElementById('districtDropdown');
+    const districtToggle = document.getElementById('districtToggle');
+
+    function getFilteredDistricts() {
+      const query = districtInput?.value.trim().toLowerCase() || '';
+      if (!query) return districts;
+      return districts.filter(name => name.toLowerCase().includes(query));
+    }
+
+    function openDistrictDropdown() {
+      if (!districtDropdown || !districtSearch) return;
+      districtDropdown.classList.add('active');
+      districtSearch.classList.add('active');
+    }
+
+    function closeDistrictDropdown() {
+      if (!districtDropdown || !districtSearch) return;
+      districtDropdown.classList.remove('active');
+      districtSearch.classList.remove('active');
+    }
+
+    function renderDistrictDropdown() {
+      if (!districtDropdown || !districtInput) return;
+
+      const matches = getFilteredDistricts();
+      districtDropdown.innerHTML = '';
+
+      if (!matches.length) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'district-empty';
+        emptyState.textContent = 'No district found';
+        districtDropdown.appendChild(emptyState);
+        openDistrictDropdown();
+        return;
+      }
+
+      matches.forEach(name => {
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'district-option';
+        if (name.toLowerCase() === districtInput.value.trim().toLowerCase()) {
+          option.classList.add('active');
+        }
+        option.textContent = name;
+        option.addEventListener('mousedown', event => {
+          event.preventDefault();
+          districtInput.value = name;
+          renderDistrictDropdown();
+          closeDistrictDropdown();
+        });
+        districtDropdown.appendChild(option);
+      });
+
+      openDistrictDropdown();
+    }
+
+    districtInput?.addEventListener('focus', renderDistrictDropdown);
+    districtInput?.addEventListener('click', renderDistrictDropdown);
+    districtInput?.addEventListener('input', renderDistrictDropdown);
+    districtInput?.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeDistrictDropdown();
+    });
+
+    districtToggle?.addEventListener('click', () => {
+      districtInput?.focus();
+      renderDistrictDropdown();
+    });
+
+    document.addEventListener('click', event => {
+      if (!districtSearch?.contains(event.target)) {
+        closeDistrictDropdown();
+      }
+    });
+
+    document.getElementById('placeOrderBtn').addEventListener('click', function () {
+      const name = document.getElementById('fullName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const address = document.getElementById('address').value.trim();
+      const district = document.getElementById('district').value.trim();
+      const missing = [];
+      if (!name) missing.push('Full Name');
+      if (!phone) missing.push('Phone Number');
+      if (!address) missing.push('Full Address');
+      if (!district) missing.push('District');
+      if (missing.length) { alert('Please fill in: ' + missing.join(', ')); return; }
+      const orderId = 'RV-' + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById('orderNumber').textContent = orderId;
+      document.getElementById('orderConfirmOverlay').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  </script>
+</body>
+</html>
+

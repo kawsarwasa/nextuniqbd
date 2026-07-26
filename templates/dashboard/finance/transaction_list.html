@@ -1,0 +1,75 @@
+{% extends "dashboard/base.html" %}
+{% load finance_tags %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | All Transactions{% endblock %}
+{% block page_title %}All Transactions{% endblock %}
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'finance:dashboard' %}">Accounts</a></li>
+  <li class="breadcrumb-item active" aria-current="page">All Transactions</li>
+{% endblock %}
+
+{% block content %}
+  {% url 'finance:cash_in_create' as finance_cash_in_add_url %}
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <p class="text-body-secondary mb-0">Review every Cash In and Cash Out entry.</p>
+    <div class="d-flex flex-wrap gap-2">
+      {% if perms.finance.add_cashtransaction %}
+        <a class="btn btn-success" href="{% url 'finance:cash_in_create' %}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Cash In</a>
+        <a class="btn btn-danger" href="{% url 'finance:cash_out_create' %}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add Cash Out</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card mb-4">
+    <div class="card-header"><h3 class="card-title"><i class="bi bi-funnel me-2" aria-hidden="true"></i>Filter Transactions</h3></div>
+    <div class="card-body">
+      <form method="get" class="row g-3">
+        <div class="col-12 col-md-2"><label class="form-label" for="transaction-start-date">Start Date</label><input id="transaction-start-date" class="form-control" type="date" name="start_date" value="{{ filter_values.start_date }}"></div>
+        <div class="col-12 col-md-2"><label class="form-label" for="transaction-end-date">End Date</label><input id="transaction-end-date" class="form-control" type="date" name="end_date" value="{{ filter_values.end_date }}"></div>
+        <div class="col-12 col-md-2"><label class="form-label" for="transaction-type">Transaction Type</label><select id="transaction-type" class="form-select" name="transaction_type"><option value="">All Types</option>{% for value,label in transaction_types %}<option value="{{ value }}"{% if filter_values.transaction_type == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="col-12 col-md-2"><label class="form-label" for="transaction-category">Item</label><select id="transaction-category" class="form-select" name="category"><option value="">All Items</option>{% for category in categories %}<option value="{{ category.pk }}"{% if filter_values.category == category.pk|stringformat:'s' %} selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
+        <div class="col-12 col-md-2"><label class="form-label" for="transaction-method">Payment Method</label><select id="transaction-method" class="form-select" name="payment_method"><option value="">All Methods</option>{% for value,label in payment_methods %}<option value="{{ value }}"{% if filter_values.payment_method == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="col-12 col-md-2"><label class="form-label" for="transaction-search">Search</label><input id="transaction-search" class="form-control" type="search" name="search" value="{{ filter_values.search }}" placeholder="Description, reference, item"></div>
+        <div class="col-12 d-flex flex-wrap gap-2"><button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1" aria-hidden="true"></i>Filter</button><a class="btn btn-outline-secondary" href="{% url 'finance:transaction_list' %}">Reset</a></div>
+      </form>
+    </div>
+  </div>
+  <div class="row mb-4"><div class="col-12 col-md-4"><div class="card h-100 mb-0"><div class="card-body"><span class="text-body-secondary small">Filtered Total</span><div class="fs-4 fw-semibold mt-2">{{ filtered_total|money }}</div></div></div></div></div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Transactions</h3></div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr><th scope="col">Date</th><th scope="col">Type</th><th scope="col">Source</th><th scope="col">Item</th><th scope="col">Description</th><th scope="col">Payment Method</th><th scope="col">Reference</th><th scope="col" class="text-end">Amount</th><th scope="col">Created By</th><th scope="col" class="text-end">Actions</th></tr></thead>
+          <tbody>
+            {% for item in transactions %}
+              <tr>
+                <td class="text-nowrap">{{ item.transaction_date|date:"d M Y" }}</td>
+                <td>{% if item.transaction_type == 'cash_in' %}<span class="badge text-bg-success">Cash In</span>{% else %}<span class="badge text-bg-danger">Cash Out</span>{% endif %}</td>
+                <td>{% if item.source_type == 'due_payment' %}<a href="{% url 'finance:due_detail' item.due_payment.due_id %}">Due Payment</a>{% elif item.source_type == 'opening_balance' %}<span class="badge text-bg-info">Opening Balance</span>{% else %}<span class="badge text-bg-secondary">Manual</span>{% endif %}</td>
+                <td>{{ item.category.name|default:"—" }}</td>
+                <td title="{{ item.description }}">{% if item.description %}{{ item.description|truncatechars:55 }}{% else %}—{% endif %}</td>
+                <td>{{ item.get_payment_method_display|default:"—" }}</td>
+                <td>{{ item.reference|default:"—" }}</td>
+                <td class="text-end fw-semibold {% if item.transaction_type == 'cash_in' %}text-success{% else %}text-danger{% endif %}">{{ item.amount|money }}</td>
+                <td>{% if item.created_by %}{{ item.created_by.get_full_name|default:item.created_by.username|default:item.created_by.email }}{% else %}—{% endif %}</td>
+                <td class="text-end text-nowrap">
+                  {% if item.source_type == 'manual' and item.transaction_type == 'cash_in' %}
+                    {% if perms.finance.change_cashtransaction %}<a class="btn btn-outline-primary btn-sm" href="{% url 'finance:cash_in_update' item.pk %}" title="Edit Cash In" aria-label="Edit Cash In"><i class="bi bi-pencil" aria-hidden="true"></i></a>{% endif %}
+                    {% if perms.finance.delete_cashtransaction %}<a class="btn btn-outline-danger btn-sm" href="{% url 'finance:cash_in_delete' item.pk %}" title="Delete Cash In" aria-label="Delete Cash In"><i class="bi bi-trash3" aria-hidden="true"></i></a>{% endif %}
+                  {% elif item.source_type == 'manual' %}
+                    {% if perms.finance.change_cashtransaction %}<a class="btn btn-outline-primary btn-sm" href="{% url 'finance:cash_out_update' item.pk %}" title="Edit Cash Out" aria-label="Edit Cash Out"><i class="bi bi-pencil" aria-hidden="true"></i></a>{% endif %}
+                    {% if perms.finance.delete_cashtransaction %}<a class="btn btn-outline-danger btn-sm" href="{% url 'finance:cash_out_delete' item.pk %}" title="Delete Cash Out" aria-label="Delete Cash Out"><i class="bi bi-trash3" aria-hidden="true"></i></a>{% endif %}
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="10">{% include "dashboard/finance/includes/empty_state.html" with title="No transactions found" message="Try changing the filters or add a new cash entry." icon="bi-arrow-left-right" can_add=perms.finance.add_cashtransaction add_url=finance_cash_in_add_url add_label="Add Cash In" %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% include "dashboard/finance/includes/pagination.html" %}
+    </div>
+  </div>
+{% endblock %}

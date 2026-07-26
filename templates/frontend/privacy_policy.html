@@ -1,0 +1,104 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Privacy Policy | Customer Information and Data Protection{% endblock %}
+
+{% block extra_head %}
+  <meta name="description" content="Learn how we collect, use, protect, and manage customer information when you use our website and services." />
+{% endblock %}
+
+{% block content %}
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Privacy Policy</span>
+      </nav>
+    </div>
+  </div>
+
+  <main class="privacy-page section">
+    <div class="container">
+      <article class="privacy-card">
+        <header class="privacy-header">
+          <span class="about-section-label">Your Privacy</span>
+          <h1>Privacy Policy</h1>
+          <p class="privacy-updated"><i class="fa fa-clock"></i> Last Updated: {% now "F j, Y" %}</p>
+          <p>We respect your privacy and are committed to handling your personal information responsibly. This Privacy Policy explains what information we may collect, how we use it, and how we protect it when you use our website or purchase our products.</p>
+        </header>
+
+        <section class="privacy-section">
+          <h2>Information We Collect</h2>
+          <p>Depending on how you use the website, we may collect:</p>
+          <ul class="privacy-list">
+            <li>Name, phone number, email address, and delivery address</li>
+            <li>Account information</li>
+            <li>Order details and selected payment method information</li>
+            <li>Information you provide when contacting customer support</li>
+          </ul>
+        </section>
+
+        <section class="privacy-section">
+          <h2>How We Use Your Information</h2>
+          <p>We may use customer information to:</p>
+          <ul class="privacy-list">
+            <li>Process and deliver orders</li>
+            <li>Communicate about orders and services</li>
+            <li>Provide customer support</li>
+            <li>Manage customer accounts</li>
+            <li>Improve website performance and customer experience</li>
+            <li>Prevent fraud and unauthorized activity</li>
+            <li>Meet necessary business, accounting, or legal requirements</li>
+          </ul>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Information Sharing</h2>
+          <p>We may share only the information needed to complete an order or provide a service with trusted delivery, hosting, or technical service providers.</p>
+          <p>We do not sell or rent customers&rsquo; personal information to third parties.</p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Cookies and Website Usage</h2>
+          <p>We use essential cookies and session data to support important website functions, including account login, the shopping cart, and security features.</p>
+          <p>This project does not include analytics, advertising pixels, or other marketing tracking services.</p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Data Security</h2>
+          <p>We use reasonable technical and administrative measures to protect customer information from unauthorized access, misuse, or disclosure. However, no website or online data-transfer system can guarantee complete security.</p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Data Retention</h2>
+          <p>We keep personal information only for as long as reasonably necessary to complete orders, provide support, maintain business records, prevent fraud, or meet applicable requirements.</p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Customer Choices</h2>
+          <p>You may contact us to update or correct your information, request account closure, stop promotional communication, or ask questions about your personal information.</p>
+          <p>Some order, payment, accounting, or security records may need to be retained where reasonably required.</p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Third-Party Links</h2>
+          <p>Our website may contain links to external websites. We are not responsible for the privacy practices or content of those third-party websites.</p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>Changes to This Policy</h2>
+          <p>We may update this Privacy Policy when our services or practices change. The latest version and update date will always be available on this page.</p>
+        </section>
+
+        <section class="privacy-contact" aria-labelledby="privacy-contact-title">
+          <i class="fa fa-envelope-open-text" aria-hidden="true"></i>
+          <div>
+            <h2 id="privacy-contact-title">Contact Us</h2>
+            <p>For privacy-related questions, contact {{ site_company.company_name|default:default_company_name }} through our Contact Us page. It provides our current business email, phone number, and address.</p>
+            <a href="{% url 'frontend_contact' %}" class="btn-cta-primary">Contact Us <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+{% endblock %}

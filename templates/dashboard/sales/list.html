@@ -1,0 +1,97 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Sales{% endblock %}
+{% block page_title %}Sales{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Sales</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ sale_total }}</h3>
+          <p>{% if request.user.is_staff %}All Sales{% else %}My Sales{% endif %}</p>
+        </div>
+        <i class="small-box-icon bi bi-receipt"></i>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>&#2547;{{ sale_amount_total }}</h3>
+          <p>Total Sales</p>
+        </div>
+        <i class="small-box-icon bi bi-cash-stack"></i>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-info">
+        <div class="inner">
+          <h3>{{ sale_item_total }}</h3>
+          <p>Items Sold</p>
+        </div>
+        <i class="small-box-icon bi bi-box-seam"></i>
+      </div>
+    </div>
+    <div class="col-lg-3 col-6">
+      <div class="small-box text-bg-secondary">
+        <div class="inner">
+          <h3>&#2547;{{ average_sale_amount|floatformat:2 }}</h3>
+          <p>Average Sale</p>
+        </div>
+        <i class="small-box-icon bi bi-graph-up-arrow"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title mb-0">Sale Records</h3>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Sale</th>
+            <th>Customer</th>
+            <th>Payment</th>
+            <th>Items</th>
+            <th class="text-end">Total</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sale in sales %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ sale.sale_id }}</div>
+                <div class="text-muted small">{{ sale.sale_date|date:"M d, Y h:i A" }}</div>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ sale.full_name }}</div>
+                <div class="text-muted small">{{ sale.phone }}{% if sale.email %} &middot; {{ sale.email }}{% endif %}</div>
+              </td>
+              <td>{{ sale.payment_method }}</td>
+              <td>{{ sale.item_count }} item{{ sale.item_count|pluralize }}</td>
+              <td class="text-end fw-semibold">&#2547;{{ sale.total_amount }}</td>
+              <td class="text-end">
+                <a href="{% url 'dashboard_sale_detail' sale.sale_id %}" class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-eye me-1"></i>View
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-5 text-muted">No sales found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% include "dashboard/includes/pagination.html" with page_obj=page_obj label="Sales pagination" %}
+  </div>
+{% endblock %}

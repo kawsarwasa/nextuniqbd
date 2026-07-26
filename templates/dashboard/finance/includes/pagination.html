@@ -1,0 +1,29 @@
+{% if page_obj.has_other_pages %}
+  <nav aria-label="{{ pagination_label|default:'Accounts pagination' }}" class="mt-4">
+    <ul class="pagination justify-content-end flex-wrap mb-0">
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Previous</span></li>
+      {% endif %}
+      {% for page_number in page_obj.paginator.page_range %}
+        <li class="page-item{% if page_number == page_obj.number %} active{% endif %}">
+          {% if page_number == page_obj.number %}
+            <span class="page-link" aria-current="page">{{ page_number }}</span>
+          {% else %}
+            <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_number }}">{{ page_number }}</a>
+          {% endif %}
+        </li>
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog - SB Revo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span><i class="fa fa-phone"></i> (+84) 4567 421 978</span>
+        <span><i class="fa fa-envelope"></i> support@sbrevo.com</span>
+      </div>
+      <div class="topbar-right">
+        <span class="promo-text"><i class="fa fa-truck"></i> Free Shipping on orders over $99</span>
+        <a href="#"><i class="fa fa-user"></i> Sign In</a>
+        <a href="#"><i class="fa fa-user-plus"></i> Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <div class="logo">
+        <a href="index.html"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></a>
+      </div>
+      <div class="search-bar">
+        <select class="search-category"><option>All Categories</option><option>Fashion</option><option>Electronics</option></select>
+        <input type="text" placeholder="Search for products..." />
+        <button class="search-btn"><i class="fa fa-search"></i></button>
+      </div>
+      <div class="header-actions">
+        <div class="action-item cart-icon">
+          <i class="fa fa-shopping-cart"></i><span class="badge" id="cartBadge">3</span><span class="action-label">Cart</span>
+          <div class="cart-preview">
+            <div class="cart-total"><span>Subtotal:</span><strong>$723.98</strong></div>
+            <div class="cart-buttons">
+              <a href="cart.html" class="btn-outline">View Cart</a>
+              <a href="checkout.html" class="btn-primary">Checkout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <div class="nav-all-categories"><button class="all-cat-btn"><i class="fa fa-bars"></i> All Categories</button></div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">Fashion</a></li>
+        <li><a href="#">Electronics</a></li>
+        <li><a href="#">Kitchen</a></li>
+        <li><a href="#">Watches</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="blog.html" class="active">Blog</a></li>
+        <li class="hot-deal"><a href="#">Hot Deals <span class="hot-tag">HOT</span></a></li>
+      </ul>
+      <div class="nav-promo"><i class="fa fa-tag"></i> <strong>20% OFF</strong> Use code: <span>REVO20</span></div>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">Blog</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- BLOG PAGE HEADER -->
+  <div class="blog-page-header">
+    <div class="container">
+      <h1>Our Blog</h1>
+      <p>Tips, trends, and stories from the world of fashion &amp; lifestyle</p>
+    </div>
+  </div>
+
+  <!-- BLOG MAIN -->
+  <section class="blog-section">
+    <div class="container">
+      <div class="blog-layout">
+
+        <!-- POSTS GRID -->
+        <div class="blog-main-col">
+          <div class="blog-grid">
+
+            <!-- Post 1 -->
+            <div class="blog-card">
+              <div class="blog-card-img">
+                <a href="blog_details.html">
+                  <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop" alt="Fashion Trends" />
+                </a>
+                <span class="blog-category-badge">Fashion</span>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-meta">
+                  <div class="blog-author-av">SJ</div>
+                  <span class="blog-author-name">Sarah Johnson</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-calendar-alt"></i> March 15, 2024</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-clock"></i> 5 min read</span>
+                </div>
+                <h3 class="blog-card-title"><a href="blog_details.html">Top 10 Fashion Trends You Need to Know This Season</a></h3>
+                <p class="blog-card-excerpt">Discover the hottest styles dominating the fashion world this season. From sustainable fabrics to bold colors, we cover everything you need to refresh your wardrobe.</p>
+                <a href="blog_details.html" class="blog-read-more">Read More <i class="fa fa-arrow-right"></i></a>
+              </div>
+            </div>
+
+            <!-- Post 2 -->
+            <div class="blog-card">
+              <div class="blog-card-img">
+                <a href="blog_details.html">
+                  <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop" alt="Style Tips" />
+                </a>
+                <span class="blog-category-badge">Style</span>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-meta">
+                  <div class="blog-author-av">MR</div>
+                  <span class="blog-author-name">Mike Rodriguez</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-calendar-alt"></i> March 10, 2024</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-clock"></i> 4 min read</span>
+                </div>
+                <h3 class="blog-card-title"><a href="blog_details.html">How to Build a Capsule Wardrobe on a Budget</a></h3>
+                <p class="blog-card-excerpt">A capsule wardrobe doesn't have to break the bank. Learn how to choose versatile, timeless pieces that mix and match effortlessly for any occasion.</p>
+                <a href="blog_details.html" class="blog-read-more">Read More <i class="fa fa-arrow-right"></i></a>
+              </div>
+            </div>
+
+            <!-- Post 3 -->
+            <div class="blog-card">
+              <div class="blog-card-img">
+                <a href="blog_details.html">
+                  <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop" alt="Sustainable Fashion" />
+                </a>
+                <span class="blog-category-badge">Lifestyle</span>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-meta">
+                  <div class="blog-author-av">EL</div>
+                  <span class="blog-author-name">Emma Lee</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-calendar-alt"></i> March 5, 2024</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-clock"></i> 6 min read</span>
+                </div>
+                <h3 class="blog-card-title"><a href="blog_details.html">Why Sustainable Fashion is the Future of Shopping</a></h3>
+                <p class="blog-card-excerpt">The fashion industry is one of the world's biggest polluters. Here's how choosing sustainable brands and eco-friendly materials can make a real difference.</p>
+                <a href="blog_details.html" class="blog-read-more">Read More <i class="fa fa-arrow-right"></i></a>
+              </div>
+            </div>
+
+            <!-- Post 4 -->
+            <div class="blog-card">
+              <div class="blog-card-img">
+                <a href="blog_details.html">
+                  <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=400&fit=crop" alt="Travel Style" />
+                </a>
+                <span class="blog-category-badge">Travel</span>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-meta">
+                  <div class="blog-author-av">JW</div>
+                  <span class="blog-author-name">James Wilson</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-calendar-alt"></i> Feb 28, 2024</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-clock"></i> 5 min read</span>
+                </div>
+                <h3 class="blog-card-title"><a href="blog_details.html">Packing Light: The Ultimate Travel Style Guide</a></h3>
+                <p class="blog-card-excerpt">Traveling doesn't mean sacrificing style. Discover our expert tips for packing a carry-on that keeps you looking sharp from the airport to the destination.</p>
+                <a href="blog_details.html" class="blog-read-more">Read More <i class="fa fa-arrow-right"></i></a>
+              </div>
+            </div>
+
+            <!-- Post 5 -->
+            <div class="blog-card">
+              <div class="blog-card-img">
+                <a href="blog_details.html">
+                  <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop" alt="Winter Trends" />
+                </a>
+                <span class="blog-category-badge">Trends</span>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-meta">
+                  <div class="blog-author-av">AC</div>
+                  <span class="blog-author-name">Amy Chen</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-calendar-alt"></i> Feb 20, 2024</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-clock"></i> 4 min read</span>
+                </div>
+                <h3 class="blog-card-title"><a href="blog_details.html">Winter 2024: The Cozy Knits You Can't Miss</a></h3>
+                <p class="blog-card-excerpt">This winter, chunky knits and oversized sweaters are taking center stage. We've rounded up the best styles to keep you warm without compromising on fashion.</p>
+                <a href="blog_details.html" class="blog-read-more">Read More <i class="fa fa-arrow-right"></i></a>
+              </div>
+            </div>
+
+            <!-- Post 6 -->
+            <div class="blog-card">
+              <div class="blog-card-img">
+                <a href="blog_details.html">
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop" alt="Skincare Tips" />
+                </a>
+                <span class="blog-category-badge">Tips</span>
+              </div>
+              <div class="blog-card-body">
+                <div class="blog-meta">
+                  <div class="blog-author-av">DK</div>
+                  <span class="blog-author-name">Dana Kim</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-calendar-alt"></i> Feb 14, 2024</span>
+                  <span class="blog-meta-sep">·</span>
+                  <span><i class="fa fa-clock"></i> 3 min read</span>
+                </div>
+                <h3 class="blog-card-title"><a href="blog_details.html">5 Skincare Essentials Every Fashionista Needs</a></h3>
+                <p class="blog-card-excerpt">Great style starts with great skin. We share five must-have skincare products that will keep your complexion glowing all year round, regardless of the season.</p>
+                <a href="blog_details.html" class="blog-read-more">Read More <i class="fa fa-arrow-right"></i></a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Pagination -->
+          <div class="blog-pagination">
+            <a href="#" class="page-btn active">1</a>
+            <a href="#" class="page-btn">2</a>
+            <a href="#" class="page-btn">3</a>
+            <a href="#" class="page-btn page-next"><i class="fa fa-chevron-right"></i></a>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="blog-sidebar">
+
+          <!-- Search -->
+          <div class="sidebar-widget">
+            <h4 class="sidebar-widget-title">Search</h4>
+            <div class="sidebar-search">
+              <input type="text" placeholder="Search posts..." />
+              <button><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+
+          <!-- Categories -->
+          <div class="sidebar-widget">
+            <h4 class="sidebar-widget-title">Categories</h4>
+            <ul class="sidebar-cat-list">
+              <li><a href="#">Fashion <span>12</span></a></li>
+              <li><a href="#">Trends <span>10</span></a></li>
+              <li><a href="#">Style <span>9</span></a></li>
+              <li><a href="#">Lifestyle <span>8</span></a></li>
+              <li><a href="#">Tips <span>7</span></a></li>
+              <li><a href="#">Travel <span>5</span></a></li>
+            </ul>
+          </div>
+
+          <!-- Recent Posts -->
+          <div class="sidebar-widget">
+            <h4 class="sidebar-widget-title">Recent Posts</h4>
+            <div class="sidebar-recent-posts">
+              <a href="blog_details.html" class="sidebar-recent-item">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=70&h=70&fit=crop" alt="" />
+                <div>
+                  <p>Top 10 Fashion Trends This Season</p>
+                  <span>March 15, 2024</span>
+                </div>
+              </a>
+              <a href="blog_details.html" class="sidebar-recent-item">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=70&h=70&fit=crop" alt="" />
+                <div>
+                  <p>Build a Capsule Wardrobe on a Budget</p>
+                  <span>March 10, 2024</span>
+                </div>
+              </a>
+              <a href="blog_details.html" class="sidebar-recent-item">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=70&h=70&fit=crop" alt="" />
+                <div>
+                  <p>Why Sustainable Fashion is the Future</p>
+                  <span>March 5, 2024</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="sidebar-widget">
+            <h4 class="sidebar-widget-title">Popular Tags</h4>
+            <div class="tag-cloud">
+              <a href="#" class="tag">Fashion</a>
+              <a href="#" class="tag">Style</a>
+              <a href="#" class="tag">Hoodie</a>
+              <a href="#" class="tag">Sale</a>
+              <a href="#" class="tag">Summer</a>
+              <a href="#" class="tag">Winter</a>
+              <a href="#" class="tag">Travel</a>
+              <a href="#" class="tag">Beauty</a>
+              <a href="#" class="tag">Wellness</a>
+              <a href="#" class="tag">Trends</a>
+              <a href="#" class="tag">Lifestyle</a>
+              <a href="#" class="tag">Skincare</a>
+            </div>
+          </div>
+
+          <!-- Promo Banner -->
+          <div class="sidebar-widget sidebar-promo">
+            <div class="sidebar-promo-inner">
+              <p class="sidebar-promo-tag">Limited Offer</p>
+              <h4>Get 20% Off</h4>
+              <p>Use code <strong>REVO20</strong> on your next order</p>
+              <a href="index.html" class="sidebar-promo-btn">Shop Now</a>
+            </div>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-col brand-col">
+          <div class="footer-logo"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></div>
+          <p>Your one-stop destination for fashion, electronics, home goods, and more.</p>
+          <div class="footer-contact">
+            <p><i class="fa fa-map-marker-alt"></i> 685 Market Street, San Francisco, CA 94105</p>
+            <p><i class="fa fa-phone"></i> (+84) 4567 421 978</p>
+            <p><i class="fa fa-envelope"></i> support@sbrevo.com</p>
+          </div>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Shop</h4><ul><li><a href="index.html">New Arrivals</a></li><li><a href="index.html">Best Sellers</a></li><li><a href="#">Fashion</a></li><li><a href="#">Electronics</a></li></ul></div>
+        <div class="footer-col"><h4>Customer Service</h4><ul><li><a href="#">My Account</a></li><li><a href="#">Order Tracking</a></li><li><a href="#">Returns</a></li><li><a href="#">Shipping Info</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="blog.html">Blog</a></li><li><a href="#">Privacy Policy</a></li></ul></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>&copy; 2024 SB Revo. All rights reserved.</p>
+        <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop"><i class="fa fa-chevron-up"></i></button>
+  <div class="toast" id="toast"><i class="fa fa-check-circle"></i><span id="toastMsg">Done!</span></div>
+  <script src="script.js"></script>
+</body>
+</html>

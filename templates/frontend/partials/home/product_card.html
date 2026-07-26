@@ -1,0 +1,72 @@
+{% load static %}
+<div
+  class="product-card{% if hide_product_image %} product-card-no-image{% endif %}"
+  data-product-id="{{ product.id }}"
+  data-category="{{ product.category_label }}"
+  data-brand="{{ product.brand_label }}"
+  data-price="{{ product.current_price|floatformat:2 }}"
+  data-rating="{{ product.display_rating|floatformat:1 }}"
+  data-in-stock="{% if product.is_in_stock %}true{% else %}false{% endif %}"
+  data-sale="{% if product.is_on_sale %}true{% else %}false{% endif %}"
+  data-new="{% if product.is_new_arrival %}true{% else %}false{% endif %}"
+  data-description="{{ product.short_description_plain|default:'No description available.'|escape }}"
+>
+  {% if not hide_product_image %}
+    <div class="product-badges">
+      {% if product.is_on_sale %}
+        <span class="badge-sale">-{{ product.sale_percentage }}%</span>
+      {% endif %}
+      {% if product.is_new_arrival %}
+        <span class="badge-new">NEW</span>
+      {% endif %}
+      {% if product.track_stock and not product.is_in_stock %}
+        <span class="badge-hot">Out of Stock</span>
+      {% elif product.track_stock and product.is_low_stock %}
+        <span class="badge-hot">Only {{ product.stock_quantity }} left</span>
+      {% endif %}
+      {% if extra_badge_label and not product.is_new_arrival %}
+        <span class="badge-hot">{{ extra_badge_label }}</span>
+      {% endif %}
+    </div>
+    <div class="product-image">
+      <img
+        src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+        alt="{{ product.name }}"
+        width="600"
+        height="600"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="product-actions">
+        <button type="button" title="Quick View"><i class="fa fa-eye"></i></button>
+      </div>
+    </div>
+  {% endif %}
+  <div class="product-info">
+    <p class="product-cat">{{ product.category_label }}</p>
+    <h4><a href="{% url 'frontend_product_detail' product.slug %}">{{ product.name }}</a></h4>
+    <div class="product-rating">
+      {% for _ in product.full_stars %}
+        <i class="fa fa-star"></i>
+      {% endfor %}
+      {% for _ in product.empty_stars %}
+        <i class="far fa-star"></i>
+      {% endfor %}
+      <span>({{ product.review_count }})</span>
+    </div>
+    <div class="product-price">
+      <span class="price-current">${{ product.current_price }}</span>
+      {% if product.is_on_sale %}
+        <span class="price-old">${{ product.regular_price }}</span>
+      {% endif %}
+    </div>
+    <div class="product-card-actions">
+      <button class="add-to-cart" type="button" data-product-id="{{ product.id }}"{% if not product.is_in_stock %} disabled aria-disabled="true"{% endif %}>
+        <i class="fa fa-shopping-cart"></i> Add to Cart
+      </button>
+      <button class="buy-now" type="button" data-product-id="{{ product.id }}"{% if not product.is_in_stock %} disabled aria-disabled="true"{% endif %}>
+        <i class="fa fa-bolt"></i> Buy Now
+      </button>
+    </div>
+  </div>
+</div>

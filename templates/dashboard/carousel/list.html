@@ -1,0 +1,145 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Hero Carousel{% endblock %}
+{% block page_title %}Hero Carousel{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Hero Carousel</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4">
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-primary">
+        <div class="inner">
+          <h3>{{ hero_slide_total }}</h3>
+          <p>Total Slides</p>
+        </div>
+        <i class="small-box-icon bi bi-images"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-6">
+      <div class="small-box text-bg-success">
+        <div class="inner">
+          <h3>{{ hero_slide_active_total }}</h3>
+          <p>Active Slides</p>
+        </div>
+        <i class="small-box-icon bi bi-check-circle"></i>
+      </div>
+    </div>
+    <div class="col-lg-4 col-12">
+      <div class="small-box text-bg-dark">
+        <div class="inner">
+          <h3>{{ page_obj.paginator.count }}</h3>
+          <p>Visible In List</p>
+        </div>
+        <i class="small-box-icon bi bi-collection-play"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title mb-0">Hero Carousel Management</h3>
+      <a href="{% url 'dashboard_hero_slide_add' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Slide
+      </a>
+    </div>
+    <div class="card-body table-responsive p-0">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Eyebrow</th>
+            <th>Title</th>
+            <th>Alignment</th>
+            <th>Sort</th>
+            <th>Status</th>
+            <th>Updated</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for slide in hero_slides %}
+            <tr>
+              <td>
+                {% if slide.image %}
+                  <img src="{{ slide.image.url }}" alt="{{ slide.name }}" class="dashboard-category-thumb" />
+                {% else %}
+                  <div class="dashboard-category-thumb dashboard-category-thumb--placeholder">
+                    <i class="bi bi-image"></i>
+                  </div>
+                {% endif %}
+              </td>
+              <td class="fw-semibold">{{ slide.name }}</td>
+              <td>{{ slide.eyebrow|default:"-" }}</td>
+              <td>
+                <div class="fw-semibold">{{ slide.title }}</div>
+                {% if slide.title_highlight %}
+                  <div class="text-muted small">Highlight: {{ slide.title_highlight }}</div>
+                {% endif %}
+              </td>
+              <td>{{ slide.get_content_alignment_display }}</td>
+              <td>{{ slide.sort_order }}</td>
+              <td>
+                {% if slide.is_active %}
+                  <span class="badge text-bg-success">Active</span>
+                {% else %}
+                  <span class="badge text-bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td>{{ slide.updated_at|date:"d M Y, h:i A" }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="{% url 'dashboard_hero_slide_edit' slide.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <form
+                    id="delete-hero-slide-{{ slide.pk }}"
+                    action="{% url 'dashboard_hero_slide_delete' slide.pk %}"
+                    method="post"
+                    class="d-inline"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm js-delete-trigger"
+                      data-delete-form-id="delete-hero-slide-{{ slide.pk }}"
+                      data-delete-item-name="{{ slide.name }}"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="text-center py-5">
+                <div class="mb-3 text-muted">No hero slides created yet.</div>
+                <a href="{% url 'dashboard_hero_slide_add' %}" class="btn btn-primary">Create your first slide</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% if is_paginated %}
+      <div class="card-footer">
+        <nav aria-label="Hero slide pagination">
+          <ul class="pagination pagination-sm mb-0 justify-content-end">
+            {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

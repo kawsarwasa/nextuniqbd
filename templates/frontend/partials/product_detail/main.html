@@ -1,0 +1,127 @@
+<section class="pd-section">
+  <div class="container">
+    <div class="pd-layout">
+      <div class="pd-gallery">
+        <div class="pd-main-img" id="pdMainImg">
+          {% with main_image=product.primary_image %}
+            <img src="{% if main_image %}{{ main_image.image.url }}{% else %}https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&h=700&fit=crop{% endif %}" alt="{{ product.name }}" id="mainProductImg" width="700" height="700" decoding="async" fetchpriority="high" />
+          {% endwith %}
+          <div class="zoom-hint"><i class="fa fa-search-plus"></i> Click to zoom</div>
+          <div class="img-zoom-overlay" id="imgZoomOverlay">
+            <button class="zoom-close" id="zoomClose"><i class="fa fa-times"></i></button>
+            {% with main_image=product.primary_image %}
+              <img src="{% if main_image %}{{ main_image.image.url }}{% else %}https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1200&h=1200&fit=crop{% endif %}" id="zoomedImg" alt="Zoomed product image" width="1200" height="1200" loading="lazy" decoding="async" />
+            {% endwith %}
+          </div>
+        </div>
+        <div class="pd-thumbs" id="pdThumbs">
+          {% if product.images.all %}
+            {% for image in product.images.all %}
+              <div class="pd-thumb{% if forloop.first %} active{% endif %}">
+                <img src="{{ image.image.url }}" data-full="{{ image.image.url }}" data-zoom="{{ image.image.url }}" alt="View {{ forloop.counter }}" width="120" height="120" loading="lazy" decoding="async" />
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="pd-thumb active">
+              <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1200&h=1200&fit=crop" alt="View 1" />
+            </div>
+            <div class="pd-thumb">
+              <img src="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&h=1200&fit=crop" alt="View 2" />
+            </div>
+            <div class="pd-thumb">
+              <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&h=1200&fit=crop" alt="View 3" />
+            </div>
+            <div class="pd-thumb">
+              <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&fit=crop" alt="View 4" />
+            </div>
+          {% endif %}
+        </div>
+        <div class="pd-share">
+          <span>Share:</span>
+          <a href="#" class="share-btn fb"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="share-btn tw"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="share-btn pi"><i class="fab fa-pinterest-p"></i></a>
+          <a href="#" class="share-btn em"><i class="fa fa-envelope"></i></a>
+        </div>
+      </div>
+
+      <div class="pd-info">
+        <div class="pd-brand-row">
+          <a href="{% url 'frontend_products' %}" class="pd-brand">{{ product.brand_label|default:"Unbranded" }}</a>
+          <div class="pd-badges-inline">
+            {% if product.is_new_arrival %}
+              <span class="badge-new">NEW</span>
+            {% endif %}
+            {% if product.is_on_sale %}
+              <span class="badge-sale">-{{ product.sale_percentage }}%</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <h1 class="pd-title">{{ product.name }}</h1>
+
+        <div class="pd-rating-row">
+          <div class="star-rating">
+            {% for _ in product.full_stars %}
+              <i class="fa fa-star"></i>
+            {% endfor %}
+            {% for _ in product.empty_stars %}
+              <i class="far fa-star"></i>
+            {% endfor %}
+          </div>
+          <span class="pd-review-count">{{ review_summary.count }} Review{{ review_summary.count|pluralize }}</span>
+          <a href="#tab-reviews" class="pd-write-review">Write a Review</a>
+        </div>
+
+        <div class="pd-price-block">
+          <span class="pd-price-current">${{ product.current_price }}</span>
+          {% if product.is_on_sale %}
+            <span class="pd-price-old">${{ product.regular_price }}</span>
+            <span class="pd-price-save">Save ${{ product.sale_amount }} ({{ product.sale_percentage }}%)</span>
+          {% else %}
+            <span class="pd-price-save">Current catalog price</span>
+          {% endif %}
+        </div>
+
+        <div class="pd-meta">
+          <div class="pd-meta-row"><span class="meta-label">SKU:</span><span>{{ product.sku }}</span></div>
+          <div class="pd-meta-row"><span class="meta-label">Category:</span><a href="{% url 'frontend_products' %}">{{ product.category_label }}</a></div>
+          <div class="pd-meta-row"><span class="meta-label">Brand:</span><a href="{% url 'frontend_products' %}">{{ product.brand_label|default:"Unbranded" }}</a></div>
+          <div class="pd-meta-row"><span class="meta-label">Status:</span><span>{{ product.get_status_display }}</span></div>
+          <div class="pd-meta-row">
+            <span class="meta-label">Availability:</span>
+            <span class="{% if product.is_in_stock %}in-stock{% else %}out-of-stock{% endif %}">
+              <i class="fa {% if product.is_in_stock %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+              {{ product.stock_display }}
+            </span>
+          </div>
+        </div>
+
+        <div class="pd-short-desc">
+          {{ product.short_description_plain|default:"No short description available yet." }}
+        </div>
+
+        <div class="pd-purchase-row">
+          <div class="pd-qty-wrap">
+            <label class="pd-option-label">Quantity</label>
+            <div class="pd-qty">
+              <button id="pdQtyMinus"><i class="fa fa-minus"></i></button>
+              <input type="number" id="pdQtyInput" value="1" min="1" max="{% if product.track_stock %}{{ product.stock_quantity }}{% else %}10{% endif %}"{% if not product.is_in_stock %} disabled{% endif %} />
+              <button id="pdQtyPlus"><i class="fa fa-plus"></i></button>
+            </div>
+            <span class="qty-limit">Max 10 per order</span>
+          </div>
+        </div>
+
+        <div class="pd-action-btns product-card-actions">
+          <button class="pd-add-to-cart" id="pdAddToCart" data-product-id="{{ product.id }}"{% if not product.is_in_stock %} disabled aria-disabled="true"{% endif %}>
+            <i class="fa fa-shopping-cart"></i> Add to Cart
+          </button>
+          <button class="pd-buy-now" id="pdBuyNow"{% if not product.is_in_stock %} disabled aria-disabled="true"{% endif %}>
+            <i class="fa fa-bolt"></i> Buy Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

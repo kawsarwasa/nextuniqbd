@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}
+{% load finance_tags %}
+{% block title %}{{ site_company.company_name|default:default_company_name }} | {{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block breadcrumb %}<li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li><li class="breadcrumb-item"><a href="{% url 'finance:dashboard' %}">Accounts</a></li><li class="breadcrumb-item"><a href="{% url 'finance:cash_out_list' %}">Cash Out</a></li><li class="breadcrumb-item active" aria-current="page">{% if form.instance.pk %}Edit{% else %}Add{% endif %}</li>{% endblock %}
+{% block content %}
+  <div class="row justify-content-center"><div class="col-12 col-xl-10"><div class="card"><div class="card-header"><h3 class="card-title"><i class="bi bi-arrow-up-circle text-danger me-2" aria-hidden="true"></i>{{ page_title }}</h3></div><form method="post" novalidate><div class="card-body">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="row"><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.transaction_date %}</div><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.category %}</div></div>
+    <div class="row"><div class="col-12 col-md-6"><label class="form-label" for="{{ form.amount.id_for_label }}">{{ form.amount.label }}<span class="text-danger" aria-hidden="true">*</span></label><div class="input-group"><span class="input-group-text">৳</span>{{ form.amount }}</div>{% if form.amount.errors %}<div class="invalid-feedback d-block">{{ form.amount.errors }}</div>{% endif %}{% if form.amount.help_text %}<div class="form-text">{{ form.amount.help_text }}</div>{% endif %}</div><div class="col-12 col-md-6">{% include "dashboard/finance/includes/form_field.html" with field=form.payment_method %}</div></div>
+    {% include "dashboard/finance/includes/form_field.html" with field=form.description %}
+    {% include "dashboard/finance/includes/form_field.html" with field=form.reference %}
+  </div><div class="card-footer d-flex flex-wrap justify-content-between gap-2"><a class="btn btn-outline-secondary" href="{% url 'finance:cash_out_list' %}">Cancel</a><button class="btn btn-danger" type="submit">{{ submit_label }}</button></div></form></div></div></div>
+{% endblock %}

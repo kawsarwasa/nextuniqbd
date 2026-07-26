@@ -1,0 +1,450 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | {{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_purchase_list' %}">Purchases</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+{% endblock %}
+
+{% block content %}
+  <div class="purchase-page">
+    <div class="purchase-page__hero mb-4">
+      <div>
+        <div class="purchase-page__eyebrow"><i class="bi bi-box-seam me-2"></i>Inventory purchasing</div>
+        <h2 class="purchase-page__title">{{ page_title }}</h2>
+        <p class="purchase-page__subtitle mb-0">Record supplier details and add the products received into stock.</p>
+      </div>
+      <a href="{% url 'dashboard_purchase_list' %}" class="btn btn-light purchase-page__back">
+        <i class="bi bi-arrow-left me-1"></i>Back to purchases
+      </a>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% if item_formset.non_form_errors %}
+      <div class="alert alert-danger">
+        {% for error in item_formset.non_form_errors %}<div>{{ error }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row g-4 align-items-start">
+        <div class="col-xl-4">
+          <div class="card purchase-card h-100">
+            <div class="card-header purchase-card__header">
+              <div class="purchase-card__heading">
+                <span class="purchase-card__icon"><i class="bi bi-person-vcard"></i></span>
+                <span>
+                  <span class="purchase-card__eyebrow">Purchase information</span>
+                  <span class="purchase-card__title">Supplier details</span>
+                </span>
+              </div>
+            </div>
+            <div class="card-body purchase-card__body">
+              {% if purchase %}
+                <div class="purchase-reference mb-4">
+                  <span class="purchase-reference__label">Purchase ID</span>
+                  <strong>{{ purchase.purchase_id }}</strong>
+                </div>
+              {% endif %}
+
+              <div class="purchase-field mb-3">
+                <label for="{{ form.supplier_name.id_for_label }}" class="form-label">Supplier name <span class="text-muted fw-normal">(optional)</span></label>
+                {{ form.supplier_name }}
+                {% for error in form.supplier_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="purchase-field mb-3">
+                <label for="{{ form.supplier_phone.id_for_label }}" class="form-label">Phone number <span class="text-muted fw-normal">(optional)</span></label>
+                {{ form.supplier_phone }}
+                {% for error in form.supplier_phone.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="purchase-field">
+                <label for="{{ form.supplier_address.id_for_label }}" class="form-label">Address <span class="text-muted fw-normal">(optional)</span></label>
+                {{ form.supplier_address }}
+                {% for error in form.supplier_address.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="purchase-tip mt-4">
+            <span class="purchase-tip__icon"><i class="bi bi-lightbulb"></i></span>
+            <div>
+              <strong>Quick tip</strong>
+              <p class="mb-0">Search by product name, SKU, category, or brand in the product field.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-8">
+          <div class="card purchase-card purchase-items-card">
+            <div class="card-header purchase-card__header purchase-items-card__header">
+              <div class="purchase-card__heading">
+                <span class="purchase-card__icon purchase-card__icon--blue"><i class="bi bi-cart-plus"></i></span>
+                <span>
+                  <span class="purchase-card__eyebrow">Stock received</span>
+                  <span class="purchase-card__title">Purchase items</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="card-body purchase-card__body">
+              {{ item_formset.management_form }}
+              <div class="purchase-items-intro">
+                <span><i class="bi bi-info-circle me-1"></i>Select a product to automatically fill its current price.</span>
+                <span class="purchase-items-count" id="purchase-items-count">0 items</span>
+              </div>
+
+              <div id="purchase-items-list" class="purchase-items-list">
+                {% for item_form in item_formset %}
+                  <div class="purchase-item-row">
+                    {{ item_form.id }}
+                    <div class="purchase-item-row__header">
+                      <div class="purchase-item-row__number"><span class="purchase-item-number">{{ forloop.counter }}</span><span>Product line</span></div>
+                      <div class="purchase-item-row__actions">
+                        {% if item_formset.can_delete %}<div class="d-none">{{ item_form.DELETE }}</div>{% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-danger purchase-row-remove"><i class="bi bi-trash3 me-1"></i>Remove</button>
+                      </div>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                      <div class="col-12 col-lg-6">
+                        <label for="{{ item_form.product.id_for_label }}" class="form-label">Product</label>
+                        {{ item_form.product }}
+                        {% for error in item_form.product.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                      </div>
+                      <div class="col-6 col-lg-2">
+                        <label for="{{ item_form.quantity.id_for_label }}" class="form-label">Quantity</label>
+                        {{ item_form.quantity }}
+                        {% for error in item_form.quantity.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                      </div>
+                      <div class="col-6 col-lg-2">
+                        <label for="{{ item_form.unit_price.id_for_label }}" class="form-label">Unit price</label>
+                        {{ item_form.unit_price }}
+                        {% for error in item_form.unit_price.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                      </div>
+                      <div class="col-12 col-lg-2">
+                        <label for="{{ item_form.subtotal.id_for_label }}" class="form-label">Subtotal</label>
+                        {{ item_form.subtotal }}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+
+              <div class="purchase-add-product">
+                <button type="button" class="btn btn-primary" id="add-purchase-row">
+                  <i class="bi bi-plus-lg me-1"></i>Add product
+                </button>
+              </div>
+
+              <div id="purchase-empty-state" class="purchase-empty-state d-none">
+                <span class="purchase-empty-state__icon"><i class="bi bi-bag-plus"></i></span>
+                <strong>No products added yet</strong>
+                <span>Click “Add product” to start this purchase.</span>
+              </div>
+
+              <template id="purchase-empty-form-template">
+                <div class="purchase-item-row">
+                  {{ item_formset.empty_form.id }}
+                  <div class="purchase-item-row__header">
+                    <div class="purchase-item-row__number"><span class="purchase-item-number"></span><span>Product line</span></div>
+                    <div class="purchase-item-row__actions">
+                      <div class="d-none">{{ item_formset.empty_form.DELETE }}</div>
+                      <button type="button" class="btn btn-sm btn-outline-danger purchase-row-remove"><i class="bi bi-trash3 me-1"></i>Remove</button>
+                    </div>
+                  </div>
+                  <div class="row g-3 align-items-end">
+                    <div class="col-12 col-lg-6">
+                      <label for="{{ item_formset.empty_form.product.id_for_label }}" class="form-label">Product</label>
+                      {{ item_formset.empty_form.product }}
+                    </div>
+                    <div class="col-6 col-lg-2">
+                      <label for="{{ item_formset.empty_form.quantity.id_for_label }}" class="form-label">Quantity</label>
+                      {{ item_formset.empty_form.quantity }}
+                    </div>
+                    <div class="col-6 col-lg-2">
+                      <label for="{{ item_formset.empty_form.unit_price.id_for_label }}" class="form-label">Unit price</label>
+                      {{ item_formset.empty_form.unit_price }}
+                    </div>
+                    <div class="col-12 col-lg-2">
+                      <label for="{{ item_formset.empty_form.subtotal.id_for_label }}" class="form-label">Subtotal</label>
+                      {{ item_formset.empty_form.subtotal }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+              {{ purchase_product_options|json_script:"purchase-product-options" }}
+            </div>
+
+            <div class="card-footer purchase-items-card__footer">
+              <div class="purchase-total">
+                <span class="purchase-total__label">Total purchase amount</span>
+                <strong id="purchase-total-display">0.00</strong>
+              </div>
+              <div class="purchase-form-actions">
+                <a href="{% url 'dashboard_purchase_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>{{ submit_label }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const totalFormsInput = document.getElementById('id_items-TOTAL_FORMS');
+      const itemsList = document.getElementById('purchase-items-list');
+      const addButton = document.getElementById('add-purchase-row');
+      const emptyTemplate = document.getElementById('purchase-empty-form-template');
+      const emptyState = document.getElementById('purchase-empty-state');
+      const itemsCount = document.getElementById('purchase-items-count');
+      const totalDisplay = document.getElementById('purchase-total-display');
+      const productDataElement = document.getElementById('purchase-product-options');
+      const productOptions = productDataElement ? JSON.parse(productDataElement.textContent) : [];
+      const productPrices = Object.fromEntries(productOptions.map((product) => [String(product.id), product.unit_price]));
+      const productMetadata = Object.fromEntries(productOptions.map((product) => [String(product.id), product]));
+
+      const closeAllSearchableSelects = () => {
+        document.querySelectorAll('.dashboard-combobox.is-open').forEach((wrapper) => {
+          wrapper.classList.remove('is-open');
+          wrapper.querySelector('.dashboard-combobox__toggle')?.setAttribute('aria-expanded', 'false');
+        });
+      };
+
+      function initializeProductDropdown(select) {
+        if (!select || select.dataset.purchaseDropdownInitialized) return;
+
+        const searchPlaceholder = select.dataset.searchPlaceholder || 'Search product';
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dashboard-combobox purchase-product-combobox';
+
+        const toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.className = 'dashboard-combobox__toggle';
+        toggleButton.setAttribute('aria-haspopup', 'listbox');
+        toggleButton.setAttribute('aria-expanded', 'false');
+
+        const toggleLabel = document.createElement('span');
+        toggleLabel.className = 'dashboard-combobox__label';
+
+        const toggleIcon = document.createElement('i');
+        toggleIcon.className = 'bi bi-chevron-down dashboard-combobox__chevron';
+
+        toggleButton.appendChild(toggleLabel);
+        toggleButton.appendChild(toggleIcon);
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'dashboard-combobox__dropdown';
+
+        const searchBox = document.createElement('div');
+        searchBox.className = 'dashboard-combobox__search';
+
+        const searchInput = document.createElement('input');
+        searchInput.type = 'search';
+        searchInput.className = 'form-control';
+        searchInput.placeholder = searchPlaceholder;
+
+        searchBox.appendChild(searchInput);
+
+        const optionList = document.createElement('div');
+        optionList.className = 'dashboard-combobox__list';
+        optionList.setAttribute('role', 'listbox');
+
+        dropdown.appendChild(searchBox);
+        dropdown.appendChild(optionList);
+
+        select.insertAdjacentElement('afterend', wrapper);
+        wrapper.appendChild(toggleButton);
+        wrapper.appendChild(dropdown);
+        select.classList.add('dashboard-combobox__native');
+        select.dataset.purchaseDropdownInitialized = 'true';
+
+        const getOptions = () =>
+          Array.from(select.options).map((option) => ({
+            value: option.value,
+            label: option.text.trim(),
+            group: productMetadata[String(option.value)]?.category || 'Other products',
+            isEmptyOption: !option.value,
+          }));
+
+        const renderOptions = (query = '') => {
+          const normalizedQuery = query.trim().toLowerCase();
+          optionList.innerHTML = '';
+
+          const options = getOptions();
+          const nonEmptyOptions = options.filter(({ isEmptyOption }) => !isEmptyOption);
+          const sourceOptions = nonEmptyOptions.length ? nonEmptyOptions : options;
+          const filteredOptions = sourceOptions.filter(({ label, isEmptyOption }) => {
+            if (!normalizedQuery || isEmptyOption) return true;
+            return label.toLowerCase().includes(normalizedQuery);
+          });
+
+          const optionGroups = new Map();
+          filteredOptions.forEach((option) => {
+            const groupOptions = optionGroups.get(option.group) || [];
+            groupOptions.push(option);
+            optionGroups.set(option.group, groupOptions);
+          });
+
+          optionGroups.forEach((groupOptions, groupName) => {
+            const groupHeading = document.createElement('div');
+            groupHeading.className = 'purchase-product-group';
+            groupHeading.textContent = groupName;
+            optionList.appendChild(groupHeading);
+
+            groupOptions.forEach(({ value, label }) => {
+              const item = document.createElement('button');
+              item.type = 'button';
+              item.className = 'dashboard-combobox__option purchase-product-option';
+              item.textContent = label;
+              item.dataset.value = value;
+              item.setAttribute('role', 'option');
+              if (select.value === value) item.classList.add('is-selected');
+              item.addEventListener('click', () => {
+                select.value = value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                closeAllSearchableSelects();
+              });
+              optionList.appendChild(item);
+            });
+          });
+
+          if (!filteredOptions.length) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'dashboard-combobox__empty';
+            emptyState.textContent = 'No result found';
+            optionList.appendChild(emptyState);
+          }
+        };
+
+        const syncSelectedLabel = () => {
+          const selectedOption = select.options[select.selectedIndex];
+          const selectedLabel = selectedOption ? selectedOption.text.trim() : '';
+          toggleLabel.textContent =
+            !selectedOption || !selectedOption.value || selectedLabel === '---------'
+              ? 'Select product'
+              : selectedLabel;
+          optionList.querySelectorAll('.dashboard-combobox__option').forEach((item) => {
+            item.classList.toggle('is-selected', item.dataset.value === select.value);
+          });
+        };
+
+        toggleButton.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const isOpen = wrapper.classList.contains('is-open');
+          closeAllSearchableSelects();
+          if (!isOpen) {
+            wrapper.classList.add('is-open');
+            toggleButton.setAttribute('aria-expanded', 'true');
+            searchInput.focus();
+            searchInput.select();
+          }
+        });
+        searchInput.addEventListener('input', () => {
+          renderOptions(searchInput.value);
+          syncSelectedLabel();
+        });
+        select.addEventListener('change', () => {
+          syncSelectedLabel();
+          toggleButton.setAttribute('aria-expanded', 'false');
+        });
+        wrapper.addEventListener('click', (event) => event.stopPropagation());
+        renderOptions();
+        syncSelectedLabel();
+      }
+
+      function syncProductPrice(row) {
+        const select = row.querySelector('select[name$="-product"]');
+        const unitPrice = row.querySelector('input[name$="-unit_price"]');
+        if (select && unitPrice && select.value) unitPrice.value = productPrices[String(select.value)] || '';
+        if (select && unitPrice && !select.value) unitPrice.value = '';
+      }
+
+      function parseAmount(value) {
+        const parsed = parseFloat(value || '0');
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      function updateRowSubtotal(row) {
+        const quantity = row.querySelector('input[name$="-quantity"]');
+        const unitPrice = row.querySelector('input[name$="-unit_price"]');
+        const subtotal = row.querySelector('input[name$="-subtotal"]');
+        const deleted = row.querySelector('input[name$="-DELETE"]');
+        if (!quantity || !unitPrice || !subtotal) return 0;
+        if (deleted && deleted.checked) {
+          subtotal.value = '0.00';
+          return 0;
+        }
+        const value = parseAmount(quantity.value) * parseAmount(unitPrice.value);
+        subtotal.value = value.toFixed(2);
+        return value;
+      }
+
+      function updateRowNumbers() {
+        const rows = Array.from(itemsList.querySelectorAll('.purchase-item-row')).filter((row) => !row.classList.contains('d-none'));
+        rows.forEach((row, index) => {
+          const number = row.querySelector('.purchase-item-number');
+          if (number) number.textContent = index + 1;
+        });
+        itemsCount.textContent = `${rows.length} ${rows.length === 1 ? 'item' : 'items'}`;
+        emptyState.classList.toggle('d-none', rows.length > 0);
+      }
+
+      function updateTotal() {
+        let total = 0;
+        itemsList.querySelectorAll('.purchase-item-row').forEach((row) => { total += updateRowSubtotal(row); });
+        totalDisplay.textContent = total.toFixed(2);
+        updateRowNumbers();
+      }
+
+      function bindRow(row) {
+        row.querySelectorAll('input[name$="-quantity"], input[name$="-unit_price"]').forEach((input) => input.addEventListener('input', updateTotal));
+        const productSelect = row.querySelector('select[name$="-product"]');
+        if (productSelect) {
+          initializeProductDropdown(productSelect);
+          if (!productSelect.dataset.priceListener) {
+            productSelect.addEventListener('change', () => {
+              syncProductPrice(row);
+              updateTotal();
+            });
+            productSelect.dataset.priceListener = 'true';
+          }
+        }
+        const removeButton = row.querySelector('.purchase-row-remove');
+        if (removeButton) removeButton.addEventListener('click', () => {
+          const deleted = row.querySelector('input[name$="-DELETE"]');
+          if (deleted) {
+            deleted.checked = true;
+            row.classList.add('d-none');
+          } else {
+            row.remove();
+            totalFormsInput.value = Math.max(parseInt(totalFormsInput.value, 10) - 1, 0);
+          }
+          closeAllSearchableSelects();
+          updateTotal();
+        });
+      }
+
+      document.addEventListener('click', closeAllSearchableSelects);
+      itemsList.querySelectorAll('.purchase-item-row').forEach(bindRow);
+      updateTotal();
+
+      addButton.addEventListener('click', () => {
+        const formIndex = parseInt(totalFormsInput.value, 10);
+        itemsList.insertAdjacentHTML('beforeend', emptyTemplate.innerHTML.replace(/__prefix__/g, formIndex));
+        totalFormsInput.value = formIndex + 1;
+        bindRow(itemsList.lastElementChild);
+        itemsList.lastElementChild.querySelector('.dashboard-combobox__toggle')?.click();
+        updateTotal();
+      });
+    });
+  </script>
+{% endblock %}

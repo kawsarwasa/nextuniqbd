@@ -1,0 +1,843 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}All Products - SB Revo{% endblock %}
+
+{% block content %}
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">All Products</span>
+      </nav>
+    </div>
+  </div>
+
+  <section class="products-page-section">
+    <div class="container">
+      <div class="products-page-layout">
+        <aside class="filter-sidebar" id="filterSidebar">
+          <div class="filter-sidebar-header">
+            <h3><i class="fa fa-sliders-h"></i> Filters</h3>
+            <button class="filter-clear-all" id="clearAllFilters">Clear All</button>
+          </div>
+
+          <div class="active-filters-wrap" id="activeFiltersWrap" style="display:none">
+            <p class="active-filters-label">Active Filters:</p>
+            <div class="active-filters" id="activeFilters"></div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="category">
+              <span><i class="fa fa-th-large"></i> Category</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-category">
+              <ul class="filter-checklist">
+                {% for item in category_filters %}
+                  <li><label><input type="checkbox" class="filter-cb" data-filter="category" value="{{ item.name }}"{% if item.checked %} checked{% endif %} /> {{ item.name }} <span class="filter-count">{{ item.count }}</span></label></li>
+                {% empty %}
+                  <li class="text-muted small">No categories available</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="brand">
+              <span><i class="fa fa-tag"></i> Brand</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-brand">
+              <ul class="filter-checklist">
+                {% for item in brand_filters %}
+                  <li><label><input type="checkbox" class="filter-cb" data-filter="brand" value="{{ item.name }}"{% if item.checked %} checked{% endif %} /> {{ item.name }} <span class="filter-count">{{ item.count }}</span></label></li>
+                {% empty %}
+                  <li class="text-muted small">No brands available</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="price">
+              <span><i class="fa fa-dollar-sign"></i> Price Range</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-price">
+              <div class="price-range-wrap">
+                <div class="price-range-display">
+                  <span id="priceMin">$0</span>
+                  <span id="priceMax">${{ price_max }}</span>
+                </div>
+                <div class="price-slider-track">
+                  <div class="price-slider-fill" id="sliderFill"></div>
+                  <input type="range" class="price-range-input" id="rangeMin" min="0" max="{{ price_max }}" value="0" step="5" />
+                  <input type="range" class="price-range-input" id="rangeMax" min="0" max="{{ price_max }}" value="{{ price_max }}" step="5" />
+                </div>
+                <div class="price-range-inputs-row">
+                  <input type="number" class="price-input-field" id="priceMinInput" value="0" min="0" max="{{ price_max }}" placeholder="Min" />
+                  <span>-</span>
+                  <input type="number" class="price-input-field" id="priceMaxInput" value="{{ price_max }}" min="0" max="{{ price_max }}" placeholder="Max" />
+                </div>
+              </div>
+              <ul class="filter-checklist price-preset-list" style="margin-top:10px">
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="0" data-max="50" /> Under $50</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="50" data-max="100" /> $50 - $100</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="100" data-max="200" /> $100 - $200</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="200" data-max="350" /> $200 - $350</label></li>
+                <li><label><input type="radio" name="pricePreset" class="price-preset" data-min="350" data-max="{{ price_max }}" /> Over $350</label></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="rating">
+              <span><i class="fa fa-star"></i> Customer Rating</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-rating">
+              <ul class="filter-checklist rating-list">
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="4" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="3" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="2" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+                <li>
+                  <label>
+                    <input type="radio" name="filterRating" class="filter-rating-rb" value="1" />
+                    <div class="rating-stars-row">
+                      <i class="fa fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                      <span>&amp; Up</span>
+                    </div>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-group-title" data-filter-toggle="availability">
+              <span><i class="fa fa-box"></i> Availability</span>
+              <i class="fa fa-chevron-down filter-arrow"></i>
+            </button>
+            <div class="filter-group-body" id="filter-availability">
+              <ul class="filter-checklist">
+                {% for item in availability_filters %}
+                  <li><label><input type="checkbox" class="filter-cb" data-filter="availability" value="{{ item.value }}"{% if item.checked %} checked{% endif %} /> {{ item.label }} <span class="filter-count">{{ item.count }}</span></label></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <div class="products-page-main">
+          {% if selected_search_query or selected_search_category or selected_search_brand %}
+            <div class="sidebar-widget" style="margin-bottom: 18px;">
+              <h4 class="sidebar-widget-title">Search Results</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;">
+                {% if selected_search_query %}Keyword: <strong>{{ selected_search_query }}</strong>{% endif %}
+                {% if selected_search_query and selected_search_category %} · {% endif %}
+                {% if selected_search_category %}
+                  Category:
+                  <strong>
+                    {% for category in header_search_categories %}
+                      {% if category.slug == selected_search_category %}{{ category.name }}{% endif %}
+                    {% endfor %}
+                  </strong>
+                {% endif %}
+                {% if selected_search_brand %}
+                  {% if selected_search_query or selected_search_category %} Â· {% endif %}
+                  Brand:
+                  <strong>
+                    {% for item in brand_filters %}
+                      {% if item.checked %}{{ item.name }}{% endif %}
+                    {% endfor %}
+                  </strong>
+                {% endif %}
+              </p>
+            </div>
+          {% endif %}
+
+          <div class="products-toolbar">
+            <div class="toolbar-left">
+              <button class="mobile-filter-btn" id="mobileFilterBtn"><i class="fa fa-sliders-h"></i> Filters</button>
+              <span class="products-count"><strong id="visibleCount">{{ product_count }}</strong> products found</span>
+            </div>
+            <div class="toolbar-right">
+              <div class="sort-wrap">
+                <label>Sort by:</label>
+                <select id="sortSelect" class="sort-select">
+                  <option value="default">Default</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="rating">Best Rating</option>
+                  <option value="newest">Newest</option>
+                  <option value="name-asc">Name A-Z</option>
+                </select>
+              </div>
+              <div class="view-toggle">
+                <button class="view-btn active" id="gridViewBtn" title="Grid view"><i class="fa fa-th"></i></button>
+                <button class="view-btn" id="listViewBtn" title="List view"><i class="fa fa-list"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="plp-grid" id="plpGrid">
+            {% for product in products %}
+              <div
+                class="product-card"
+                data-product-id="{{ product.id }}"
+                data-order="{{ product.sort_order }}"
+                data-created="{{ product.created_timestamp }}"
+                data-category="{{ product.category_label }}"
+                data-brand="{{ product.brand_label }}"
+                data-price="{{ product.current_price|floatformat:2 }}"
+                data-rating="{{ product.display_rating|floatformat:1 }}"
+                data-in-stock="{% if product.is_in_stock %}true{% else %}false{% endif %}"
+                data-sale="{% if product.is_on_sale %}true{% else %}false{% endif %}"
+                data-new="{% if product.is_new_arrival %}true{% else %}false{% endif %}"
+                data-image="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+                data-category-label="{{ product.category_label }}"
+                data-name="{{ product.name|escape }}"
+                data-reviews="{{ product.review_count }}"
+                data-current-price="{{ product.current_price }}"
+                data-regular-price="{{ product.regular_price }}"
+                data-description="{{ product.short_description_plain|default:'No description available.'|escape }}"
+                data-detail-url="{% url 'frontend_product_detail' product.slug %}"
+              >
+                <div class="product-badges">
+                  {% if product.is_on_sale %}
+                    <span class="badge-sale">-{{ product.sale_percentage }}%</span>
+                  {% endif %}
+                  {% if product.is_new_arrival %}
+                    <span class="badge-new">NEW</span>
+                  {% endif %}
+                  {% if product.track_stock and not product.is_in_stock %}
+                    <span class="badge-hot">Out of Stock</span>
+                  {% elif product.track_stock and product.is_low_stock %}
+                    <span class="badge-hot">Only {{ product.stock_quantity }} left</span>
+                  {% endif %}
+                </div>
+                <div class="product-image">
+                  <img
+                    src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+                    alt="{{ product.name }}"
+                    width="600"
+                    height="600"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="product-actions">
+                    <button type="button" class="js-quick-view-trigger" title="Quick View"><i class="fa fa-eye"></i></button>
+                  </div>
+                </div>
+                <div class="product-info">
+                  <p class="product-cat">{{ product.category_label }}</p>
+                  <h4><a href="{% url 'frontend_product_detail' product.slug %}">{{ product.name }}</a></h4>
+                  <div class="product-rating">
+                    {% for _ in product.full_stars %}
+                      <i class="fa fa-star"></i>
+                    {% endfor %}
+                    {% for _ in product.empty_stars %}
+                      <i class="far fa-star"></i>
+                    {% endfor %}
+                    <span>({{ product.review_count }})</span>
+                  </div>
+                  <div class="product-price">
+                    <span class="price-current">${{ product.current_price }}</span>
+                    {% if product.is_on_sale %}
+                      <span class="price-old">${{ product.regular_price }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="product-card-actions">
+                    <button class="add-to-cart" type="button"{% if not product.is_in_stock %} disabled aria-disabled="true"{% endif %}>
+                      <i class="fa fa-shopping-cart"></i> Add to Cart
+                    </button>
+                    <button class="buy-now" type="button"{% if not product.is_in_stock %} disabled aria-disabled="true"{% endif %}>
+                      <i class="fa fa-bolt"></i> Buy Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="alert alert-light border mb-0">No published products available right now.</div>
+            {% endfor %}
+          </div>
+
+          <div class="plp-no-results" id="plpNoResults" style="display:none">
+            <i class="fa fa-search"></i>
+            <h3>No products found</h3>
+            <p>Try adjusting your filters or search term to find what you're looking for.</p>
+            <button class="plp-no-results-clear" id="noResultsClear">Clear All Filters</button>
+          </div>
+
+          <div class="plp-pagination" id="plpPagination" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="mobile-filter-overlay" id="mobileFilterOverlay"></div>
+{% endblock %}
+
+{% block page_overlays %}
+  {% with modal_product=products|first %}
+    <div class="modal-overlay" id="quickViewModal">
+      <div class="modal-box quickview-box">
+        <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+        <div class="quickview-content">
+          <div class="quickview-image">
+            <img src="{% if modal_product and modal_product.primary_image_url %}{{ modal_product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" />
+          </div>
+          <div class="quickview-info">
+            <p class="product-cat" id="qvCat">{% if modal_product %}{{ modal_product.category_label }}{% endif %}</p>
+            <h2 id="qvName">{% if modal_product %}{{ modal_product.name }}{% else %}Product Preview{% endif %}</h2>
+            <div class="product-rating">
+              <span id="qvReviews">{% if modal_product %}{{ modal_product.review_count }} reviews{% else %}0 reviews{% endif %}</span>
+            </div>
+            <div class="product-price large" id="qvPrice">
+              <span class="price-current" id="qvCurrentPrice">{% if modal_product %}${{ modal_product.current_price }}{% else %}$0.00{% endif %}</span>
+              <span class="price-old" id="qvOldPrice"{% if not modal_product or not modal_product.is_on_sale %} style="display:none"{% endif %}>{% if modal_product and modal_product.is_on_sale %}${{ modal_product.regular_price }}{% endif %}</span>
+            </div>
+            <p class="qv-desc" id="qvDesc">{% if modal_product %}{{ modal_product.short_description_plain|default:"No description available." }}{% else %}No description available.{% endif %}</p>
+            <div class="qv-actions">
+              <button class="add-to-cart full" type="button"{% if modal_product %} data-product-id="{{ modal_product.id }}"{% endif %}>Add to Cart</button>
+            </div>
+            <a href="{% if modal_product %}{% url 'frontend_product_detail' modal_product.slug %}{% else %}{% url 'frontend_product_details' %}{% endif %}" class="view-detail" id="qvDetailLink">View Full Details <i class="fa fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endwith %}
+{% endblock %}
+
+{% block extra_scripts %}
+  <script>
+    (function () {
+      const grid = document.getElementById('plpGrid');
+      if (!grid) {
+        return;
+      }
+
+      let allCards = Array.from(grid.querySelectorAll('.product-card'));
+      const countEl = document.getElementById('visibleCount');
+      const noResults = document.getElementById('plpNoResults');
+      const paginationEl = document.getElementById('plpPagination');
+      const rangeMin = document.getElementById('rangeMin');
+      const rangeMax = document.getElementById('rangeMax');
+      const priceMinEl = document.getElementById('priceMin');
+      const priceMaxEl = document.getElementById('priceMax');
+      const priceMinInput = document.getElementById('priceMinInput');
+      const priceMaxInput = document.getElementById('priceMaxInput');
+      const sliderFill = document.getElementById('sliderFill');
+      const activeFiltersWrap = document.getElementById('activeFiltersWrap');
+      const activeFilters = document.getElementById('activeFilters');
+      const sliderMax = Number(rangeMax?.max || 500);
+      const modal = document.getElementById('quickViewModal');
+      const modalClose = document.getElementById('quickViewClose');
+      const qvImage = document.getElementById('qvImage');
+      const qvCat = document.getElementById('qvCat');
+      const qvName = document.getElementById('qvName');
+      const qvReviews = document.getElementById('qvReviews');
+      const qvCurrentPrice = document.getElementById('qvCurrentPrice');
+      const qvOldPrice = document.getElementById('qvOldPrice');
+      const qvDesc = document.getElementById('qvDesc');
+      const qvDetailLink = document.getElementById('qvDetailLink');
+      const qvAddToCart = modal?.querySelector('.add-to-cart.full');
+      const availabilityLabels = {
+        in_stock: 'In Stock',
+        on_sale: 'On Sale',
+        new_arrival: 'New Arrivals',
+      };
+      const ITEMS_PER_PAGE = 12;
+      let currentPage = 1;
+      let filteredCards = [...allCards];
+
+      const state = {
+        categories: new Set(
+          Array.from(document.querySelectorAll('.filter-cb[data-filter="category"]:checked')).map((input) => input.value)
+        ),
+        brands: new Set(
+          Array.from(document.querySelectorAll('.filter-cb[data-filter="brand"]:checked')).map((input) => input.value)
+        ),
+        availability: new Set(
+          Array.from(document.querySelectorAll('.filter-cb[data-filter="availability"]:checked')).map((input) => input.value)
+        ),
+        priceMin: 0,
+        priceMax: sliderMax,
+        rating: 0,
+      };
+
+      function updateSliderFill() {
+        const min = parseInt(rangeMin.value, 10);
+        const max = parseInt(rangeMax.value, 10);
+        sliderFill.style.left = (min / sliderMax * 100) + '%';
+        sliderFill.style.width = ((max - min) / sliderMax * 100) + '%';
+      }
+
+      function syncPrice() {
+        let min = parseInt(rangeMin.value, 10);
+        let max = parseInt(rangeMax.value, 10);
+        if (min > max - 20) {
+          min = max - 20;
+          rangeMin.value = min;
+        }
+        priceMinEl.textContent = '$' + min;
+        priceMaxEl.textContent = '$' + max;
+        priceMinInput.value = min;
+        priceMaxInput.value = max;
+        state.priceMin = min;
+        state.priceMax = max;
+        updateSliderFill();
+        applyFilters();
+      }
+
+      rangeMin?.addEventListener('input', syncPrice);
+      rangeMax?.addEventListener('input', syncPrice);
+      priceMinInput?.addEventListener('change', () => {
+        rangeMin.value = priceMinInput.value;
+        syncPrice();
+      });
+      priceMaxInput?.addEventListener('change', () => {
+        rangeMax.value = priceMaxInput.value;
+        syncPrice();
+      });
+
+      document.querySelectorAll('.price-preset').forEach((preset) => {
+        preset.addEventListener('change', function () {
+          rangeMin.value = this.dataset.min;
+          rangeMax.value = this.dataset.max;
+          syncPrice();
+        });
+      });
+
+      document.querySelectorAll('.filter-cb').forEach((checkbox) => {
+        checkbox.addEventListener('change', function () {
+          const key = this.dataset.filter;
+          const value = this.value;
+
+          if (key === 'category') {
+            this.checked ? state.categories.add(value) : state.categories.delete(value);
+          } else if (key === 'brand') {
+            this.checked ? state.brands.add(value) : state.brands.delete(value);
+          } else if (key === 'availability') {
+            this.checked ? state.availability.add(value) : state.availability.delete(value);
+          }
+
+          applyFilters();
+        });
+      });
+
+      document.querySelectorAll('.filter-rating-rb').forEach((radio) => {
+        radio.addEventListener('change', function () {
+          state.rating = parseInt(this.value, 10);
+          applyFilters();
+        });
+      });
+
+      function matchesAvailability(card) {
+        if (!state.availability.size) {
+          return true;
+        }
+
+        return Array.from(state.availability).some((flag) => {
+          if (flag === 'in_stock') {
+            return card.dataset.inStock === 'true';
+          }
+          if (flag === 'on_sale') {
+            return card.dataset.sale === 'true';
+          }
+          if (flag === 'new_arrival') {
+            return card.dataset.new === 'true';
+          }
+          return false;
+        });
+      }
+
+      function scrollProductsToTop() {
+        const toolbar = document.querySelector('.products-toolbar');
+        if (!toolbar) {
+          return;
+        }
+
+        const top = toolbar.getBoundingClientRect().top + window.scrollY - 120;
+        window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+      }
+
+      function buildPaginationItems(totalPages) {
+        if (totalPages <= 7) {
+          return Array.from({ length: totalPages }, (_, index) => index + 1);
+        }
+
+        const items = [1];
+        if (currentPage > 3) {
+          items.push('dots-left');
+        }
+
+        for (let page = Math.max(2, currentPage - 1); page <= Math.min(totalPages - 1, currentPage + 1); page += 1) {
+          items.push(page);
+        }
+
+        if (currentPage < totalPages - 2) {
+          items.push('dots-right');
+        }
+        items.push(totalPages);
+        return items;
+      }
+
+      function setPage(page, options = {}) {
+        const totalPages = Math.max(1, Math.ceil(filteredCards.length / ITEMS_PER_PAGE));
+        currentPage = Math.min(Math.max(page, 1), totalPages);
+        renderVisibleCards();
+        if (options.scroll !== false) {
+          scrollProductsToTop();
+        }
+      }
+
+      function renderPagination() {
+        if (!paginationEl) {
+          return;
+        }
+
+        const totalItems = filteredCards.length;
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+        if (totalItems === 0 || totalPages <= 1) {
+          paginationEl.innerHTML = '';
+          paginationEl.style.display = 'none';
+          return;
+        }
+
+        paginationEl.style.display = 'flex';
+        paginationEl.innerHTML = '';
+
+        const prevButton = document.createElement('button');
+        prevButton.type = 'button';
+        prevButton.className = `page-btn${currentPage === 1 ? ' disabled' : ''}`;
+        prevButton.innerHTML = '<i class="fa fa-chevron-left"></i>';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => setPage(currentPage - 1));
+        paginationEl.appendChild(prevButton);
+
+        buildPaginationItems(totalPages).forEach((item) => {
+          if (typeof item === 'string') {
+            const dots = document.createElement('span');
+            dots.className = 'page-dots';
+            dots.textContent = '...';
+            paginationEl.appendChild(dots);
+            return;
+          }
+
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `page-btn${item === currentPage ? ' active' : ''}`;
+          button.textContent = item;
+          button.addEventListener('click', () => setPage(item));
+          paginationEl.appendChild(button);
+        });
+
+        const nextButton = document.createElement('button');
+        nextButton.type = 'button';
+        nextButton.className = `page-btn${currentPage === totalPages ? ' disabled' : ''}`;
+        nextButton.innerHTML = '<i class="fa fa-chevron-right"></i>';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.addEventListener('click', () => setPage(currentPage + 1));
+        paginationEl.appendChild(nextButton);
+      }
+
+      function renderVisibleCards() {
+        const totalItems = filteredCards.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+        if (currentPage > totalPages) {
+          currentPage = totalPages;
+        }
+
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+
+        allCards.forEach((card) => {
+          card.style.display = 'none';
+        });
+
+        filteredCards.forEach((card, index) => {
+          card.style.display = index >= start && index < end ? '' : 'none';
+        });
+
+        countEl.textContent = totalItems;
+        noResults.style.display = totalItems === 0 ? 'flex' : 'none';
+        renderPagination();
+      }
+
+      function applyFilters(resetPage = true) {
+        filteredCards = allCards.filter((card) => {
+          const price = parseFloat(card.dataset.price || '0');
+          const rating = parseFloat(card.dataset.rating || '0');
+          const cardCategory = card.dataset.category || '';
+          const cardBrand = card.dataset.brand || '';
+
+          let show = true;
+          if (state.categories.size > 0 && !state.categories.has(cardCategory)) {
+            show = false;
+          }
+          if (state.brands.size > 0 && !state.brands.has(cardBrand)) {
+            show = false;
+          }
+          if (price < state.priceMin || price > state.priceMax) {
+            show = false;
+          }
+          if (state.rating > 0 && rating < state.rating) {
+            show = false;
+          }
+          if (!matchesAvailability(card)) {
+            show = false;
+          }
+
+          return show;
+        });
+
+        if (resetPage) {
+          currentPage = 1;
+        }
+
+        renderVisibleCards();
+        updateActiveFiltersBar();
+      }
+
+      function updateActiveFiltersBar() {
+        const tags = [];
+
+        state.categories.forEach((value) => {
+          tags.push({
+            label: value,
+            clear: () => {
+              state.categories.delete(value);
+              document.querySelector(`.filter-cb[data-filter="category"][value="${value}"]`).checked = false;
+              applyFilters();
+            },
+          });
+        });
+
+        state.brands.forEach((value) => {
+          tags.push({
+            label: value,
+            clear: () => {
+              state.brands.delete(value);
+              document.querySelector(`.filter-cb[data-filter="brand"][value="${value}"]`).checked = false;
+              applyFilters();
+            },
+          });
+        });
+
+        state.availability.forEach((value) => {
+          tags.push({
+            label: availabilityLabels[value] || value,
+            clear: () => {
+              state.availability.delete(value);
+              document.querySelector(`.filter-cb[data-filter="availability"][value="${value}"]`).checked = false;
+              applyFilters();
+            },
+          });
+        });
+
+        if (state.rating > 0) {
+          tags.push({
+            label: state.rating + '+ Stars',
+            clear: () => {
+              state.rating = 0;
+              document.querySelectorAll('.filter-rating-rb').forEach((radio) => {
+                radio.checked = false;
+              });
+              applyFilters();
+            },
+          });
+        }
+
+        if (state.priceMin > 0 || state.priceMax < sliderMax) {
+          tags.push({
+            label: '$' + state.priceMin + ' - $' + state.priceMax,
+            clear: () => {
+              state.priceMin = 0;
+              state.priceMax = sliderMax;
+              rangeMin.value = 0;
+              rangeMax.value = sliderMax;
+              document.querySelectorAll('.price-preset').forEach((preset) => {
+                preset.checked = false;
+              });
+              syncPrice();
+            },
+          });
+        }
+
+        activeFilters.innerHTML = '';
+        tags.forEach((tag) => {
+          const button = document.createElement('button');
+          button.className = 'active-filter-tag';
+          button.innerHTML = tag.label + ' <i class="fa fa-times"></i>';
+          button.addEventListener('click', tag.clear);
+          activeFilters.appendChild(button);
+        });
+
+        activeFiltersWrap.style.display = tags.length ? 'block' : 'none';
+      }
+
+      function clearAll() {
+        state.categories.clear();
+        state.brands.clear();
+        state.availability.clear();
+        state.priceMin = 0;
+        state.priceMax = sliderMax;
+        state.rating = 0;
+
+        document.querySelectorAll('.filter-cb, .filter-rating-rb, .price-preset').forEach((element) => {
+          element.checked = false;
+        });
+
+        rangeMin.value = 0;
+        rangeMax.value = sliderMax;
+        syncPrice();
+        applyFilters();
+      }
+
+      document.getElementById('clearAllFilters')?.addEventListener('click', clearAll);
+      document.getElementById('noResultsClear')?.addEventListener('click', clearAll);
+
+      document.getElementById('sortSelect')?.addEventListener('change', function () {
+        const value = this.value;
+        const cards = Array.from(grid.querySelectorAll('.product-card'));
+
+        cards.sort((a, b) => {
+          if (value === 'price-asc') {
+            return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+          }
+          if (value === 'price-desc') {
+            return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+          }
+          if (value === 'rating') {
+            return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+          }
+          if (value === 'newest') {
+            return Number(b.dataset.created) - Number(a.dataset.created);
+          }
+          if (value === 'name-asc') {
+            return a.dataset.name.localeCompare(b.dataset.name);
+          }
+          return Number(a.dataset.order) - Number(b.dataset.order);
+        });
+
+        cards.forEach((card) => grid.appendChild(card));
+        allCards = Array.from(grid.querySelectorAll('.product-card'));
+        currentPage = 1;
+        applyFilters(false);
+      });
+
+      document.getElementById('gridViewBtn')?.addEventListener('click', function () {
+        grid.classList.remove('plp-list-view');
+        this.classList.add('active');
+        document.getElementById('listViewBtn').classList.remove('active');
+      });
+
+      document.getElementById('listViewBtn')?.addEventListener('click', function () {
+        grid.classList.add('plp-list-view');
+        this.classList.add('active');
+        document.getElementById('gridViewBtn').classList.remove('active');
+      });
+
+      document.querySelectorAll('.filter-group-title').forEach((button) => {
+        button.addEventListener('click', function () {
+          const target = this.dataset.filterToggle;
+          const body = document.getElementById('filter-' + target);
+          const arrow = this.querySelector('.filter-arrow');
+          body.classList.toggle('collapsed');
+          arrow.style.transform = body.classList.contains('collapsed') ? 'rotate(-90deg)' : 'rotate(0)';
+        });
+      });
+
+      const sidebar = document.getElementById('filterSidebar');
+      const overlay = document.getElementById('mobileFilterOverlay');
+
+      document.getElementById('mobileFilterBtn')?.addEventListener('click', function () {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+
+      overlay?.addEventListener('click', function () {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+
+      grid.querySelectorAll('.js-quick-view-trigger').forEach((button) => {
+        button.addEventListener('click', function () {
+          const card = this.closest('.product-card');
+          if (!card || !modal) {
+            return;
+          }
+
+          qvImage.src = card.dataset.image;
+          qvCat.textContent = card.dataset.categoryLabel || '';
+          qvName.textContent = card.dataset.name || 'Product Preview';
+          qvReviews.textContent = (card.dataset.reviews || '0') + ' reviews';
+          qvCurrentPrice.textContent = '$' + (card.dataset.currentPrice || '0.00');
+          qvDesc.textContent = card.dataset.description || 'No description available.';
+          if (qvDetailLink) {
+            qvDetailLink.href = card.dataset.detailUrl || '{% url "frontend_product_details" %}';
+          }
+          if (qvAddToCart) {
+            qvAddToCart.dataset.productId = card.dataset.productId || '';
+          }
+
+          if (card.dataset.sale === 'true') {
+            qvOldPrice.textContent = '$' + (card.dataset.regularPrice || '');
+            qvOldPrice.style.display = '';
+          } else {
+            qvOldPrice.textContent = '';
+            qvOldPrice.style.display = 'none';
+          }
+
+          modal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      modalClose?.addEventListener('click', function () {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+
+      modal?.addEventListener('click', function (event) {
+        if (event.target === modal) {
+          modal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+
+      updateSliderFill();
+      applyFilters();
+    })();
+  </script>
+{% endblock %}

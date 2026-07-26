@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoSmart Fleece Hoodie - SB Revo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span><i class="fa fa-phone"></i> (+84) 4567 421 978</span>
+        <span><i class="fa fa-envelope"></i> support@sbrevo.com</span>
+      </div>
+      <div class="topbar-right">
+        <span class="promo-text"><i class="fa fa-truck"></i> Free Shipping on orders over $99</span>
+        <div class="currency-selector">
+          <select><option>USD $</option><option>AUD $</option></select>
+        </div>
+        <a href="#"><i class="fa fa-user"></i> Sign In</a>
+        <a href="#"><i class="fa fa-user-plus"></i> Register</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container header-inner">
+      <div class="logo">
+        <a href="index.html"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></a>
+      </div>
+      <div class="search-bar">
+        <select class="search-category">
+          <option>All Categories</option>
+          <option>Fashion</option>
+          <option>Electronics</option>
+          <option>Kitchen</option>
+          <option>Sports</option>
+        </select>
+        <input type="text" placeholder="Search for products..." />
+        <button class="search-btn"><i class="fa fa-search"></i></button>
+      </div>
+      <div class="header-actions">
+        <div class="action-item cart-icon">
+          <i class="fa fa-shopping-cart"></i>
+          <span class="badge" id="cartBadge">5</span>
+          <span class="action-label">Cart</span>
+          <div class="cart-preview">
+            <div class="cart-item">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=60&h=60&fit=crop" alt="Product" />
+              <div><p>Running Sneakers</p><span>$120.00 × 1</span></div>
+              <button class="remove-item"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="cart-item">
+              <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=60&h=60&fit=crop" alt="Product" />
+              <div><p>Smart Watch</p><span>$299.00 × 1</span></div>
+              <button class="remove-item"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="cart-total"><span>Subtotal:</span><strong>$419.00</strong></div>
+            <div class="cart-buttons">
+              <a href="cart.html" class="btn-outline">View Cart</a>
+              <a href="cart.html" class="btn-primary">Checkout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <div class="nav-all-categories">
+        <button class="all-cat-btn"><i class="fa fa-bars"></i> All Categories</button>
+        <div class="all-cat-dropdown">
+          <a href="#"><i class="fa fa-tshirt"></i> Fashion</a>
+          <a href="#"><i class="fa fa-utensils"></i> Kitchen</a>
+          <a href="#"><i class="fa fa-laptop"></i> Computer</a>
+          <a href="#"><i class="fa fa-briefcase"></i> Bags</a>
+          <a href="#"><i class="fa fa-clock"></i> Watches</a>
+          <a href="#"><i class="fa fa-mobile-alt"></i> Smartphone</a>
+          <a href="#"><i class="fa fa-spa"></i> Health & Beauty</a>
+          <a href="#"><i class="fa fa-running"></i> Sport Clothing</a>
+          <a href="#"><i class="fa fa-gem"></i> Jewelry</a>
+          <a href="#"><i class="fa fa-glasses"></i> Accessories</a>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li class="has-dropdown">
+          <a href="#">Fashion <i class="fa fa-chevron-down"></i></a>
+          <div class="mega-menu">
+            <div class="mega-col"><h4>Women</h4><a href="#">Dresses</a><a href="#">Tops</a><a href="#">Skirts</a></div>
+            <div class="mega-col"><h4>Men</h4><a href="#">Shirts</a><a href="#">Trousers</a><a href="#">Suits</a></div>
+            <div class="mega-col"><h4>Kids</h4><a href="#">Boys</a><a href="#">Girls</a><a href="#">Baby</a></div>
+            <div class="mega-col mega-banner"><img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=200&h=150&fit=crop" alt="" /><span>Up to 40% Off</span></div>
+          </div>
+        </li>
+        <li><a href="#">Electronics</a></li>
+        <li><a href="#">Kitchen</a></li>
+        <li><a href="#">Watches</a></li>
+        <li><a href="#">Sports</a></li>
+        <li><a href="#">Blog</a></li>
+        <li class="hot-deal"><a href="#">Hot Deals <span class="hot-tag">HOT</span></a></li>
+      </ul>
+      <div class="nav-promo">
+        <i class="fa fa-tag"></i> <strong>20% OFF</strong> Use code: <span>REVO20</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="index.html"><i class="fa fa-home"></i> Home</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <a href="index.html">Fashion</a>
+        <span class="sep"><i class="fa fa-chevron-right"></i></span>
+        <span class="current">EcoSmart Fleece Hoodie</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL MAIN -->
+  <section class="pd-section">
+    <div class="container">
+      <div class="pd-layout">
+
+        <!-- LEFT: IMAGE GALLERY -->
+        <div class="pd-gallery">
+          <div class="pd-main-img" id="pdMainImg">
+            <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&h=700&fit=crop" alt="EcoSmart Fleece Hoodie" id="mainProductImg" />
+            <div class="zoom-hint"><i class="fa fa-search-plus"></i> Click to zoom</div>
+            <div class="img-zoom-overlay" id="imgZoomOverlay">
+              <button class="zoom-close" id="zoomClose"><i class="fa fa-times"></i></button>
+              <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1200&h=1200&fit=crop" id="zoomedImg" alt="Zoomed" />
+            </div>
+          </div>
+          <div class="pd-thumbs" id="pdThumbs">
+            <div class="pd-thumb active">
+              <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=120&h=120&fit=crop"
+                   data-full="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&h=700&fit=crop"
+                   data-zoom="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1200&h=1200&fit=crop"
+                   alt="View 1" />
+            </div>
+            <div class="pd-thumb">
+              <img src="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=120&h=120&fit=crop"
+                   data-full="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=700&h=700&fit=crop"
+                   data-zoom="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&h=1200&fit=crop"
+                   alt="View 2" />
+            </div>
+            <div class="pd-thumb">
+              <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=120&h=120&fit=crop"
+                   data-full="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&h=700&fit=crop"
+                   data-zoom="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&h=1200&fit=crop"
+                   alt="View 3" />
+            </div>
+            <div class="pd-thumb">
+              <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=120&h=120&fit=crop"
+                   data-full="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700&h=700&fit=crop"
+                   data-zoom="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&fit=crop"
+                   alt="View 4" />
+            </div>
+          </div>
+          <!-- Share -->
+          <div class="pd-share">
+            <span>Share:</span>
+            <a href="#" class="share-btn fb"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="share-btn tw"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="share-btn pi"><i class="fab fa-pinterest-p"></i></a>
+            <a href="#" class="share-btn em"><i class="fa fa-envelope"></i></a>
+          </div>
+        </div>
+
+        <!-- RIGHT: PRODUCT INFO -->
+        <div class="pd-info">
+
+          <div class="pd-brand-row">
+            <a href="index.html" class="pd-brand">Common Good</a>
+            <div class="pd-badges-inline">
+              <span class="badge-new">NEW</span>
+              <span class="badge-sale">-30%</span>
+            </div>
+          </div>
+
+          <h1 class="pd-title">EcoSmart Fleece Hoodie</h1>
+
+          <div class="pd-rating-row">
+            <div class="star-rating">
+              <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+            </div>
+            <span class="pd-review-count">24 Reviews</span>
+            <a href="#tab-reviews" class="pd-write-review">Write a Review</a>
+          </div>
+
+          <div class="pd-price-block">
+            <span class="pd-price-current">$245.00</span>
+            <span class="pd-price-old">$350.00</span>
+            <span class="pd-price-save">Save $105.00 (30%)</span>
+          </div>
+
+          <div class="pd-meta">
+            <div class="pd-meta-row"><span class="meta-label">SKU:</span><span>SPORT-6-FS</span></div>
+            <div class="pd-meta-row"><span class="meta-label">Brand:</span><a href="index.html">Common Good</a></div>
+            <div class="pd-meta-row"><span class="meta-label">Condition:</span><span>New</span></div>
+            <div class="pd-meta-row"><span class="meta-label">Weight:</span><span>1.00 KGS</span></div>
+            <div class="pd-meta-row">
+              <span class="meta-label">Availability:</span>
+              <span class="in-stock"><i class="fa fa-check-circle"></i> In Stock</span>
+            </div>
+          </div>
+
+          <div class="pd-short-desc">
+            Premium quality fleece hoodie made from 100% sustainable materials. Designed for all-day comfort with a relaxed fit and kangaroo pocket. Perfect for casual wear and outdoor activities.
+          </div>
+
+          <!-- Variants: Color -->
+          <div class="pd-option">
+            <label class="pd-option-label">Color: <strong id="selectedColor">Charcoal</strong></label>
+            <div class="pd-color-swatches">
+              <button class="color-swatch active" data-color="Charcoal" style="background:#4a4a4a" title="Charcoal"></button>
+              <button class="color-swatch" data-color="Navy Blue" style="background:#1a3a6b" title="Navy Blue"></button>
+              <button class="color-swatch" data-color="Forest Green" style="background:#2d5a27" title="Forest Green"></button>
+              <button class="color-swatch" data-color="Burgundy" style="background:#722f37" title="Burgundy"></button>
+              <button class="color-swatch" data-color="Cream" style="background:#f5f0e8;border:1px solid #ccc" title="Cream"></button>
+            </div>
+          </div>
+
+          <!-- Variants: Size -->
+          <div class="pd-option">
+            <label class="pd-option-label">Size: <strong id="selectedSize">M</strong>
+              <a href="about.html" class="size-guide-link"><i class="fa fa-ruler"></i> Size Guide</a>
+            </label>
+            <div class="pd-size-buttons">
+              <button class="pd-size-btn" data-size="XS">XS</button>
+              <button class="pd-size-btn" data-size="S">S</button>
+              <button class="pd-size-btn active" data-size="M">M</button>
+              <button class="pd-size-btn" data-size="L">L</button>
+              <button class="pd-size-btn" data-size="XL">XL</button>
+              <button class="pd-size-btn out-of-stock" data-size="XXL" disabled>XXL</button>
+            </div>
+          </div>
+
+          <!-- Qty + Actions -->
+          <div class="pd-purchase-row">
+            <div class="pd-qty-wrap">
+              <label class="pd-option-label">Quantity</label>
+              <div class="pd-qty">
+                <button id="pdQtyMinus"><i class="fa fa-minus"></i></button>
+                <input type="number" id="pdQtyInput" value="1" min="1" max="10" />
+                <button id="pdQtyPlus"><i class="fa fa-plus"></i></button>
+              </div>
+              <span class="qty-limit">Max 10 per order</span>
+            </div>
+          </div>
+
+          <div class="pd-action-btns">
+            <button class="pd-add-to-cart" id="pdAddToCart">
+              <i class="fa fa-shopping-cart"></i> Add to Cart
+            </button>
+            <button class="pd-buy-now" id="pdBuyNow">
+              <i class="fa fa-bolt"></i> Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT TABS -->
+  <section class="pd-tabs-section">
+    <div class="container">
+      <div class="pd-tabs-nav">
+        <button class="pd-tab-btn active" data-pdtab="description">Description</button>
+        <button class="pd-tab-btn" data-pdtab="reviews" id="tab-reviews">Reviews (24)</button>
+      </div>
+
+      <div class="pd-tab-content active" id="pdtab-description">
+        <div class="pd-description-grid">
+          <div class="pd-desc-text">
+            <h3>Product Description</h3>
+            <p>The EcoSmart Fleece Hoodie is the perfect blend of comfort, style, and sustainability. Crafted from recycled materials, this hoodie is soft to the touch while being gentle on the planet.</p>
+            <h4>Key Features</h4>
+            <ul class="pd-features-list">
+              <li><i class="fa fa-check"></i> Made from 100% recycled polyester fleece</li>
+              <li><i class="fa fa-check"></i> Kangaroo pocket with internal zipper compartment</li>
+              <li><i class="fa fa-check"></i> Ribbed cuffs and hem for a secure, comfortable fit</li>
+              <li><i class="fa fa-check"></i> Adjustable drawstring hood</li>
+              <li><i class="fa fa-check"></i> Machine washable — cold water, tumble dry low</li>
+              <li><i class="fa fa-check"></i> Available in 5 colors and 6 sizes</li>
+            </ul>
+            <h4>Material Composition</h4>
+            <p>80% Recycled Polyester, 20% Cotton. Fabric weight: 280gsm. Anti-pilling finish for lasting softness.</p>
+          </div>
+          <div class="pd-desc-specs">
+            <h3>Specifications</h3>
+            <table class="specs-table">
+              <tr><td>Material</td><td>Recycled Polyester / Cotton</td></tr>
+              <tr><td>Weight</td><td>1.00 KGS</td></tr>
+              <tr><td>Fit</td><td>Relaxed / Unisex</td></tr>
+              <tr><td>Season</td><td>All Season</td></tr>
+              <tr><td>Care</td><td>Machine Wash Cold</td></tr>
+              <tr><td>Country of Origin</td><td>Portugal</td></tr>
+              <tr><td>Certification</td><td>GOTS Certified Organic</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="pd-tab-content" id="pdtab-reviews">
+        <!-- Review Summary -->
+        <div class="reviews-layout">
+          <div class="reviews-summary">
+            <div class="avg-rating">
+              <span class="avg-score">4.5</span>
+              <div class="avg-stars">
+                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+              </div>
+              <p>Based on 24 reviews</p>
+            </div>
+            <div class="rating-bars">
+              <div class="rating-bar-row"><span>5 ★</span><div class="rbar"><div class="rbar-fill" style="width:65%"></div></div><span>65%</span></div>
+              <div class="rating-bar-row"><span>4 ★</span><div class="rbar"><div class="rbar-fill" style="width:22%"></div></div><span>22%</span></div>
+              <div class="rating-bar-row"><span>3 ★</span><div class="rbar"><div class="rbar-fill" style="width:8%"></div></div><span>8%</span></div>
+              <div class="rating-bar-row"><span>2 ★</span><div class="rbar"><div class="rbar-fill" style="width:3%"></div></div><span>3%</span></div>
+              <div class="rating-bar-row"><span>1 ★</span><div class="rbar"><div class="rbar-fill" style="width:2%"></div></div><span>2%</span></div>
+            </div>
+          </div>
+          <div class="reviews-list">
+            <div class="review-item">
+              <div class="review-header">
+                <div class="reviewer-avatar">JD</div>
+                <div>
+                  <strong>Jessica D.</strong>
+                  <div class="review-stars"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i></div>
+                </div>
+                <span class="review-date">March 10, 2024</span>
+                <span class="verified-badge"><i class="fa fa-check-circle"></i> Verified Purchase</span>
+              </div>
+              <h5>Super comfortable, exactly as described</h5>
+              <p>This hoodie is incredibly soft and the fit is perfect. I ordered a Medium and it's a nice relaxed fit. The quality feels premium — no pilling after multiple washes. Will definitely order again in another color!</p>
+              <div class="review-helpful"><span>Was this helpful?</span><button>Yes (12)</button><button>No (1)</button></div>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <div class="reviewer-avatar">MR</div>
+                <div>
+                  <strong>Mike R.</strong>
+                  <div class="review-stars"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i></div>
+                </div>
+                <span class="review-date">February 28, 2024</span>
+                <span class="verified-badge"><i class="fa fa-check-circle"></i> Verified Purchase</span>
+              </div>
+              <h5>Great value for the price</h5>
+              <p>Really good hoodie for the price. The fabric is thick and warm. I use it for hiking and casual wear. Only minor complaint — runs slightly large so consider sizing down if you prefer a fitted look.</p>
+              <div class="review-helpful"><span>Was this helpful?</span><button>Yes (8)</button><button>No (0)</button></div>
+            </div>
+            <div class="review-item">
+              <div class="review-header">
+                <div class="reviewer-avatar">SL</div>
+                <div>
+                  <strong>Sarah L.</strong>
+                  <div class="review-stars"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i></div>
+                </div>
+                <span class="review-date">February 14, 2024</span>
+              </div>
+              <h5>Love the eco-friendly aspect</h5>
+              <p>As someone who cares about sustainability, I appreciate that this is made from recycled materials without sacrificing quality. The charcoal color looks great and holds up well after washing.</p>
+              <div class="review-helpful"><span>Was this helpful?</span><button>Yes (5)</button><button>No (0)</button></div>
+            </div>
+
+            <!-- Write Review Form -->
+            <div class="write-review-form">
+              <h4>Write a Review</h4>
+              <form id="reviewForm">
+                <div class="review-form-row">
+                  <input type="text" placeholder="Your Name *" required />
+                  <input type="email" placeholder="Your Email *" required />
+                </div>
+                <div class="review-rating-pick">
+                  <label>Your Rating:</label>
+                  <div class="star-pick" id="starPick">
+                    <i class="far fa-star" data-val="1"></i>
+                    <i class="far fa-star" data-val="2"></i>
+                    <i class="far fa-star" data-val="3"></i>
+                    <i class="far fa-star" data-val="4"></i>
+                    <i class="far fa-star" data-val="5"></i>
+                  </div>
+                </div>
+                <input type="text" placeholder="Review Title *" required />
+                <textarea placeholder="Write your review here..." rows="4" required></textarea>
+                <button type="submit" class="btn-submit-review">Submit Review</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>    </div>
+  </section>
+
+  <!-- RELATED PRODUCTS -->
+  <section class="section related-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Related Products</h2>
+        <a href="index.html" class="view-all">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      <div class="related-carousel-wrap">
+        <button class="prod-nav prev" id="relPrev"><i class="fa fa-chevron-left"></i></button>
+        <div class="products-row" id="relatedRow">
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-sale">-15%</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=300&h=300&fit=crop" alt="Product" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Zip-Up Fleece Jacket</a></h4>
+              <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(18)</span></div>
+              <div class="product-price"><span class="price-current">$210.00</span><span class="price-old">$245.00</span></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-new">NEW</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=300&h=300&fit=crop" alt="Product" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Crewneck Sweatshirt</a></h4>
+              <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(32)</span></div>
+              <div class="product-price"><span class="price-current">$185.00</span></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=300&fit=crop" alt="Product" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Classic Pullover Hoodie</a></h4>
+              <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i><i class="far fa-star"></i><span>(9)</span></div>
+              <div class="product-price"><span class="price-current">$195.00</span><span class="price-old">$240.00</span></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-badges"><span class="badge-hot">HOT</span></div>
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=300&h=300&fit=crop" alt="Product" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Graphic Print T-Shirt</a></h4>
+              <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><span>(66)</span></div>
+              <div class="product-price"><span class="price-current">$28.00</span></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=300&h=300&fit=crop" alt="Product" />
+              <div class="product-actions">
+                <button title="Quick View"><i class="fa fa-eye"></i></button>
+                
+                
+              </div>
+            </div>
+            <div class="product-info">
+              <p class="product-cat">Fashion</p>
+              <h4><a href="product_details.html">Outdoor Explorer Jacket</a></h4>
+              <div class="product-rating"><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="far fa-star"></i><span>(12)</span></div>
+              <div class="product-price"><span class="price-current">$189.00</span></div>
+              <button class="add-to-cart">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <button class="prod-nav next" id="relNext"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENTLY VIEWED -->
+  <section class="section recently-viewed-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Recently Viewed</h2>
+      </div>
+      <div class="products-row recently-row">
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop" alt="Watch" />
+            <div class="product-actions"><button title="Quick View"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <div class="product-info">
+            <p class="product-cat">Watches</p>
+            <h4><a href="product_details.html">Minimalist Smart Watch</a></h4>
+            <div class="product-price"><span class="price-current">$299.00</span></div>
+            <button class="add-to-cart">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&h=300&fit=crop" alt="Sneakers" />
+            <div class="product-actions"><button title="Quick View"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <div class="product-info">
+            <p class="product-cat">Shoes</p>
+            <h4><a href="product_details.html">Running Pro Sneakers</a></h4>
+            <div class="product-price"><span class="price-current">$89.99</span><span class="price-old">$119.99</span></div>
+            <button class="add-to-cart">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&h=300&fit=crop" alt="Bag" />
+            <div class="product-actions"><button title="Quick View"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <div class="product-info">
+            <p class="product-cat">Bags</p>
+            <h4><a href="product_details.html">Premium Leather Handbag</a></h4>
+            <div class="product-price"><span class="price-current">$149.00</span><span class="price-old">$249.00</span></div>
+            <button class="add-to-cart">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop" alt="Headphones" />
+            <div class="product-actions"><button title="Quick View"><i class="fa fa-eye"></i></button></div>
+          </div>
+          <div class="product-info">
+            <p class="product-cat">Electronics</p>
+            <h4><a href="product_details.html">Wireless Headphones Pro</a></h4>
+            <div class="product-price"><span class="price-current">$199.00</span><span class="price-old">$249.00</span></div>
+            <button class="add-to-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-col brand-col">
+          <div class="footer-logo"><span class="logo-sb">SB</span><span class="logo-revo">Revo</span></div>
+          <p>Your one-stop destination for fashion, electronics, home goods, and more. Shop smart, shop Revo.</p>
+          <div class="footer-contact">
+            <p><i class="fa fa-map-marker-alt"></i> 685 Market Street, San Francisco, CA 94105</p>
+            <p><i class="fa fa-phone"></i> (+84) 4567 421 978</p>
+            <p><i class="fa fa-envelope"></i> support@sbrevo.com</p>
+          </div>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-pinterest-p"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col"><h4>Shop</h4><ul><li><a href="index.html">New Arrivals</a></li><li><a href="index.html">Best Sellers</a></li><li><a href="product_details.html">Fashion</a></li><li><a href="index.html">Electronics</a></li><li><a href="blog.html">Sports</a></li></ul></div>
+        <div class="footer-col"><h4>Customer Service</h4><ul><li><a href="about.html">My Account</a></li><li><a href="cart.html">Order Tracking</a></li><li><a href="checkout.html">Returns</a></li><li><a href="checkout.html">Shipping Info</a></li><li><a href="blog_details.html">FAQ</a></li></ul></div>
+        <div class="footer-col"><h4>Company</h4><ul><li><a href="about.html">About Us</a></li><li><a href="blog.html">Blog</a></li><li><a href="about.html">Careers</a></li><li><a href="about.html">Privacy Policy</a></li><li><a href="checkout.html">Terms</a></li></ul></div>
+        <div class="footer-col">
+          <h4>Brands</h4><ul><li><a href="product_details.html">CommonGood</a></li><li><a href="product_details.html">OFS Studio</a></li><li><a href="product_details.html">Vega Pro</a></li><li><a href="product_details.html">NovaTech</a></li></ul>
+          <h4 style="margin-top:20px">We Accept</h4>
+          <div class="payment-icons"><i class="fab fa-cc-visa"></i><i class="fab fa-cc-mastercard"></i><i class="fab fa-cc-paypal"></i><i class="fab fa-cc-apple-pay"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p>&copy; 2024 SB Revo. All rights reserved.</p>
+        <div class="footer-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a><a href="#">Sitemap</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="backToTop"><i class="fa fa-chevron-up"></i></button>
+  <div class="modal-overlay" id="quickViewModal">
+    <div class="modal-box quickview-box">
+      <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
+      <div class="quickview-content">
+        <div class="quickview-image">
+          <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=400&fit=crop" alt="Quick View" id="qvImage" />
+        </div>
+        <div class="quickview-info">
+          <p class="product-cat" id="qvCat">Fashion</p>
+          <h2 id="qvName">EcoSmart Fleece Hoodie</h2>
+          <div class="product-rating">
+            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+            <span>(24 reviews)</span>
+          </div>
+          <div class="product-price large" id="qvPrice">
+            <span class="price-current">$245.00</span>
+            <span class="price-old">$350.00</span>
+          </div>
+          <p class="qv-desc">A premium quality fleece hoodie perfect for all seasons. Made from sustainable materials and designed for everyday comfort.</p>
+          <div class="qv-options">
+            <div class="qv-size">
+              <label>Size:</label>
+              <div class="size-btns">
+                <button>XS</button><button class="active">S</button><button>M</button><button>L</button><button>XL</button>
+              </div>
+            </div>
+            <div class="qv-color">
+              <label>Color:</label>
+              <div class="color-btns">
+                <button class="color-btn active" style="background:#333"></button>
+                <button class="color-btn" style="background:#4a6da7"></button>
+                <button class="color-btn" style="background:#c0392b"></button>
+              </div>
+            </div>
+            <div class="qv-qty">
+              <label>Quantity:</label>
+              <div class="qty-control">
+                <button id="qvQtyMinus">-</button>
+                <input type="number" value="1" min="1" id="qvQty" />
+                <button id="qvQtyPlus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="qv-actions">
+            <button class="add-to-cart full">Add to Cart</button>
+          </div>
+          <a href="product_details.html" class="view-detail">View Full Details <i class="fa fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"><i class="fa fa-check-circle"></i><span id="toastMsg">Item added to cart!</span></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
