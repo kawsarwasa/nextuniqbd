@@ -836,9 +836,9 @@ class AuthenticationFlowTests(TestCase):
         self.assertContains(response, "Passwords do not match.")
         self.assertFalse(User.objects.filter(email="sohel@example.com").exists())
 
-    def test_login_uses_email_and_password(self):
+    def test_login_uses_username_and_password(self):
         user = User.objects.create_user(
-            username="member@example.com",
+            username="member-user",
             email="member@example.com",
             password="StrongPass@123",
         )
@@ -846,13 +846,68 @@ class AuthenticationFlowTests(TestCase):
         response = self.client.post(
             reverse("auth_login"),
             data={
-                "email": "member@example.com",
+                "username": "member-user",
                 "password": "StrongPass@123",
             },
         )
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
+
+    def test_login_rejects_email_instead_of_username(self):
+        user = User.objects.create_user(
+            username="member-user",
+            email="member@example.com",
+            password="StrongPass@123",
+        )
+
+        response = self.client.post(
+            reverse("auth_login"),
+            data={
+                "username": user.email,
+                "password": "StrongPass@123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_login_rejects_wrong_password(self):
+        user = User.objects.create_user(
+            username="member-user",
+            email="member@example.com",
+            password="StrongPass@123",
+        )
+
+        response = self.client.post(
+            reverse("auth_login"),
+            data={
+                "username": user.username,
+                "password": "WrongPass@123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_login_rejects_inactive_user(self):
+        user = User.objects.create_user(
+            username="inactive-user",
+            email="inactive@example.com",
+            password="StrongPass@123",
+            is_active=False,
+        )
+
+        response = self.client.post(
+            reverse("auth_login"),
+            data={
+                "username": user.username,
+                "password": "StrongPass@123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_dashboard_requires_login(self):
         response = self.client.get(reverse("dashboard_home"))

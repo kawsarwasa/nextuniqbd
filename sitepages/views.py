@@ -38,7 +38,7 @@ from .forms import (
     CheckoutOrderForm,
     DashboardPasswordForm,
     DashboardProfileForm,
-    EmailAuthenticationForm,
+    UsernameAuthenticationForm,
     HeroSlideForm,
     OrderStatusForm,
     RegistrationForm,
@@ -1145,11 +1145,11 @@ def auth_login_view(request):
         fallback_url = reverse_lazy("dashboard_home") if user_can_access_dashboard(request.user) else reverse_lazy("frontend_home")
         return redirect(get_safe_redirect_url(request, str(fallback_url)))
 
-    form = EmailAuthenticationForm(request.POST or None)
+    form = UsernameAuthenticationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        email = form.cleaned_data["email"]
-        password = form.cleaned_data["password"]
-        user = authenticate(request, username=email, password=password)
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
+        user = authenticate(request, username=username, password=password)
 
         if user is None:
             form.add_error(None, "Invalid email or password.")

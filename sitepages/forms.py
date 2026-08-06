@@ -89,21 +89,33 @@ class RegistrationForm(forms.Form):
         return user
 
 
-class EmailAuthenticationForm(forms.Form):
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"}),
+class UsernameAuthenticationForm(forms.Form):
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Username",
+                "autocomplete": "username",
+            }
+        ),
     )
     password = forms.CharField(
         strip=False,
-        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Password"}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Password",
+                "autocomplete": "current-password",
+            }
+        ),
     )
     remember_me = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
 
-    def clean_email(self):
-        return (self.cleaned_data.get("email") or "").strip().lower()
+    def clean_username(self):
+        return (self.cleaned_data.get("username") or "").strip()
 
 
 class CheckoutOrderForm(forms.Form):

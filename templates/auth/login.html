@@ -43,11 +43,11 @@
               <div class="alert alert-info">{{ message }}</div>
             {% endfor %}
             <div class="input-group mb-3">
-              {{ form.email }}
+              {{ form.username }}
               <div class="input-group-text"><span class="bi bi-envelope"></span></div>
             </div>
-            {% if form.email.errors %}
-              <div class="text-danger small mb-3">{{ form.email.errors|join:", " }}</div>
+            {% if form.username.errors %}
+              <div class="text-danger small mb-3">{{ form.username.errors|join:", " }}</div>
             {% endif %}
             <div class="input-group mb-3">
               {{ form.password }}
