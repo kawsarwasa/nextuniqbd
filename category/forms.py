@@ -120,6 +120,7 @@ class ProductForm(forms.ModelForm):
             "sku",
             "brand",
             "status",
+            "is_featured",
             "availability",
             "track_stock",
             "stock_quantity",
@@ -156,6 +157,7 @@ class ProductForm(forms.ModelForm):
                 }
             ),
             "status": forms.Select(attrs={"class": "form-select"}),
+            "is_featured": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "track_stock": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "stock_quantity": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),
             "low_stock_threshold": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),

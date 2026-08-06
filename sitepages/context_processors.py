@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.cache import cache
 
 from category.models import Brand, Category
@@ -6,8 +7,13 @@ from .cart import get_cart_state
 from .cache import (
     ACTIVE_CATEGORIES_CACHE_KEY,
     FOOTER_BRANDS_CACHE_KEY,
+    FOOTER_CATEGORIES_CACHE_KEY,
     PUBLIC_CACHE_TIMEOUT,
 )
+
+
+def currency_context(request):
+    return {"currency_symbol": settings.CURRENCY_SYMBOL}
 
 
 def cart_context(request):
@@ -50,11 +56,25 @@ def footer_brand_context(request):
     footer_brands = cache.get(FOOTER_BRANDS_CACHE_KEY)
     if footer_brands is None:
         footer_brands = list(
-            Brand.objects.filter(is_active=True).only("name", "slug").order_by("name", "id")
+            Brand.objects.filter(is_active=True, show_on_homepage=True)
+            .only("name", "slug")
+            .order_by("name", "id")
         )
         cache.set(FOOTER_BRANDS_CACHE_KEY, footer_brands, PUBLIC_CACHE_TIMEOUT)
 
-    return {"footer_brands": footer_brands}
+    footer_categories = cache.get(FOOTER_CATEGORIES_CACHE_KEY)
+    if footer_categories is None:
+        footer_categories = list(
+            Category.objects.filter(is_active=True, show_on_homepage=True)
+            .only("name", "slug")
+            .order_by("sort_order", "name", "id")[:5]
+        )
+        cache.set(FOOTER_CATEGORIES_CACHE_KEY, footer_categories, PUBLIC_CACHE_TIMEOUT)
+
+    return {
+        "footer_brands": footer_brands,
+        "footer_categories": footer_categories,
+    }
     
 
 def dashboard_profile_context(request):

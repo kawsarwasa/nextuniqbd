@@ -69,7 +69,7 @@
               <div class="price-range-wrap">
                 <div class="price-range-display">
                   <span id="priceMin">$0</span>
-                  <span id="priceMax">${{ price_max }}</span>
+                  <span id="priceMax">{{ currency_symbol }}{{ price_max }}</span>
                 </div>
                 <div class="price-slider-track">
                   <div class="price-slider-fill" id="sliderFill"></div>
@@ -220,7 +220,7 @@
                 data-in-stock="{% if product.is_in_stock %}true{% else %}false{% endif %}"
                 data-sale="{% if product.is_on_sale %}true{% else %}false{% endif %}"
                 data-new="{% if product.is_new_arrival %}true{% else %}false{% endif %}"
-                data-image="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+                data-image="{% if product.primary_image_card_url %}{{ product.primary_image_card_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
                 data-category-label="{{ product.category_label }}"
                 data-name="{{ product.name|escape }}"
                 data-reviews="{{ product.review_count }}"
@@ -244,12 +244,13 @@
                 </div>
                 <div class="product-image">
                   <img
-                    src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+                    src="{% if product.primary_image_card_url %}{{ product.primary_image_card_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
                     alt="{{ product.name }}"
-                    width="600"
-                    height="600"
-                    loading="lazy"
+                    width="400"
+                    height="400"
+                    loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
                     decoding="async"
+                    {% if forloop.first %}fetchpriority="high"{% endif %}
                   />
                   <div class="product-actions">
                     <button type="button" class="js-quick-view-trigger" title="Quick View"><i class="fa fa-eye"></i></button>
@@ -268,9 +269,9 @@
                     <span>({{ product.review_count }})</span>
                   </div>
                   <div class="product-price">
-                    <span class="price-current">${{ product.current_price }}</span>
+                    <span class="price-current">{{ currency_symbol }}{{ product.current_price }}</span>
                     {% if product.is_on_sale %}
-                      <span class="price-old">${{ product.regular_price }}</span>
+                      <span class="price-old">{{ currency_symbol }}{{ product.regular_price }}</span>
                     {% endif %}
                   </div>
                   <div class="product-card-actions">
@@ -311,7 +312,7 @@
         <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
         <div class="quickview-content">
           <div class="quickview-image">
-            <img src="{% if modal_product and modal_product.primary_image_url %}{{ modal_product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" />
+            <img src="{% if modal_product and modal_product.primary_image_card_url %}{{ modal_product.primary_image_card_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" width="400" height="400" loading="lazy" decoding="async" />
           </div>
           <div class="quickview-info">
             <p class="product-cat" id="qvCat">{% if modal_product %}{{ modal_product.category_label }}{% endif %}</p>
@@ -320,8 +321,8 @@
               <span id="qvReviews">{% if modal_product %}{{ modal_product.review_count }} reviews{% else %}0 reviews{% endif %}</span>
             </div>
             <div class="product-price large" id="qvPrice">
-              <span class="price-current" id="qvCurrentPrice">{% if modal_product %}${{ modal_product.current_price }}{% else %}$0.00{% endif %}</span>
-              <span class="price-old" id="qvOldPrice"{% if not modal_product or not modal_product.is_on_sale %} style="display:none"{% endif %}>{% if modal_product and modal_product.is_on_sale %}${{ modal_product.regular_price }}{% endif %}</span>
+              <span class="price-current" id="qvCurrentPrice">{% if modal_product %}{{ currency_symbol }}{{ modal_product.current_price }}{% else %}{{ currency_symbol }}0.00{% endif %}</span>
+              <span class="price-old" id="qvOldPrice"{% if not modal_product or not modal_product.is_on_sale %} style="display:none"{% endif %}>{% if modal_product and modal_product.is_on_sale %}{{ currency_symbol }}{{ modal_product.regular_price }}{% endif %}</span>
             </div>
             <p class="qv-desc" id="qvDesc">{% if modal_product %}{{ modal_product.short_description_plain|default:"No description available." }}{% else %}No description available.{% endif %}</p>
             <div class="qv-actions">
@@ -374,6 +375,7 @@
         new_arrival: 'New Arrivals',
       };
       const ITEMS_PER_PAGE = 12;
+      const currencySymbol = '{{ currency_symbol|escapejs }}';
       let currentPage = 1;
       let filteredCards = [...allCards];
 
@@ -406,8 +408,8 @@
           min = max - 20;
           rangeMin.value = min;
         }
-        priceMinEl.textContent = '$' + min;
-        priceMaxEl.textContent = '$' + max;
+        priceMinEl.textContent = currencySymbol + min;
+        priceMaxEl.textContent = currencySymbol + max;
         priceMinInput.value = min;
         priceMaxInput.value = max;
         state.priceMin = min;
@@ -678,7 +680,7 @@
 
         if (state.priceMin > 0 || state.priceMax < sliderMax) {
           tags.push({
-            label: '$' + state.priceMin + ' - $' + state.priceMax,
+            label: currencySymbol + state.priceMin + ' - ' + currencySymbol + state.priceMax,
             clear: () => {
               state.priceMin = 0;
               state.priceMax = sliderMax;

@@ -164,7 +164,7 @@
                       <p>{{ item.name }}</p>
                       <span>{{ item.category_name }}{% if item.brand_name %} &middot; {{ item.brand_name }}{% endif %} &middot; Qty: {{ item.quantity }}</span>
                     </div>
-                    <strong>৳{{ item.subtotal }}</strong>
+                    <strong>{{ currency_symbol }}{{ item.subtotal }}</strong>
                   </div>
                 {% endfor %}
               </div>
@@ -172,14 +172,14 @@
               <div class="summary-rows checkout-summary-rows">
                 <div class="summary-row">
                   <span>Subtotal (<span id="checkoutItemCount">{{ cart_state.item_count }}</span> items)</span>
-                  <span id="checkoutSubtotal">৳{{ cart_state.subtotal }}</span>
+                  <span id="checkoutSubtotal">{{ currency_symbol }}{{ cart_state.subtotal }}</span>
                 </div>
               </div>
 
               <div class="summary-rows">
                 <div class="summary-row">
                   <span>Shipping</span>
-                  <span id="checkoutShipping">৳{{ checkout_initial_shipping|floatformat:2 }}</span>
+                  <span id="checkoutShipping">{{ currency_symbol }}{{ checkout_initial_shipping|floatformat:2 }}</span>
                 </div>
                 <div class="summary-row">
                   <span>Estimated Delivery</span>
@@ -189,7 +189,7 @@
 
               <div class="summary-total">
                 <span>Total</span>
-                <span id="checkoutTotal">৳{{ cart_state.subtotal|add:checkout_initial_shipping }}</span>
+                <span id="checkoutTotal">{{ currency_symbol }}{{ cart_state.subtotal|add:checkout_initial_shipping }}</span>
               </div>
 
               <button class="btn-place-order" id="placeOrderBtn" type="submit">
@@ -242,7 +242,7 @@
 
       function formatCurrency(value) {
         const amount = Number.isFinite(value) ? value : 0;
-        return `৳${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `{{ currency_symbol|escapejs }}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       }
 
       function updateShippingSummary() {

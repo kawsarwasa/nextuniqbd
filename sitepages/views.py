@@ -1,7 +1,7 @@
 import re
 import json
 import logging
-from copy import copy
+from datetime import timedelta
 from math import ceil
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import transaction
-from django.db.models import Avg, Count, DecimalField, ExpressionWrapper, F, OuterRef, Prefetch, Q, Subquery, Sum
+from django.db.models import Avg, Count, DecimalField, ExpressionWrapper, F, IntegerField, OuterRef, Prefetch, Q, Subquery, Sum
 from django.db.models.functions import TruncMonth
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -29,7 +29,6 @@ from django.views.decorators.http import require_POST
 from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
-from blog.models import BlogCategory, BlogPost, BlogPostImage, BlogTag
 from category.models import Brand, Category, Product, ProductImage, ProductReview
 from .abandoned_checkout import (
     create_or_update_abandoned_checkout,
@@ -41,7 +40,6 @@ from .forms import (
     DashboardProfileForm,
     EmailAuthenticationForm,
     HeroSlideForm,
-    HomepagePromoBannerForm,
     OrderStatusForm,
     RegistrationForm,
     RoleForm,
@@ -58,10 +56,10 @@ from .permissions import (
 )
 from .models import (
     HeroSlide,
-    HomepagePromoBanner,
     Order,
     OrderItem,
     Sale,
+    SaleItem,
     UserProfile,
 )
 from .cart import (
@@ -81,11 +79,9 @@ from .order_status import change_order_status
 from .order_tracking import build_order_tracking_context
 from .cache import (
     HERO_SLIDES_CACHE_KEY,
-    HOMEPAGE_BLOG_POSTS_CACHE_KEY,
     HOMEPAGE_BRANDS_CACHE_KEY,
     HOMEPAGE_CATEGORIES_CACHE_KEY,
-    HOMEPAGE_PROMOS_CACHE_KEY,
-    HOMEPAGE_PRODUCT_TABS_CACHE_KEY,
+    HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY,
     get_public_cache_value,
 )
 
@@ -155,7 +151,13 @@ def get_published_products_queryset(*, include_detail_relations=False):
     queryset = Product.objects.select_related("brand", "category").filter(status=Product.Status.PUBLISHED)
 
     if include_detail_relations:
-        return queryset.prefetch_related("images", "reviews")
+        return queryset.prefetch_related(
+            Prefetch(
+                "images",
+                queryset=ProductImage.objects.only("id", "product_id", "image", "sort_order").order_by("sort_order", "id"),
+            ),
+            "reviews",
+        )
 
     return queryset.annotate(
         _review_count=Count("reviews"),
@@ -163,9 +165,26 @@ def get_published_products_queryset(*, include_detail_relations=False):
     ).prefetch_related(
         Prefetch(
             "images",
-            queryset=ProductImage.objects.order_by("sort_order", "id")[:1],
+            queryset=ProductImage.objects.only("id", "product_id", "image", "sort_order").order_by("sort_order", "id")[:1],
             to_attr="card_images",
         )
+    )
+
+
+def with_confirmed_sales_total(queryset):
+    """Add an accurate, join-safe total of quantities in final confirmed sales."""
+    confirmed_sale_items = (
+        SaleItem.objects.filter(
+            product_id=OuterRef("pk"),
+            sale__order__status=Order.Status.CONFIRMED,
+        )
+        .order_by()
+        .values("product_id")
+        .annotate(total_sold=Sum("quantity"))
+        .values("total_sold")[:1]
+    )
+    return queryset.annotate(
+        total_sold=Subquery(confirmed_sale_items, output_field=IntegerField())
     )
 
 
@@ -215,127 +234,16 @@ def get_homepage_brands():
     return get_public_cache_value(HOMEPAGE_BRANDS_CACHE_KEY, build_brands)
 
 
-def get_homepage_promo_banners():
-    def build_banners():
-        active_banners = list(HomepagePromoBanner.objects.filter(is_active=True).order_by("sort_order", "id"))
-        return {
-            "large": next(
-                (banner for banner in active_banners if banner.placement == HomepagePromoBanner.Placement.LARGE),
-                None,
-            ),
-            "small": [
-                banner for banner in active_banners if banner.placement == HomepagePromoBanner.Placement.SMALL
-            ][:2],
-        }
-
-    return get_public_cache_value(HOMEPAGE_PROMOS_CACHE_KEY, build_banners)
-
-
-def get_homepage_blog_posts():
-    def build_posts():
-        posts = list(
-            get_published_blog_posts_queryset()
-            .annotate(approved_comment_total=Count("comments", filter=Q(comments__is_approved=True)))
-            [:3]
-        )
-        decorate_blog_posts(posts)
-        for post in posts:
-            post.comment_count = getattr(post, "approved_comment_total", 0)
-        return posts
-
-    return get_public_cache_value(HOMEPAGE_BLOG_POSTS_CACHE_KEY, build_posts)
-
-
-def get_homepage_product_tab_context():
-    def build_context():
-        categories = list(
-            Category.objects.filter(is_active=True, sort_order__gte=1, sort_order__lte=4)
-            .annotate(published_product_count=Count("products", filter=Q(products__status=Product.Status.PUBLISHED)))
-            .filter(published_product_count__gt=0)
-            .order_by("sort_order", "name", "id")
-        )
-
-        if not categories:
-            return {
-                "homepage_product_tabs": [
-                    {"key": "deals", "label": "Today's Deals", "products": [], "extra_badge_label": "HOT"},
-                    {"key": "bestsellers", "label": "Best Sellers", "products": [], "extra_badge_label": "HOT"},
-                    {"key": "new", "label": "New Arrivals", "products": [], "extra_badge_label": ""},
-                    {"key": "featured", "label": "Featured", "products": [], "extra_badge_label": "FEATURED"},
-                ],
-                "homepage_category_product_tabs": [],
-            }
-
-        base_products = list(
+def get_homepage_latest_products():
+    def build_products():
+        products = list(
             get_published_products_queryset()
-            .filter(
-                category__is_active=True,
-                category__sort_order__gte=1,
-                category__sort_order__lte=4,
-            )
-            .only(
-                "id", "category_id", "brand_id", "name", "slug", "regular_price", "current_price",
-                "sku", "status", "availability", "track_stock", "stock_quantity", "low_stock_threshold",
-                "short_description", "full_description", "created_at",
-                "category__name", "category__slug", "category__sort_order", "category__show_on_homepage",
-                "brand__name", "brand__show_on_homepage",
-            )
-            .order_by("category__sort_order", "category__name", "-created_at", "-id")
+            .filter(category__is_active=True)
+            .order_by("-created_at", "-id")[:20]
         )
+        return decorate_products(products)
 
-        def cards(products):
-            # A product can appear in several tabs. Copies keep per-tab decoration
-            # (notably sort_order) independent while sharing prefetched relations.
-            return decorate_products([copy(product) for product in products[:5]])
-
-        fallback_products = cards(base_products)
-        deals = cards([product for product in base_products if product.current_price < product.regular_price])
-        featured = cards(
-            [
-                product
-                for product in base_products
-                if product.category.show_on_homepage
-                or (product.brand is not None and product.brand.show_on_homepage)
-            ]
-        )
-        bestsellers = cards(
-            sorted(
-                base_products,
-                key=lambda product: (
-                    product.category.sort_order,
-                    product.category.name.casefold(),
-                    -product.review_count,
-                    -float(product.average_rating),
-                    -product.created_at.timestamp(),
-                    -product.id,
-                ),
-            )
-        )
-
-        products_by_category = {}
-        for product in base_products:
-            products_by_category.setdefault(product.category_id, []).append(product)
-        category_tabs = [
-            {
-                "key": f"category-{category.slug}",
-                "label": category.name,
-                "products": cards(products_by_category.get(category.id, [])),
-                "extra_badge_label": "",
-            }
-            for category in categories
-        ]
-
-        return {
-            "homepage_product_tabs": [
-                {"key": "deals", "label": "Today's Deals", "products": deals or fallback_products, "extra_badge_label": "HOT"},
-                {"key": "bestsellers", "label": "Best Sellers", "products": bestsellers or fallback_products, "extra_badge_label": "HOT"},
-                {"key": "new", "label": "New Arrivals", "products": fallback_products, "extra_badge_label": ""},
-                {"key": "featured", "label": "Featured", "products": featured or fallback_products, "extra_badge_label": "FEATURED"},
-            ],
-            "homepage_category_product_tabs": category_tabs,
-        }
-
-    return get_public_cache_value(HOMEPAGE_PRODUCT_TABS_CACHE_KEY, build_context)
+    return get_public_cache_value(HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY, build_products)
 
 
 def build_hero_slide_title_html(title, highlight):
@@ -375,6 +283,8 @@ def decorate_product(product, now=None):
     product.category_label = product.category.name
     product.brand_label = product.brand.name if product.brand else ""
     product.primary_image_url = primary_image.image.url if primary_image and primary_image.image else ""
+    product.primary_image_card_url = primary_image.card_url if primary_image else ""
+    product.primary_image_detail_url = primary_image.detail_url if primary_image else ""
     product.display_rating = product.average_rating
     rounded_rating = max(0, min(5, round(product.display_rating)))
     product.full_stars = range(rounded_rating)
@@ -392,7 +302,7 @@ def decorate_product(product, now=None):
     else:
         product.is_in_stock = "out" not in (product.availability or "").strip().lower()
         product.stock_display = product.availability or "Not specified"
-    product.is_new_arrival = (now - product.created_at).days <= 30
+    product.is_new_arrival = now - product.created_at <= timedelta(days=30)
     product.short_description_plain = " ".join(strip_tags(product.short_description or "").split())
     product.full_description_html = product.full_description or (
         f"<p>{product.short_description_plain or 'No product description available yet.'}</p>"
@@ -430,6 +340,7 @@ def build_products_listing_context(request=None):
     search_query = ((request.GET.get("q") if request else "") or "").strip()
     selected_category_slug = ((request.GET.get("category") if request else "") or "").strip()
     selected_brand_slug = ((request.GET.get("brand") if request else "") or "").strip()
+    selected_product_tab = ((request.GET.get("tab") if request else "") or "").strip().lower()
 
     queryset = get_published_products_queryset().order_by("-id")
 
@@ -448,6 +359,31 @@ def build_products_listing_context(request=None):
 
     if selected_brand_slug:
         queryset = queryset.filter(brand__slug=selected_brand_slug)
+
+    tab_labels = {
+        "deals": "Today's Deals",
+        "bestsellers": "Best Sellers",
+        "new": "New Arrivals",
+        "featured": "Featured Products",
+    }
+    now = timezone.now()
+    if selected_product_tab == "deals":
+        queryset = queryset.filter(current_price__lt=F("regular_price")).annotate(
+            discount_percent=ExpressionWrapper(
+                (F("regular_price") - F("current_price")) * 100 / F("regular_price"),
+                output_field=DecimalField(max_digits=7, decimal_places=2),
+            )
+        ).order_by("-discount_percent", "-created_at", "-id")
+    elif selected_product_tab == "bestsellers":
+        queryset = with_confirmed_sales_total(queryset).filter(total_sold__gt=0).order_by(
+            "-total_sold", "-_average_rating", "-created_at", "-id"
+        )
+    elif selected_product_tab == "new":
+        queryset = queryset.filter(created_at__gte=now - timedelta(days=30)).order_by("-created_at", "-id")
+    elif selected_product_tab == "featured":
+        queryset = queryset.filter(is_featured=True).order_by("-created_at", "-id")
+    else:
+        selected_product_tab = ""
 
     products = list(queryset)
     decorate_products(products)
@@ -520,6 +456,8 @@ def build_products_listing_context(request=None):
         "selected_search_query": search_query,
         "selected_search_category": selected_category_slug,
         "selected_search_brand": selected_brand_slug,
+        "selected_product_tab": selected_product_tab,
+        "selected_product_tab_label": tab_labels.get(selected_product_tab, ""),
     }
 
 
@@ -645,175 +583,6 @@ def create_order_from_checkout(request, checkout_form, cart_state):
     )
     mark_pending_abandoned_checkout_converted(request)
     return order
-
-
-def get_published_blog_posts_queryset(*, include_detail_relations=False):
-    queryset = BlogPost.objects.select_related("category").filter(status=BlogPost.Status.PUBLISHED)
-    if include_detail_relations:
-        return queryset.prefetch_related("tags", "images", "comments").order_by("-published_at", "-created_at", "-id")
-
-    return queryset.annotate(
-        _comment_count=Count("comments"),
-    ).prefetch_related(
-        Prefetch(
-            "images",
-            queryset=BlogPostImage.objects.order_by("sort_order", "id")[:1],
-            to_attr="card_images",
-        )
-    ).order_by("-published_at", "-created_at", "-id")
-
-
-def decorate_blog_post(post):
-    if post is None:
-        return None
-
-    plain_content = " ".join(strip_tags(post.content or "").split())
-    excerpt_plain = " ".join(strip_tags(post.excerpt or "").split())
-    summary_text = excerpt_plain or plain_content
-    word_count = len((plain_content or summary_text).split())
-
-    post.primary_image_url = post.primary_image.url if post.primary_image else ""
-    post.excerpt_plain = summary_text
-    post.content_plain = plain_content
-    post.author_initials = "".join(part[:1].upper() for part in post.author_name.split()[:2]) or "AU"
-    post.read_time_minutes = max(1, ceil(max(word_count, 60) / 180))
-    post.published_display = timezone.localtime(post.published_at).strftime("%B %d, %Y") if post.published_at else ""
-    post.comment_count = post.comment_total
-    return post
-
-
-def decorate_blog_posts(posts):
-    for post in posts:
-        decorate_blog_post(post)
-    return posts
-
-
-def build_blog_sidebar_context():
-    published_posts = get_published_blog_posts_queryset()
-    category_filters = list(
-        BlogCategory.objects.filter(posts__status=BlogPost.Status.PUBLISHED)
-        .annotate(post_count=Count("posts", filter=Q(posts__status=BlogPost.Status.PUBLISHED)))
-        .order_by("sort_order", "name")
-    )
-    tag_filters = list(
-        BlogTag.objects.filter(posts__status=BlogPost.Status.PUBLISHED)
-        .annotate(post_count=Count("posts", filter=Q(posts__status=BlogPost.Status.PUBLISHED)))
-        .order_by("name")
-    )
-    recent_posts = list(published_posts[:3])
-    decorate_blog_posts(recent_posts)
-    return {
-        "blog_sidebar_categories": category_filters,
-        "blog_sidebar_tags": tag_filters,
-        "blog_recent_posts": recent_posts,
-    }
-
-
-def build_blog_listing_context(request):
-    search_query = (request.GET.get("q") or "").strip()
-    category_slug = (request.GET.get("category") or "").strip()
-    tag_slug = (request.GET.get("tag") or "").strip()
-
-    posts_queryset = get_published_blog_posts_queryset()
-
-    if search_query:
-        posts_queryset = posts_queryset.filter(
-            Q(title__icontains=search_query)
-            | Q(excerpt__icontains=search_query)
-            | Q(content__icontains=search_query)
-            | Q(author_name__icontains=search_query)
-        )
-
-    selected_category = None
-    if category_slug:
-        selected_category = BlogCategory.objects.filter(slug=category_slug).first()
-        posts_queryset = posts_queryset.filter(category__slug=category_slug)
-
-    selected_tag = None
-    if tag_slug:
-        selected_tag = BlogTag.objects.filter(slug=tag_slug).first()
-        posts_queryset = posts_queryset.filter(tags__slug=tag_slug).distinct()
-
-    paginator = Paginator(posts_queryset, 6)
-    page_obj = paginator.get_page(request.GET.get("page"))
-    posts = list(page_obj.object_list)
-    decorate_blog_posts(posts)
-    page_obj.object_list = posts
-
-    query_without_page = request.GET.copy()
-    query_without_page.pop("page", None)
-    base_query = query_without_page.urlencode()
-
-    def page_link(page_number):
-        page_query = query_without_page.copy()
-        page_query["page"] = page_number
-        return f"?{page_query.urlencode()}"
-
-    sidebar_context = build_blog_sidebar_context()
-    for category in sidebar_context["blog_sidebar_categories"]:
-        category.url = f'?category={category.slug}'
-        if search_query:
-            category.url = f'?q={search_query}&category={category.slug}'
-        if tag_slug:
-            category.url += f'&tag={tag_slug}' if "?" in category.url else f'?tag={tag_slug}'
-        category.is_active = category.slug == category_slug
-
-    for tag in sidebar_context["blog_sidebar_tags"]:
-        tag.url = f'?tag={tag.slug}'
-        if search_query:
-            tag.url = f'?q={search_query}&tag={tag.slug}'
-        if category_slug:
-            tag.url += f'&category={category_slug}' if "?" in tag.url else f'?category={category_slug}'
-        tag.is_active = tag.slug == tag_slug
-
-    return {
-        "posts": posts,
-        "page_obj": page_obj,
-        "is_paginated": page_obj.has_other_pages(),
-        "paginator_page_links": [page_link(number) for number in paginator.page_range],
-        "search_query": search_query,
-        "selected_category": selected_category,
-        "selected_tag": selected_tag,
-        "filter_reset_url": request.path,
-        "query_string_without_page": base_query,
-        **sidebar_context,
-    }
-
-
-def build_blog_detail_context(post):
-    decorate_blog_post(post)
-    approved_comments = [comment for comment in post.comments.all() if comment.is_approved]
-
-    related_posts = list(
-        get_published_blog_posts_queryset().filter(category=post.category).exclude(pk=post.pk)[:3]
-    )
-    decorate_blog_posts(related_posts)
-
-    for comment in approved_comments:
-        comment.author_initials = "".join(part[:1].upper() for part in comment.author_name.split()[:2]) or "CM"
-
-    return {
-        "post": post,
-        "approved_comments": approved_comments,
-        "approved_comment_total": len(approved_comments),
-        "related_posts": related_posts,
-        **build_blog_sidebar_context(),
-    }
-
-
-def build_blog_comment_form_context(form_data=None, errors=None, submitted=False):
-    form_data = form_data or {}
-    errors = errors or {}
-    return {
-        "blog_comment_form_data": {
-            "author_name": form_data.get("author_name", ""),
-            "author_email": form_data.get("author_email", ""),
-            "body": form_data.get("body", ""),
-        },
-        "blog_comment_form_errors": errors,
-        "blog_comment_submitted": submitted,
-        "blog_comment_form_open": submitted or bool(errors),
-    }
 
 
 def get_user_display_name(user):
@@ -1068,11 +837,8 @@ def _render_known_template(request, prefix: str, template_path: str):
         stem = template_path.removesuffix(".html")
         active_map = {
             "index": "home",
-            "about": "about",
             "products": "products",
             "product_details": "products",
-            "blog": "blog",
-            "blog_details": "article",
             "cart": "cart",
             "checkout": "checkout",
             "contact": "contact",
@@ -1089,91 +855,17 @@ def frontend_home(request):
         "active_page": "home",
         "template_stem": "index",
         "hero_slides": get_active_hero_slides(),
+        "homepage_latest_products": get_homepage_latest_products(),
         "homepage_categories": get_homepage_categories(),
         "homepage_brands": get_homepage_brands(),
-        "homepage_promo_banners": get_homepage_promo_banners(),
-        "homepage_blog_posts": get_homepage_blog_posts(),
     }
-    context.update(get_homepage_product_tab_context())
     return render(request, "frontend/index.html", context)
-
-
-@ensure_csrf_cookie
-def frontend_blog(request):
-    context = {
-        "active_page": "blog",
-        "template_stem": "blog",
-    }
-    context.update(build_blog_listing_context(request))
-    return render(request, "frontend/blog.html", context)
 
 
 def frontend_page(request, template_name: str):
     if not FRONTEND_TEMPLATE_RE.fullmatch(template_name):
         raise Http404("Invalid frontend page.")
     return _render_known_template(request, "frontend", template_name)
-
-
-@ensure_csrf_cookie
-def frontend_blog_detail(request, slug=None):
-    requested_slug = slug or request.GET.get("slug")
-    queryset = get_published_blog_posts_queryset(include_detail_relations=True)
-
-    if requested_slug:
-        post = queryset.filter(slug=requested_slug).first()
-        if post is None:
-            raise Http404("Blog post not found.")
-    else:
-        post = queryset.first()
-        if post is None:
-            raise Http404("No published blog posts available.")
-
-    if request.method == "POST":
-        form_data = {
-            "author_name": (request.POST.get("author_name") or "").strip(),
-            "author_email": (request.POST.get("author_email") or "").strip(),
-            "body": (request.POST.get("body") or "").strip(),
-        }
-        errors = {}
-
-        if not post.allow_comments:
-            errors["non_field_error"] = "Comments are disabled for this article."
-        if not form_data["author_name"]:
-            errors["author_name"] = "Your name is required."
-        if not form_data["author_email"]:
-            errors["author_email"] = "Your email is required."
-        else:
-            try:
-                validate_email(form_data["author_email"])
-            except ValidationError:
-                errors["author_email"] = "Enter a valid email address."
-        if not form_data["body"]:
-            errors["body"] = "Comment text is required."
-
-        if not errors:
-            post.comments.create(
-                author_name=form_data["author_name"],
-                author_email=form_data["author_email"],
-                body=form_data["body"],
-                is_approved=False,
-            )
-            return redirect(f"{redirect('frontend_blog_detail', slug=post.slug).url}?comment_submitted=1#comments")
-
-        context = {
-            "active_page": "blog",
-            "template_stem": "blog_details",
-        }
-        context.update(build_blog_detail_context(post))
-        context.update(build_blog_comment_form_context(form_data=form_data, errors=errors))
-        return render(request, "frontend/blog_details.html", context)
-
-    context = {
-        "active_page": "blog",
-        "template_stem": "blog_details",
-    }
-    context.update(build_blog_detail_context(post))
-    context.update(build_blog_comment_form_context(submitted=request.GET.get("comment_submitted") == "1"))
-    return render(request, "frontend/blog_details.html", context)
 
 
 @ensure_csrf_cookie
@@ -1624,82 +1316,6 @@ class HeroSlideDeleteView(DashboardPermissionMixin, View):
             extra_tags="toast-delete",
         )
         return redirect("dashboard_hero_slide_list")
-
-
-class HomepagePromoBannerDashboardMixin(DashboardPermissionMixin):
-    model = HomepagePromoBanner
-    form_class = HomepagePromoBannerForm
-    success_url = reverse_lazy("dashboard_promo_banner_list")
-    permission_required = "sitepages.view_homepagepromobanner"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["promo_banner_total"] = HomepagePromoBanner.objects.count()
-        context["promo_banner_active_large_total"] = HomepagePromoBanner.objects.filter(
-            placement=HomepagePromoBanner.Placement.LARGE,
-            is_active=True,
-        ).count()
-        context["promo_banner_active_small_total"] = HomepagePromoBanner.objects.filter(
-            placement=HomepagePromoBanner.Placement.SMALL,
-            is_active=True,
-        ).count()
-        return context
-
-
-class HomepagePromoBannerListView(HomepagePromoBannerDashboardMixin, ListView):
-    context_object_name = "promo_banners"
-    paginate_by = 10
-    template_name = "dashboard/promo_banners/list.html"
-
-    def get_queryset(self):
-        return HomepagePromoBanner.objects.order_by("placement", "sort_order", "id")
-
-
-class HomepagePromoBannerCreateView(HomepagePromoBannerDashboardMixin, CreateView):
-    template_name = "dashboard/promo_banners/form.html"
-    permission_required = "sitepages.add_homepagepromobanner"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["page_title"] = "Add Promo Banner"
-        context["submit_label"] = "Save Banner"
-        return context
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.success(self.request, "Promo banner created successfully.", extra_tags="toast-create")
-        return response
-
-
-class HomepagePromoBannerUpdateView(HomepagePromoBannerDashboardMixin, UpdateView):
-    template_name = "dashboard/promo_banners/form.html"
-    permission_required = "sitepages.change_homepagepromobanner"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["page_title"] = "Edit Promo Banner"
-        context["submit_label"] = "Update Banner"
-        return context
-
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        messages.info(self.request, "Promo banner updated successfully.", extra_tags="toast-edit")
-        return response
-
-
-class HomepagePromoBannerDeleteView(DashboardPermissionMixin, View):
-    permission_required = "sitepages.delete_homepagepromobanner"
-
-    def post(self, request, pk):
-        promo_banner = get_object_or_404(HomepagePromoBanner, pk=pk)
-        banner_name = promo_banner.name
-        promo_banner.delete()
-        messages.error(
-            request,
-            f'"{banner_name}" deleted successfully.',
-            extra_tags="toast-delete",
-        )
-        return redirect("dashboard_promo_banner_list")
 
 
 class DashboardUserListView(DashboardPermissionMixin, ListView):

@@ -1,0 +1,16 @@
+# Static-asset-only performance rules for Apache/cPanel deployments.
+# No rewrite or Passenger directives are defined here, so Django routing remains unchanged.
+<IfModule mod_deflate.c>
+  <IfModule mod_filter.c>
+    AddOutputFilterByType DEFLATE text/css text/html text/javascript application/javascript application/json application/xml image/svg+xml font/woff2 font/woff
+  </IfModule>
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(?:css|js|svg|webp|jpe?g|png|gif|ico|woff2?|ttf)$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+  <FilesMatch "\.[0-9a-f]{8,}\.(?:css|js|svg|webp|jpe?g|png|gif|ico|woff2?|ttf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

@@ -6,8 +6,8 @@ from django.db.models.signals import post_delete, post_migrate, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from .models import Order, OrderStatusHistory, UserProfile
-from .models import HeroSlide, HomepagePromoBanner
+from .models import Order, OrderStatusHistory, Sale, SaleItem, UserProfile
+from .models import HeroSlide
 from .cache import invalidate_public_site_cache
 from .permissions import ensure_default_roles
 
@@ -18,8 +18,14 @@ SUPERUSER_PASSWORD = "Admin@100%"
 
 
 @receiver([post_save, post_delete], sender=HeroSlide)
-@receiver([post_save, post_delete], sender=HomepagePromoBanner)
 def invalidate_sitepages_public_cache(**kwargs):
+    invalidate_public_site_cache()
+
+
+@receiver([post_save, post_delete], sender=Sale)
+@receiver([post_save, post_delete], sender=SaleItem)
+def invalidate_homepage_product_tabs_for_sales(**kwargs):
+    """Sales determine the Best Sellers tab, so clear only public page caches."""
     invalidate_public_site_cache()
 
 

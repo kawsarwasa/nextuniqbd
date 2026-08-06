@@ -3,11 +3,13 @@
     <div class="container footer-grid{% if not footer_brands %} footer-grid--without-brands{% endif %}">
       <div class="footer-col brand-col">
         <div class="footer-logo">
-          {% if site_company.logo %}
-            <img src="{{ site_company.logo.url }}" alt="{{ site_company.company_name }}" class="footer-logo-img" />
-          {% else %}
-            <span class="footer-logo-img footer-logo-fallback">{{ site_company.company_name|default:default_company_name|slice:":2" }}</span>
-          {% endif %}
+          <span class="footer-logo-mark">
+            {% if site_company.logo %}
+              <img src="{{ site_company.logo.url }}" alt="{{ site_company.company_name }}" class="footer-logo-img" />
+            {% else %}
+              <span class="footer-logo-img footer-logo-fallback">{{ site_company.company_name|default:default_company_name|slice:":2" }}</span>
+            {% endif %}
+          </span>
           <span class="footer-logo-name">{{ site_company.company_name|default:default_company_name }}</span>
         </div>
         <p>Your one-stop destination for fashion, electronics, home goods, and more. Shop smart, shop Revo.</p>
@@ -24,20 +26,19 @@
           <a href="#"><i class="fab fa-youtube"></i></a>
         </div>
       </div>
+      {% if footer_categories %}
       <div class="footer-col">
-        <h4>Customer Service</h4>
+        <h4>Categories</h4>
         <ul>
-          <li><a href="{% url 'frontend_about' %}">My Account</a></li>
-          <li><a href="{% url 'frontend_cart' %}">Order Tracking</a></li>
-          <li><a href="{% url 'frontend_checkout' %}">Returns &amp; Exchanges</a></li>
-          <li><a href="{% url 'frontend_checkout' %}">Shipping Info</a></li>
+          {% for category in footer_categories %}
+            <li><a href="{% url 'frontend_products' %}?category={{ category.slug }}">{{ category.name }}</a></li>
+          {% endfor %}
         </ul>
       </div>
+      {% endif %}
       <div class="footer-col">
         <h4>Company</h4>
         <ul>
-          <li><a href="{% url 'frontend_about' %}">About Us</a></li>
-          <li><a href="{% url 'frontend_blog' %}">Blog</a></li>
           <li><a href="{% url 'frontend_contact' %}">Contact Us</a></li>
           <li><a href="{% url 'frontend_privacy_policy' %}">Privacy Policy</a></li>
         </ul>
@@ -64,6 +65,7 @@
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <p>&copy; 2026 Next Uniq BD. All rights reserved.</p>
+      <p class="footer-credit">Created by <a href="https://creativeitmart.com/" target="_blank" rel="noopener noreferrer">Creative IT Mart</a></p>
       <div class="footer-links">
         <a href="{% url 'frontend_privacy_policy' %}">Privacy Policy</a>
         <a href="#">Terms of Use</a>

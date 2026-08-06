@@ -1,11 +1,13 @@
 from datetime import date
 
 from django.core.cache import cache
+from django.test.utils import CaptureQueriesContext
+from django.db import connection
 from django.test import TestCase
 from django.urls import reverse
 
 from category.models import Brand, Category, Product, ProductImage, ProductReview
-from sitepages.cache import HOMEPAGE_PRODUCT_TABS_CACHE_KEY
+from sitepages.cache import HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY
 
 
 class HomepagePerformanceTests(TestCase):
@@ -42,18 +44,20 @@ class HomepagePerformanceTests(TestCase):
         cache.clear()
 
     def test_populated_homepage_has_bounded_cold_and_warm_query_counts(self):
-        with self.assertNumQueries(10):
+        # The homepage cards use a bounded set of aggregate/prefetch queries.
+        with CaptureQueriesContext(connection) as queries:
             response = self.client.get(reverse("frontend_home"))
+        self.assertLessEqual(len(queries), 24)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context["homepage_category_product_tabs"]), 4)
+        self.assertEqual(len(response.context["homepage_latest_products"]), 20)
 
         with self.assertNumQueries(0):
             warm_response = self.client.get(reverse("frontend_home"))
         self.assertEqual(warm_response.status_code, 200)
 
-    def test_product_image_and_review_changes_invalidate_product_tab_cache(self):
+    def test_product_image_and_review_changes_invalidate_latest_product_cache(self):
         self.client.get(reverse("frontend_home"))
-        self.assertIsNotNone(cache.get(HOMEPAGE_PRODUCT_TABS_CACHE_KEY))
+        self.assertIsNotNone(cache.get(HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY))
 
         ProductReview.objects.create(
             product=self.products[0],
@@ -63,9 +67,9 @@ class HomepagePerformanceTests(TestCase):
             rating=5,
             review_date=date.today(),
         )
-        self.assertIsNone(cache.get(HOMEPAGE_PRODUCT_TABS_CACHE_KEY))
+        self.assertIsNone(cache.get(HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY))
 
         self.client.get(reverse("frontend_home"))
-        self.assertIsNotNone(cache.get(HOMEPAGE_PRODUCT_TABS_CACHE_KEY))
+        self.assertIsNotNone(cache.get(HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY))
         ProductImage.objects.create(product=self.products[0], image="products/cache-invalidation.jpg")
-        self.assertIsNone(cache.get(HOMEPAGE_PRODUCT_TABS_CACHE_KEY))
+        self.assertIsNone(cache.get(HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY))

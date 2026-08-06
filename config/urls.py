@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
-favicon_url = f"/{settings.STATIC_URL.strip('/')}/frontend/images/next-uniq-bd.png?v=2"
+favicon_url = f"/{settings.STATIC_URL.strip('/')}/frontend/images/next-uniq-bd-favicon.svg?v=2"
 
 urlpatterns = [
     path(
@@ -29,7 +29,6 @@ urlpatterns = [
         name='favicon',
     ),
     path('admin/', admin.site.urls),
-    path('', include('blog.urls')),
     path('', include('category.urls')),
     path('', include('accounts.urls')),
     path('dashboard/accounts/', include(('finance.urls', 'finance'), namespace='finance')),

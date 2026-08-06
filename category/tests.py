@@ -1,10 +1,16 @@
+from io import BytesIO
+from tempfile import TemporaryDirectory
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from PIL import Image
 
 from .forms import ProductForm
-from .models import Brand, Category, Product, ProductReview, StockTransaction
+from .image_derivatives import product_image_variant_name
+from .models import Brand, Category, Product, ProductImage, ProductReview, StockTransaction
 
 
 class ProductFormTests(TestCase):
@@ -20,6 +26,8 @@ class ProductFormTests(TestCase):
         self.assertEqual(form.fields["sku"].initial, Product.SKU_PREFIX)
         self.assertFalse(form.fields["sku"].disabled)
         self.assertTrue(form.fields["sku"].required)
+        self.assertIn("is_featured", form.fields)
+        self.assertFalse(form.fields["is_featured"].initial)
 
     def test_form_accepts_manual_sku_and_normalizes_availability(self):
         form = ProductForm(
@@ -719,3 +727,50 @@ class ProductStockWorkflowTests(TestCase):
         response = self.client.post(edit_url, self.product_data(stock_quantity="7"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(StockTransaction.objects.filter(product=product).count(), 1)
+
+
+class ProductImageDerivativeTests(TestCase):
+    def setUp(self):
+        self.media_directory = TemporaryDirectory()
+        self.settings_override = self.settings(MEDIA_ROOT=self.media_directory.name)
+        self.settings_override.enable()
+        self.addCleanup(self.settings_override.disable)
+        self.addCleanup(self.media_directory.cleanup)
+        self.category = Category.objects.create(name="Derivative Category")
+        self.product = Product.objects.create(
+            category=self.category,
+            name="Derivative Product",
+            regular_price="100.00",
+            current_price="90.00",
+            sku="NUBDERIV001",
+        )
+
+    @staticmethod
+    def uploaded_image(width=800, height=600):
+        output = BytesIO()
+        Image.new("RGB", (width, height), "#ff5c00").save(output, format="PNG")
+        return SimpleUploadedFile("product.png", output.getvalue(), content_type="image/png")
+
+    def test_creates_size_limited_webp_derivatives_without_replacing_original(self):
+        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image())
+        storage = product_image.image.storage
+        card_name = product_image_variant_name(product_image.image.name, "card")
+        detail_name = product_image_variant_name(product_image.image.name, "detail")
+
+        self.assertTrue(storage.exists(product_image.image.name))
+        self.assertTrue(storage.exists(card_name))
+        self.assertTrue(storage.exists(detail_name))
+        self.assertIn(".card.webp", product_image.card_url)
+        self.assertIn(".detail.webp", product_image.detail_url)
+
+        with storage.open(card_name, "rb") as card_file:
+            with Image.open(card_file) as card_image:
+                self.assertLessEqual(card_image.width, 400)
+                self.assertLessEqual(card_image.height, 400)
+
+    def test_card_url_falls_back_to_original_when_derivative_is_missing(self):
+        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image(120, 80))
+        storage = product_image.image.storage
+        storage.delete(product_image_variant_name(product_image.image.name, "card"))
+
+        self.assertEqual(product_image.card_url, product_image.image.url)

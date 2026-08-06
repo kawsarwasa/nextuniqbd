@@ -118,7 +118,7 @@ def get_cart_state(request):
         .prefetch_related(
             Prefetch(
                 "images",
-                queryset=ProductImage.objects.order_by("sort_order", "id")[:1],
+                queryset=ProductImage.objects.only("id", "product_id", "image", "sort_order").order_by("sort_order", "id")[:1],
                 to_attr="card_images",
             )
         )
@@ -150,7 +150,7 @@ def get_cart_state(request):
                 "sku": product.sku,
                 "category_name": product.category.name,
                 "brand_name": product.brand.name if product.brand else "",
-                "image_url": image.image.url if image and image.image else "",
+                "image_url": image.card_url if image and image.image else "",
                 "detail_url": reverse("frontend_product_detail", args=[product.slug]),
                 "current_price": unit_price,
                 "regular_price": product.regular_price,

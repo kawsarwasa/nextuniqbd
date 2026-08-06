@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
-from blog.models import BlogCategory, BlogComment, BlogPost, BlogTag
 from category.models import Brand, Category, Product
 from company.models import CompanyProfile
 from finance.models import CashTransaction, DueAccount, DuePayment, TransactionCategory
@@ -15,7 +14,6 @@ from purchase.models import Purchase
 from .models import (
     AbandonedCheckout,
     HeroSlide,
-    HomepagePromoBanner,
     Order,
     RoleProfile,
     Sale,
@@ -39,9 +37,7 @@ MANAGED_PERMISSION_MODULES = (
     ("product", "Product", (Product,)),
     ("purchase", "Purchase", (Purchase,)),
     ("order", "Orders", (Order, Sale, AbandonedCheckout)),
-    ("blog", "Blog", (BlogCategory, BlogTag, BlogPost, BlogComment)),
     ("heroslide", "Carousel", (HeroSlide,)),
-    ("promobanner", "Promo Banners", (HomepagePromoBanner,)),
     ("company", "Company", (CompanyProfile,)),
     ("accounts", "Accounts", (TransactionCategory, CashTransaction, DueAccount, DuePayment)),
 )
@@ -56,11 +52,9 @@ ROLE_DEFINITIONS = {
         "modules": {"category", "brand", "product", "purchase"},
     },
     "content_managers": {
-        "description": "Can manage blog content, hero slides, promo banners, and company content.",
+        "description": "Can manage hero slides and company content.",
         "modules": {
-            "blog",
             "heroslide",
-            "promobanner",
             "company",
         }
     },

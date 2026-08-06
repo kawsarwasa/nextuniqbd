@@ -1,12 +1,14 @@
-﻿<header class="header" id="header">
+<header class="header" id="header">
   <div class="container header-inner">
     <div class="logo">
       <a href="{% url 'frontend_home' %}" class="site-logo-link">
-        {% if site_company.logo %}
-          <img src="{{ site_company.logo.url }}" alt="{{ site_company.company_name }}" class="site-logo-img" />
-        {% else %}
-          <span class="site-logo-img site-logo-fallback">{{ site_company.company_name|default:default_company_name|slice:":2" }}</span>
-        {% endif %}
+        <span class="site-logo-mark">
+          {% if site_company.logo %}
+            <img src="{{ site_company.logo.url }}" alt="{{ site_company.company_name }}" class="site-logo-img" />
+          {% else %}
+            <span class="site-logo-img site-logo-fallback">{{ site_company.company_name|default:default_company_name|slice:":2" }}</span>
+          {% endif %}
+        </span>
         <span class="site-logo-name">{{ site_company.company_name|default:default_company_name }}</span>
       </a>
     </div>
@@ -38,7 +40,7 @@
                 <img src="{% if item.image_url %}{{ item.image_url }}{% else %}/static/frontend/images/product-placeholder.svg{% endif %}" alt="{{ item.name }}" />
                 <div>
                   <p>{{ item.name }}</p>
-                  <span>${{ item.current_price }} x {{ item.quantity }}</span>
+                  <span>{{ currency_symbol }}{{ item.current_price }} x {{ item.quantity }}</span>
                 </div>
                 <button class="remove-item" data-product-id="{{ item.product_id }}"><i class="fa fa-times"></i></button>
               </div>
@@ -48,7 +50,7 @@
           </div>
           <div class="cart-total" id="cartPreviewTotalWrap"{% if cart_is_empty %} style="display:none"{% endif %}>
             <span>Subtotal:</span>
-            <strong id="cartPreviewSubtotal">${{ cart_subtotal }}</strong>
+            <strong id="cartPreviewSubtotal">{{ currency_symbol }}{{ cart_subtotal }}</strong>
           </div>
           <div class="cart-buttons">
             <a href="{% url 'frontend_cart' %}" class="btn-outline">View Cart</a>

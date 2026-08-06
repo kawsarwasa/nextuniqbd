@@ -338,24 +338,28 @@ class SaleManager(models.Manager):
         existing_order_item_ids = set(
             sale.items.values_list("order_item_id", flat=True)
         )
-        SaleItem.objects.bulk_create(
-            [
-                SaleItem(
-                    sale=sale,
-                    order_item=order_item,
-                    product=order_item.product,
-                    product_name=order_item.product_name,
-                    product_sku=order_item.product_sku,
-                    category_name=order_item.category_name,
-                    brand_name=order_item.brand_name,
-                    quantity=order_item.quantity,
-                    unit_price=order_item.unit_price,
-                    subtotal=order_item.subtotal,
-                )
-                for order_item in order.items.all()
-                if order_item.pk not in existing_order_item_ids
-            ]
-        )
+        new_sale_items = [
+            SaleItem(
+                sale=sale,
+                order_item=order_item,
+                product=order_item.product,
+                product_name=order_item.product_name,
+                product_sku=order_item.product_sku,
+                category_name=order_item.category_name,
+                brand_name=order_item.brand_name,
+                quantity=order_item.quantity,
+                unit_price=order_item.unit_price,
+                subtotal=order_item.subtotal,
+            )
+            for order_item in order.items.all()
+            if order_item.pk not in existing_order_item_ids
+        ]
+        if new_sale_items:
+            SaleItem.objects.bulk_create(new_sale_items)
+            # bulk_create bypasses model signals; Best Sellers depends on these rows.
+            from .cache import invalidate_public_site_cache
+
+            invalidate_public_site_cache()
         return sale, created
 
 
@@ -568,56 +572,4 @@ class HeroSlide(models.Model):
                 normalized.close()
             output.close()
             self.image.close()
-
-
-class HomepagePromoBanner(models.Model):
-    class Placement(models.TextChoices):
-        LARGE = "large", "Large Banner"
-        SMALL = "small", "Small Banner"
-
-    name = models.CharField(max_length=150)
-    placement = models.CharField(max_length=20, choices=Placement.choices, default=Placement.SMALL)
-    eyebrow = models.CharField(max_length=120, blank=True)
-    title = models.CharField(max_length=180)
-    image = models.ImageField(upload_to="promo_banners/", blank=True, null=True)
-    image_url = models.URLField(max_length=500, blank=True)
-    button_label = models.CharField(max_length=80, blank=True)
-    button_url = models.CharField(max_length=255, blank=True)
-    use_dark_overlay = models.BooleanField(default=False)
-    sort_order = models.PositiveIntegerField(default=0)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["placement", "sort_order", "id"]
-        verbose_name = "Homepage Promo Banner"
-        verbose_name_plural = "Homepage Promo Banners"
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def display_image_url(self):
-        if self.image:
-            return self.image.url
-        return self.image_url
-
-    def clean(self):
-        super().clean()
-        if not self.image and not self.image_url:
-            raise ValidationError("Upload an image or provide an image URL.")
-
-        if self.is_active:
-            active_limit = 1 if self.placement == self.Placement.LARGE else 2
-            queryset = HomepagePromoBanner.objects.filter(
-                placement=self.placement,
-                is_active=True,
-            )
-            if self.pk:
-                queryset = queryset.exclude(pk=self.pk)
-            if queryset.count() >= active_limit:
-                label = "large banner" if self.placement == self.Placement.LARGE else "small banners"
-                raise ValidationError(f"Only {active_limit} active {label} can be shown on the homepage.")
-
 

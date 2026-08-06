@@ -17,16 +17,16 @@
               {% endif %}
             </div>
             <div class="product-image">
-              <img src="{% if item.primary_image_url %}{{ item.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ item.name }}" />
+              <img src="{% if item.primary_image_card_url %}{{ item.primary_image_card_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ item.name }}" width="400" height="400" loading="lazy" decoding="async" />
               <div class="product-actions"><button title="Quick View" type="button"><i class="fa fa-eye"></i></button></div>
             </div>
             <div class="product-info">
               <p class="product-cat">{{ item.category_label }}</p>
               <h4><a href="{% url 'frontend_product_detail' item.slug %}">{{ item.name }}</a></h4>
               <div class="product-price">
-                <span class="price-current">${{ item.current_price }}</span>
+                <span class="price-current">{{ currency_symbol }}{{ item.current_price }}</span>
                 {% if item.is_on_sale %}
-                  <span class="price-old">${{ item.regular_price }}</span>
+                  <span class="price-old">{{ currency_symbol }}{{ item.regular_price }}</span>
                 {% endif %}
               </div>
               <div class="product-card-actions">

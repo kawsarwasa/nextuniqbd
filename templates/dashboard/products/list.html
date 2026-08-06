@@ -157,12 +157,6 @@
               </a>
             </th>
             <th scope="col">Status</th>
-            <th scope="col">
-              <a class="link-dark text-decoration-none" href="?{% if sort_query %}{{ sort_query }}&amp;{% endif %}sort={{ sort_options.updated.next }}">
-                Updated
-                {% if sort_options.updated.direction == "asc" %}<i class="bi bi-sort-up"></i>{% elif sort_options.updated.direction == "desc" %}<i class="bi bi-sort-down"></i>{% else %}<i class="bi bi-arrow-down-up text-muted"></i>{% endif %}
-              </a>
-            </th>
             <th scope="col" class="text-end">Actions</th>
           </tr>
         </thead>
@@ -200,10 +194,10 @@
                 <div class="text-muted small">{{ product.brand.name|default:"No brand" }}</div>
               </td>
               <td>
-                <div class="fw-semibold">${{ product.current_price }}</div>
+                <div class="fw-semibold">{{ currency_symbol }}{{ product.current_price }}</div>
                 {% if product.regular_price > product.current_price %}
                   <div class="small text-muted text-nowrap">
-                    <span class="text-decoration-line-through">${{ product.regular_price }}</span>
+                    <span class="text-decoration-line-through">{{ currency_symbol }}{{ product.regular_price }}</span>
                     <span class="badge text-bg-success ms-1">{{ product.discount_percentage }}% off</span>
                   </div>
                 {% endif %}
@@ -227,45 +221,35 @@
                 {% else %}
                   <span class="badge text-bg-secondary">Inactive</span>
                 {% endif %}
-              </td>
-              <td>
-                <time datetime="{{ product.updated_at|date:'c' }}">{{ product.updated_at|date:"d M Y, h:i A" }}</time>
+                {% if product.is_featured %}
+                  <span class="badge text-bg-primary">Featured</span>
+                {% endif %}
               </td>
               <td class="text-end">
-                <div class="dropdown">
-                  <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Actions for {{ product.name }}">
-                    <i class="bi bi-three-dots-vertical"></i>
-                  </button>
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item" href="{% url 'dashboard_product_detail' product.pk %}"><i class="bi bi-eye me-2"></i>View Details</a></li>
-                    {% if perms.category.change_product %}
-                      <li><a class="dropdown-item" href="{% url 'dashboard_product_edit' product.pk %}"><i class="bi bi-pencil-square me-2"></i>Edit Product</a></li>
-                    {% endif %}
-                    <li><a class="dropdown-item" href="{% url 'frontend_product_detail' product.slug %}" target="_blank" rel="noopener"><i class="bi bi-box-arrow-up-right me-2"></i>View on Website</a></li>
-                    {% if perms.category.add_product %}
-                      <li>
-                        <form action="{% url 'dashboard_product_duplicate' product.pk %}" method="post">
-                          {% csrf_token %}
-                          <button type="submit" class="dropdown-item"><i class="bi bi-copy me-2"></i>Duplicate Product</button>
-                        </form>
-                      </li>
-                    {% endif %}
-                    {% if perms.category.delete_product %}
-                      <li><hr class="dropdown-divider" /></li>
-                      <li>
-                        <form id="delete-product-{{ product.pk }}" action="{% url 'dashboard_product_delete' product.pk %}" method="post">
-                          {% csrf_token %}
-                          <button type="button" class="dropdown-item text-danger js-delete-trigger" data-delete-form-id="delete-product-{{ product.pk }}" data-delete-item-name="{{ product.name }}"><i class="bi bi-trash me-2"></i>Delete</button>
-                        </form>
-                      </li>
-                    {% endif %}
-                  </ul>
+                <div class="d-flex flex-wrap justify-content-end gap-1">
+                  <a class="btn btn-outline-info btn-sm" href="{% url 'dashboard_product_detail' product.pk %}" title="Details" aria-label="View details for {{ product.name }}"><i class="bi bi-eye"></i></a>
+                  {% if perms.category.change_product %}
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'dashboard_product_edit' product.pk %}" title="Edit" aria-label="Edit {{ product.name }}"><i class="bi bi-pencil-square"></i></a>
+                  {% endif %}
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'frontend_product_detail' product.slug %}" target="_blank" rel="noopener" title="View on website" aria-label="View {{ product.name }} on website"><i class="bi bi-box-arrow-up-right"></i></a>
+                  {% if perms.category.add_product %}
+                    <form action="{% url 'dashboard_product_duplicate' product.pk %}" method="post">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-outline-warning btn-sm" title="Duplicate" aria-label="Duplicate {{ product.name }}"><i class="bi bi-copy"></i></button>
+                    </form>
+                  {% endif %}
+                  {% if perms.category.delete_product %}
+                    <form id="delete-product-{{ product.pk }}" action="{% url 'dashboard_product_delete' product.pk %}" method="post">
+                      {% csrf_token %}
+                      <button type="button" class="btn btn-outline-danger btn-sm js-delete-trigger" title="Delete" aria-label="Delete {{ product.name }}" data-delete-form-id="delete-product-{{ product.pk }}" data-delete-item-name="{{ product.name }}"><i class="bi bi-trash"></i></button>
+                    </form>
+                  {% endif %}
                 </div>
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="8" class="text-center py-5">
+              <td colspan="7" class="text-center py-5">
                 <div class="mb-3 text-muted">No products created yet.</div>
                 <a href="{% url 'dashboard_product_add' %}" class="btn btn-primary">Create your first product</a>
               </td>

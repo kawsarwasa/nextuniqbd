@@ -8,7 +8,6 @@ from django.db import transaction
 
 from .models import (
     HeroSlide,
-    HomepagePromoBanner,
     Order,
     RoleProfile,
     UserProfile,
@@ -391,44 +390,5 @@ class HeroSlideForm(forms.ModelForm):
             "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),
             "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
-
-
-class HomepagePromoBannerForm(forms.ModelForm):
-    class Meta:
-        model = HomepagePromoBanner
-        fields = [
-            "name",
-            "placement",
-            "eyebrow",
-            "title",
-            "image",
-            "image_url",
-            "button_label",
-            "button_url",
-            "use_dark_overlay",
-            "sort_order",
-            "is_active",
-        ]
-        widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Banner name for dashboard use"}),
-            "placement": forms.Select(attrs={"class": "form-select"}),
-            "eyebrow": forms.TextInput(attrs={"class": "form-control", "placeholder": "Small top label"}),
-            "title": forms.TextInput(attrs={"class": "form-control", "placeholder": "Banner title"}),
-            "image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
-            "image_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://example.com/banner.jpg"}),
-            "button_label": forms.TextInput(attrs={"class": "form-control", "placeholder": "Shop Now"}),
-            "button_url": forms.TextInput(attrs={"class": "form-control", "placeholder": "/products/ or full URL"}),
-            "use_dark_overlay": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),
-            "is_active": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["image"].help_text = (
-            "Upload an image or use the image URL field below. "
-            "Recommended: 1400 x 840 px for a large banner or 1400 x 400 px for a small banner."
-        )
-        self.fields["placement"].help_text = "Homepage shows one active large banner and two active small banners."
 
 

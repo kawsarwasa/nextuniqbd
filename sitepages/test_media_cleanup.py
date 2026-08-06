@@ -8,7 +8,7 @@ from PIL import Image
 
 from blog.models import BlogCategory, BlogPost, BlogPostImage
 from category.models import Brand
-from sitepages.models import HeroSlide, HomepagePromoBanner
+from sitepages.models import HeroSlide
 
 
 def uploaded_image(filename, color):
@@ -60,7 +60,7 @@ class MediaCleanupTests(TransactionTestCase):
         self.assertFalse(old_image_path.exists())
         self.assertTrue(Path(gallery_image.image.path).exists())
 
-    def test_hero_slide_and_promo_banner_images_are_removed_on_delete(self):
+    def test_hero_slide_image_is_removed_on_delete(self):
         slide = HeroSlide.objects.create(
             name="Summer",
             title="Summer sale",
@@ -69,11 +69,3 @@ class MediaCleanupTests(TransactionTestCase):
         slide_path = Path(slide.image.path)
         slide.delete()
         self.assertFalse(slide_path.exists())
-
-        banner = HomepagePromoBanner.objects.create(
-            name="Homepage promotion",
-            image=uploaded_image("banner.jpg", "blue"),
-        )
-        banner_path = Path(banner.image.path)
-        banner.delete()
-        self.assertFalse(banner_path.exists())

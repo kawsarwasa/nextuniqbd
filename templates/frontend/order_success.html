@@ -24,7 +24,7 @@
           <div class="confirm-detail-row"><i class="fa fa-calendar-alt"></i><span>Order Date: <strong>{{ order.order_date|date:"M d, Y h:i A" }}</strong></span></div>
           <div class="confirm-detail-row"><i class="fa fa-truck"></i><span>Estimated Delivery: <strong>{{ order.delivery_estimate }}</strong></span></div>
           <div class="confirm-detail-row"><i class="fa fa-money-bill-wave"></i><span>Payment: <strong>{{ order.payment_method }}</strong></span></div>
-          <div class="confirm-detail-row"><i class="fa fa-receipt"></i><span>Total: <strong>৳{{ order.total_amount }}</strong></span></div>
+          <div class="confirm-detail-row"><i class="fa fa-receipt"></i><span>Total: <strong>{{ currency_symbol }}{{ order.total_amount }}</strong></span></div>
         </div>
         <div class="confirm-actions">
           <a href="{% url 'frontend_products' %}" class="btn-confirm-shop">Continue Shopping</a>

@@ -13,6 +13,8 @@ from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 from PIL import Image, ImageOps
 
+from .image_derivatives import generate_product_image_derivatives, product_image_variant_url
+
 
 class Category(models.Model):
     IMAGE_SIZE = (600, 600)
@@ -231,6 +233,7 @@ class Product(models.Model):
     current_price = models.DecimalField(max_digits=12, decimal_places=2)
     sku = models.CharField(max_length=SKU_LENGTH, unique=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
+    is_featured = models.BooleanField(default=False)
     availability = models.CharField(max_length=100, blank=True)
     track_stock = models.BooleanField(default=True)
     stock_quantity = models.PositiveIntegerField(default=0)
@@ -249,6 +252,10 @@ class Product(models.Model):
             models.Index(
                 fields=["status", "category", "-created_at"],
                 name="prod_home_status_cat_date",
+            ),
+            models.Index(
+                fields=["status", "is_featured", "-created_at"],
+                name="prod_home_featured_date",
             ),
         ]
         constraints = [
@@ -445,6 +452,24 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"{self.product.name} image {self.pk}"
 
+    @property
+    def card_url(self):
+        return product_image_variant_url(self.image, "card")
+
+    @property
+    def detail_url(self):
+        return product_image_variant_url(self.image, "detail")
+
+    def save(self, *args, **kwargs):
+        image_changed = bool(self.image) and (
+            not getattr(self.image, "_committed", True)
+            or not self.pk
+            or "image" in (kwargs.get("update_fields") or ())
+        )
+        super().save(*args, **kwargs)
+        if image_changed:
+            generate_product_image_derivatives(self.image)
+
 
 class ProductReview(models.Model):
     product = models.ForeignKey(
@@ -484,7 +509,19 @@ class ProductReview(models.Model):
 
 @receiver(post_delete, sender=ProductImage)
 def delete_product_image_file(sender, instance, **kwargs):
-    if instance.image:
-        storage = instance.image.storage
-        if storage.exists(instance.image.name):
-            storage.delete(instance.image.name)
+    if not instance.image or not instance.image.name:
+        return
+
+    # Keep sidecar variants in sync with their source image.  Check for another
+    # record using the same file name before removing anything from storage.
+    if ProductImage.objects.filter(image=instance.image.name).exists():
+        return
+
+    storage = instance.image.storage
+    for name in (
+        instance.image.name,
+        product_image_variant_name(instance.image.name, "card"),
+        product_image_variant_name(instance.image.name, "detail"),
+    ):
+        if storage.exists(name):
+            storage.delete(name)

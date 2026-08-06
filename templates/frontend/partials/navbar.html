@@ -15,9 +15,7 @@
 
     <ul class="nav-links">
       <li><a href="{% url 'frontend_home' %}"{% if active_page == 'home' %} class="active"{% endif %}>Home</a></li>
-      <li><a href="{% url 'frontend_about' %}"{% if active_page == 'about' %} class="active"{% endif %}>About</a></li>
       <li><a href="{% url 'frontend_products' %}"{% if active_page == 'products' %} class="active"{% endif %}>Product</a></li>
-      <li><a href="{% url 'frontend_blog' %}"{% if active_page == 'blog' %} class="active"{% endif %}>Blog</a></li>
       <li><a href="{% url 'frontend_cart' %}"{% if active_page == 'cart' %} class="active"{% endif %}>Cart</a></li>
     </ul>
   </div>

@@ -250,11 +250,11 @@
 
                         <div class="bg-gray-light py-3 px-4 mt-4 rounded">
                             <h2 class="mb-0 text-success font-weight-bold">
-                                ${{ product.current_price|default:product.regular_price|default:"0.00" }}
+                                {{ currency_symbol }}{{ product.current_price|default:product.regular_price|default:"0.00" }}
                             </h2>
                             {% if product.current_price and product.regular_price and product.current_price < product.regular_price %}
                             <h5 class="mt-1 text-muted">
-                                <small>Regular Price: <del>${{ product.regular_price }}</del></small>
+                                <small>Regular Price: <del>{{ currency_symbol }}{{ product.regular_price }}</del></small>
                             </h5>
                             {% endif %}
                         </div>

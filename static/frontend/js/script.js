@@ -89,10 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
      ============================================= */
   const frontendRoutes = window.sbRevoRoutes || {
     home: '/',
-    about: '/about/',
     products: '/products/',
-    blog: '/blog/',
-    article: '/blog-details/',
     cart: '/cart/',
     checkout: '/checkout/',
     productDetails: '/product-details/',
@@ -124,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* =============================================
      CURRENCY NORMALIZATION
      ============================================= */
-  const CURRENCY_SYMBOL = '৳';
+  const CURRENCY_SYMBOL = window.sbRevoCurrencySymbol || '৳';
 
   function formatCurrency(value) {
     const amount = typeof value === 'number'
@@ -216,73 +213,6 @@ document.addEventListener('DOMContentLoaded', function () {
       .replace(/'/g, '&#39;');
   }
 
-
-  /* =============================================
-     PRODUCT TABS
-     ============================================= */
-  document.querySelectorAll('.section-tabs-header').forEach(header => {
-    const container = header.closest('.container');
-    if (!container) return;
-
-    const tabBtns = header.querySelectorAll('.tab-btn');
-    const tabContents = Array.from(container.children).filter(child => child.classList.contains('tab-content'));
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.tab;
-        tabBtns.forEach(item => item.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('tab-' + target)?.classList.add('active');
-      });
-    });
-  });
-
-
-  /* =============================================
-     PRODUCT ROW NAVIGATION
-     ============================================= */
-  document.querySelectorAll('.prod-nav[data-carousel]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const row = document.getElementById(btn.dataset.carousel);
-      if (!row) return;
-      const direction = btn.classList.contains('prev') ? -1 : 1;
-      row.scrollBy({ left: direction * Math.max(row.clientWidth * 0.8, 240), behavior: 'smooth' });
-    });
-  });
-
-
-  /* =============================================
-     COUNTDOWN TIMER
-     ============================================= */
-  const saleEnd = new Date();
-  saleEnd.setDate(saleEnd.getDate() + 2);
-  saleEnd.setHours(23, 59, 59, 0);
-
-  function updateCountdown() {
-    const cdDays = document.getElementById('cd-days');
-    if (!cdDays) return;
-
-    const now = new Date();
-    const diff = saleEnd - now;
-    if (diff <= 0) return;
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const secs = Math.floor((diff % (1000 * 60)) / 1000);
-
-    const pad = n => String(n).padStart(2, '0');
-    cdDays.textContent = pad(days);
-    document.getElementById('cd-hours').textContent = pad(hours);
-    document.getElementById('cd-mins').textContent = pad(mins);
-    document.getElementById('cd-secs').textContent = pad(secs);
-  }
-
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
-
-
   /* =============================================
      BACK TO TOP
      ============================================= */
@@ -299,63 +229,6 @@ document.addEventListener('DOMContentLoaded', function () {
   backToTop?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-
-
-  /* =============================================
-     COOKIE BANNER
-     ============================================= */
-  const cookieBanner = document.getElementById('cookieBanner');
-  const cookieAccepted = localStorage.getItem('cookieAccepted');
-
-  if (!cookieAccepted) {
-    setTimeout(() => cookieBanner?.classList.remove('hidden'), 1000);
-  } else {
-    cookieBanner?.classList.add('hidden');
-  }
-
-  document.getElementById('acceptCookies')?.addEventListener('click', () => {
-    localStorage.setItem('cookieAccepted', 'true');
-    cookieBanner.classList.add('hidden');
-  });
-
-  document.getElementById('declineCookies')?.addEventListener('click', () => {
-    cookieBanner.classList.add('hidden');
-  });
-
-
-  /* =============================================
-     NEWSLETTER MODAL
-     ============================================= */
-  const newsletterModal = document.getElementById('newsletterModal');
-  const modalShown = sessionStorage.getItem('modalShown');
-
-  if (newsletterModal && !modalShown) {
-    setTimeout(() => {
-      newsletterModal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }, 4000);
-  }
-
-  function closeNewsletterModal() {
-    if (!newsletterModal) return;
-    newsletterModal.classList.remove('active');
-    document.body.style.overflow = '';
-    sessionStorage.setItem('modalShown', 'true');
-  }
-
-  document.getElementById('modalClose')?.addEventListener('click', closeNewsletterModal);
-  document.getElementById('modalSkip')?.addEventListener('click', closeNewsletterModal);
-
-  newsletterModal?.addEventListener('click', (e) => {
-    if (e.target === newsletterModal) closeNewsletterModal();
-  });
-
-  document.getElementById('modalForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    closeNewsletterModal();
-    showToast('Subscribed! Check your email for the discount code.');
-  });
-
 
   /* =============================================
      PRODUCT CARD LINKS
@@ -380,43 +253,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-
-  /* =============================================
-     BLOG CARD LINKS
-     ============================================= */
-  document.querySelectorAll('.blog-card').forEach(card => {
-    const cardLinks = Array.from(card.querySelectorAll('a'));
-    cardLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (!href || href === '#') {
-        link.setAttribute('href', frontendRoutes.article);
-      }
-    });
-
-    const detailsLink = card.querySelector('.blog-card-title a, .blog-content h3 a, .blog-read-more, .read-more, .blog-card-img a, .blog-image a');
-    if (!detailsLink) return;
-
-    card.setAttribute('role', 'link');
-    card.setAttribute('tabindex', '0');
-
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('a, button, input, select, textarea, label')) return;
-      window.location.href = detailsLink.href;
-    });
-
-    card.addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      if (e.target.closest('a, button, input, select, textarea, label')) return;
-      e.preventDefault();
-      window.location.href = detailsLink.href;
-    });
-  });
-
-  document.querySelectorAll('.section-header .view-all').forEach(link => {
-    if (!link.getAttribute('href') || link.getAttribute('href') === '#') {
-      link.setAttribute('href', frontendRoutes.blog);
-    }
-  });
 
 
   /* =============================================
@@ -655,15 +491,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   window.sbRevoShowToast = showToast;
 
-
-  /* =============================================
-     NEWSLETTER FORM (footer)
-     ============================================= */
-  document.getElementById('newsletterForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    showToast('Thanks for subscribing! Welcome to SB Revo.');
-    e.target.reset();
-  });
 
 
   /* =============================================
@@ -1271,7 +1098,6 @@ document.addEventListener('DOMContentLoaded', function () {
      ============================================= */
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      closeNewsletterModal();
       closeQuickView();
     }
   });
@@ -1302,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* =============================================
      SECTION SCROLL ANIMATIONS
      ============================================= */
-  const animEls = document.querySelectorAll('.product-card, .category-card, .blog-card, .feature-item, .promo-banner');
+  const animEls = document.querySelectorAll('.product-card, .category-card, .feature-item');
   const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
       if (entry.isIntersecting) {

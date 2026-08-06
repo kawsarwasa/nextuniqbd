@@ -79,6 +79,16 @@
                 {% endif %}
               </div>
               <div class="col-md-6">
+                <div class="form-check mt-4 pt-1">
+                  {{ form.is_featured }}
+                  <label for="{{ form.is_featured.id_for_label }}" class="form-check-label">Feature on homepage</label>
+                </div>
+                <div class="form-text">Only published products marked here appear in the Featured tab.</div>
+                {% if form.is_featured.errors %}
+                  <div class="text-danger small mt-1">{{ form.is_featured.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
                 <span class="form-label d-block">Availability</span>
                 <div class="dashboard-toggle-group" role="radiogroup" aria-label="Availability">
                   {% for radio in form.availability %}

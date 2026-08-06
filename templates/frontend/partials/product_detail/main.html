@@ -1,16 +1,17 @@
+{% load static %}
 <section class="pd-section">
   <div class="container">
     <div class="pd-layout">
       <div class="pd-gallery">
         <div class="pd-main-img" id="pdMainImg">
           {% with main_image=product.primary_image %}
-            <img src="{% if main_image %}{{ main_image.image.url }}{% else %}https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&h=700&fit=crop{% endif %}" alt="{{ product.name }}" id="mainProductImg" width="700" height="700" decoding="async" fetchpriority="high" />
+            <img src="{% if main_image %}{{ main_image.detail_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="{{ product.name }}" id="mainProductImg" width="1000" height="1000" decoding="async" fetchpriority="high" />
           {% endwith %}
           <div class="zoom-hint"><i class="fa fa-search-plus"></i> Click to zoom</div>
           <div class="img-zoom-overlay" id="imgZoomOverlay">
             <button class="zoom-close" id="zoomClose"><i class="fa fa-times"></i></button>
             {% with main_image=product.primary_image %}
-              <img src="{% if main_image %}{{ main_image.image.url }}{% else %}https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1200&h=1200&fit=crop{% endif %}" id="zoomedImg" alt="Zoomed product image" width="1200" height="1200" loading="lazy" decoding="async" />
+              <img src="{% if main_image %}{{ main_image.image.url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" id="zoomedImg" alt="Zoomed product image" width="1200" height="1200" loading="lazy" decoding="async" />
             {% endwith %}
           </div>
         </div>
@@ -18,21 +19,12 @@
           {% if product.images.all %}
             {% for image in product.images.all %}
               <div class="pd-thumb{% if forloop.first %} active{% endif %}">
-                <img src="{{ image.image.url }}" data-full="{{ image.image.url }}" data-zoom="{{ image.image.url }}" alt="View {{ forloop.counter }}" width="120" height="120" loading="lazy" decoding="async" />
+                <img src="{{ image.card_url }}" data-full="{{ image.detail_url }}" data-zoom="{{ image.image.url }}" alt="View {{ forloop.counter }}" width="120" height="120" loading="lazy" decoding="async" />
               </div>
             {% endfor %}
           {% else %}
             <div class="pd-thumb active">
-              <img src="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1200&h=1200&fit=crop" alt="View 1" />
-            </div>
-            <div class="pd-thumb">
-              <img src="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=1200&h=1200&fit=crop" alt="View 2" />
-            </div>
-            <div class="pd-thumb">
-              <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&h=1200&fit=crop" alt="View 3" />
-            </div>
-            <div class="pd-thumb">
-              <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=120&h=120&fit=crop" data-full="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=700&h=700&fit=crop" data-zoom="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&fit=crop" alt="View 4" />
+              <img src="{% static 'frontend/images/product-placeholder.svg' %}" data-full="{% static 'frontend/images/product-placeholder.svg' %}" data-zoom="{% static 'frontend/images/product-placeholder.svg' %}" alt="Product placeholder" width="120" height="120" loading="lazy" decoding="async" />
             </div>
           {% endif %}
         </div>
@@ -74,10 +66,10 @@
         </div>
 
         <div class="pd-price-block">
-          <span class="pd-price-current">${{ product.current_price }}</span>
+          <span class="pd-price-current">{{ currency_symbol }}{{ product.current_price }}</span>
           {% if product.is_on_sale %}
-            <span class="pd-price-old">${{ product.regular_price }}</span>
-            <span class="pd-price-save">Save ${{ product.sale_amount }} ({{ product.sale_percentage }}%)</span>
+            <span class="pd-price-old">{{ currency_symbol }}{{ product.regular_price }}</span>
+            <span class="pd-price-save">Save {{ currency_symbol }}{{ product.sale_amount }} ({{ product.sale_percentage }}%)</span>
           {% else %}
             <span class="pd-price-save">Current catalog price</span>
           {% endif %}

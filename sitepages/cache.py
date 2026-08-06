@@ -8,10 +8,9 @@ COMPANY_PROFILE_CACHE_KEY = "company:active-profile:v1"
 HERO_SLIDES_CACHE_KEY = "homepage:hero-slides:v1"
 HOMEPAGE_CATEGORIES_CACHE_KEY = "homepage:categories:v1"
 HOMEPAGE_BRANDS_CACHE_KEY = "homepage:brands:v1"
-FOOTER_BRANDS_CACHE_KEY = "footer:brands:v1"
-HOMEPAGE_PROMOS_CACHE_KEY = "homepage:promos:v1"
-HOMEPAGE_BLOG_POSTS_CACHE_KEY = "homepage:blog-posts:v1"
-HOMEPAGE_PRODUCT_TABS_CACHE_KEY = "homepage:product-tabs:v1"
+FOOTER_BRANDS_CACHE_KEY = "footer:brands:v2"
+FOOTER_CATEGORIES_CACHE_KEY = "footer:categories:v1"
+HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY = "homepage:latest-products:v1"
 
 
 def get_public_cache_value(key, builder):
@@ -31,8 +30,7 @@ def invalidate_public_site_cache():
             HOMEPAGE_CATEGORIES_CACHE_KEY,
             HOMEPAGE_BRANDS_CACHE_KEY,
             FOOTER_BRANDS_CACHE_KEY,
-            HOMEPAGE_PROMOS_CACHE_KEY,
-            HOMEPAGE_BLOG_POSTS_CACHE_KEY,
-            HOMEPAGE_PRODUCT_TABS_CACHE_KEY,
+            FOOTER_CATEGORIES_CACHE_KEY,
+            HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY,
         ]
     )

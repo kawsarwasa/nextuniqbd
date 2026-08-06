@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token }}" />
   <title>{% block title %}SB Revo{% endblock %}</title>
-  <link rel="shortcut icon" type="image/png" href="{% static 'frontend/images/next-uniq-bd.png' %}?v=2" />
-  <link rel="icon" type="image/png" href="{% static 'frontend/images/next-uniq-bd.png' %}?v=2" />
+  <link rel="shortcut icon" type="image/svg+xml" href="{% static 'frontend/images/next-uniq-bd-favicon.svg' %}?v=2" />
+  <link rel="icon" type="image/svg+xml" href="{% static 'frontend/images/next-uniq-bd-favicon.svg' %}?v=2" />
   <link rel="apple-touch-icon" href="{% static 'frontend/images/next-uniq-bd.png' %}?v=2" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="{% static 'frontend/css/style.css' %}?v=10" />
   {% block extra_head %}{% endblock %}
@@ -37,12 +37,10 @@
   {% block page_overlays %}{% endblock %}
 
   <script>
+    window.sbRevoCurrencySymbol = "{{ currency_symbol|escapejs }}";
     window.sbRevoRoutes = {
       home: "{% url 'frontend_home' %}",
-      about: "{% url 'frontend_about' %}",
       products: "{% url 'frontend_products' %}",
-      blog: "{% url 'frontend_blog' %}",
-      article: "{% url 'frontend_blog_details' %}",
       cart: "{% url 'frontend_cart' %}",
       checkout: "{% url 'frontend_checkout' %}",
       productDetails: "{% url 'frontend_product_details' %}",
@@ -54,7 +52,7 @@
       cartSetDeliveryZone: "{% url 'cart_set_delivery_zone' %}"
     };
   </script>
-  <script src="{% static 'frontend/js/script.js' %}?v=7"></script>
+  <script src="{% static 'frontend/js/script.js' %}?v=8" defer></script>
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -60,6 +60,7 @@ class ProductAdmin(admin.ModelAdmin):
         "brand",
         "sku",
         "status",
+        "is_featured",
         "regular_price",
         "current_price",
         "availability",
@@ -69,7 +70,7 @@ class ProductAdmin(admin.ModelAdmin):
         "updated_at",
     )
     search_fields = ("name", "sku", "availability")
-    list_filter = ("status", "category", "brand")
+    list_filter = ("status", "is_featured", "category", "brand")
     ordering = ("-id",)
     readonly_fields = ("sku",)
     inlines = [ProductImageInline, ProductReviewInline]

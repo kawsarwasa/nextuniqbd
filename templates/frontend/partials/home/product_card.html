@@ -16,26 +16,25 @@
       {% if product.is_on_sale %}
         <span class="badge-sale">-{{ product.sale_percentage }}%</span>
       {% endif %}
-      {% if product.is_new_arrival %}
-        <span class="badge-new">NEW</span>
-      {% endif %}
       {% if product.track_stock and not product.is_in_stock %}
         <span class="badge-hot">Out of Stock</span>
       {% elif product.track_stock and product.is_low_stock %}
         <span class="badge-hot">Only {{ product.stock_quantity }} left</span>
-      {% endif %}
-      {% if extra_badge_label and not product.is_new_arrival %}
-        <span class="badge-hot">{{ extra_badge_label }}</span>
+      {% elif product.is_new_arrival %}
+        <span class="badge-new">NEW</span>
+      {% elif product.is_featured %}
+        <span class="badge-hot">FEATURED</span>
       {% endif %}
     </div>
     <div class="product-image">
       <img
-        src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
+        src="{% if product.primary_image_card_url %}{{ product.primary_image_card_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}"
         alt="{{ product.name }}"
-        width="600"
-        height="600"
-        loading="lazy"
+        width="400"
+        height="400"
+        loading="{% if is_above_fold_product %}eager{% else %}lazy{% endif %}"
         decoding="async"
+        {% if is_above_fold_product %}fetchpriority="high"{% endif %}
       />
       <div class="product-actions">
         <button type="button" title="Quick View"><i class="fa fa-eye"></i></button>
@@ -55,9 +54,9 @@
       <span>({{ product.review_count }})</span>
     </div>
     <div class="product-price">
-      <span class="price-current">${{ product.current_price }}</span>
+      <span class="price-current">{{ currency_symbol }}{{ product.current_price }}</span>
       {% if product.is_on_sale %}
-        <span class="price-old">${{ product.regular_price }}</span>
+        <span class="price-old">{{ currency_symbol }}{{ product.regular_price }}</span>
       {% endif %}
     </div>
     <div class="product-card-actions">

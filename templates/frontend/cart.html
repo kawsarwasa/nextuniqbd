@@ -69,9 +69,9 @@
                       </div>
                     </td>
                     <td class="col-price" data-label="Price">
-                      <span class="cart-price">${{ item.current_price }}</span>
+                      <span class="cart-price">{{ currency_symbol }}{{ item.current_price }}</span>
                       {% if item.is_on_sale %}
-                        <span class="cart-price-old">${{ item.regular_price }}</span>
+                        <span class="cart-price-old">{{ currency_symbol }}{{ item.regular_price }}</span>
                       {% endif %}
                     </td>
                     <td class="col-qty" data-label="Quantity">
@@ -82,7 +82,7 @@
                       </div>
                     </td>
                     <td class="col-subtotal" data-label="Subtotal">
-                      <span class="cart-subtotal">${{ item.subtotal }}</span>
+                      <span class="cart-subtotal">{{ currency_symbol }}{{ item.subtotal }}</span>
                     </td>
                     <td class="col-remove">
                       <button class="cart-remove-btn" type="button" title="Remove item"><i class="fa fa-times"></i></button>
@@ -128,7 +128,7 @@
             <div class="summary-rows">
               <div class="summary-row">
                 <span>Subtotal (<span id="summaryItemCount">{{ cart_state.item_count }}</span> items)</span>
-                <span id="summarySubtotal">${{ cart_state.subtotal }}</span>
+                <span id="summarySubtotal">{{ currency_symbol }}{{ cart_state.subtotal }}</span>
               </div>
               <div class="summary-row discount-row" id="discountRow" style="display:none">
                 <span class="discount-label"><i class="fa fa-tag"></i> Discount (<span id="discountCode2"></span>)</span>
@@ -149,7 +149,7 @@
                       <strong>Inside Dhaka</strong>
                       <span>1-2 business days</span>
                     </div>
-                    <strong>৳60.00</strong>
+                    <strong>{{ currency_symbol }}60.00</strong>
                   </label>
                 </div>
                 <div class="ship-option{% if delivery_zone.key == 'outside_dhaka' %} selected{% endif %}">
@@ -159,7 +159,7 @@
                       <strong>Outside Dhaka</strong>
                       <span>3-5 business days</span>
                     </div>
-                    <strong>৳130.00</strong>
+                    <strong>{{ currency_symbol }}130.00</strong>
                   </label>
                 </div>
               </div>
@@ -168,13 +168,13 @@
             <div class="summary-rows">
               <div class="summary-row">
                 <span>Shipping</span>
-                <span id="summaryShipping">৳{{ delivery_zone.amount }}</span>
+                <span id="summaryShipping">{{ currency_symbol }}{{ delivery_zone.amount }}</span>
               </div>
             </div>
 
             <div class="summary-total">
               <span>Total</span>
-              <span id="summaryTotal">৳{{ cart_state.subtotal|add:delivery_zone.amount }}</span>
+              <span id="summaryTotal">{{ currency_symbol }}{{ cart_state.subtotal|add:delivery_zone.amount }}</span>
             </div>
 
             <a href="{% url 'frontend_checkout' %}" class="btn-checkout" id="checkoutBtn">
@@ -232,9 +232,9 @@
                 <span>({{ product.review_count }})</span>
               </div>
               <div class="product-price">
-                <span class="price-current">${{ product.current_price }}</span>
+                <span class="price-current">{{ currency_symbol }}{{ product.current_price }}</span>
                 {% if product.is_on_sale %}
-                  <span class="price-old">${{ product.regular_price }}</span>
+                  <span class="price-old">{{ currency_symbol }}{{ product.regular_price }}</span>
                 {% endif %}
               </div>
               <div class="product-card-actions">
@@ -279,9 +279,9 @@
               <span id="qvReviews">{% if modal_product %}({{ modal_product.review_count }} reviews){% else %}(0 reviews){% endif %}</span>
             </div>
             <div class="product-price large" id="qvPrice">
-              <span class="price-current">{% if modal_product %}${{ modal_product.current_price }}{% else %}$0.00{% endif %}</span>
+              <span class="price-current">{% if modal_product %}{{ currency_symbol }}{{ modal_product.current_price }}{% else %}{{ currency_symbol }}0.00{% endif %}</span>
               {% if modal_product and modal_product.is_on_sale %}
-                <span class="price-old">${{ modal_product.regular_price }}</span>
+                <span class="price-old">{{ currency_symbol }}{{ modal_product.regular_price }}</span>
               {% endif %}
             </div>
             <p class="qv-desc" id="qvDesc">{% if modal_product %}{{ modal_product.short_description_plain|default:"No description available." }}{% else %}No description available.{% endif %}</p>

@@ -44,6 +44,7 @@ if not SECRET_KEY:
     raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set.")
 
 DEBUG = env_bool("DJANGO_DEBUG", False)
+CURRENCY_SYMBOL = os.environ.get("CURRENCY_SYMBOL", "৳")
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
@@ -92,6 +93,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'sitepages.context_processors.cart_context',
+                'sitepages.context_processors.currency_context',
                 'sitepages.context_processors.product_search_context',
                 'sitepages.context_processors.footer_brand_context',
                 'sitepages.context_processors.dashboard_profile_context',

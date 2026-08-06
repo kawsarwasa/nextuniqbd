@@ -4,7 +4,7 @@
     <button class="modal-close" id="quickViewClose"><i class="fa fa-times"></i></button>
     <div class="quickview-content">
       <div class="quickview-image">
-        <img src="{% if product.primary_image_url %}{{ product.primary_image_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" />
+        <img src="{% if product.primary_image_card_url %}{{ product.primary_image_card_url }}{% else %}{% static 'frontend/images/product-placeholder.svg' %}{% endif %}" alt="Quick View" id="qvImage" width="400" height="400" loading="lazy" decoding="async" />
       </div>
       <div class="quickview-info">
         <p class="product-cat" id="qvCat">{{ product.category_label }}</p>
@@ -19,9 +19,9 @@
           <span id="qvReviews">({{ review_summary.count }} reviews)</span>
         </div>
         <div class="product-price large" id="qvPrice">
-          <span class="price-current">${{ product.current_price }}</span>
+          <span class="price-current">{{ currency_symbol }}{{ product.current_price }}</span>
           {% if product.is_on_sale %}
-            <span class="price-old">${{ product.regular_price }}</span>
+            <span class="price-old">{{ currency_symbol }}{{ product.regular_price }}</span>
           {% endif %}
         </div>
         <p class="qv-desc" id="qvDesc">{{ product.short_description_plain|default:"No description available." }}</p>
