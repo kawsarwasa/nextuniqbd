@@ -23,6 +23,16 @@ class RegistrationForm(forms.Form):
         max_length=150,
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Full Name"}),
     )
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Username",
+                "autocomplete": "username",
+            }
+        ),
+    )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"}),
     )
@@ -37,15 +47,21 @@ class RegistrationForm(forms.Form):
 
     def clean_email(self):
         email = (self.cleaned_data.get("email") or "").strip().lower()
-        if User.objects.filter(email__iexact=email).exists() or User.objects.filter(username__iexact=email).exists():
+        if User.objects.filter(email__iexact=email).exists():
             raise ValidationError("An account with this email already exists.")
         return email
+
+    def clean_username(self):
+        username = (self.cleaned_data.get("username") or "").strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise ValidationError("An account with this username already exists.")
+        return username
 
     def clean_password(self):
         password = self.cleaned_data.get("password") or ""
         email = (self.cleaned_data.get("email") or "").strip().lower()
-        name = (self.cleaned_data.get("name") or "").strip()
-        candidate_user = User(username=email or name or "user", email=email)
+        username = (self.cleaned_data.get("username") or "").strip()
+        candidate_user = User(username=username or "user", email=email)
         validate_password(password, user=candidate_user)
         return password
 
@@ -65,6 +81,7 @@ class RegistrationForm(forms.Form):
         ensure_default_roles()
 
         name = (self.cleaned_data["name"] or "").strip()
+        username = self.cleaned_data["username"]
         email = (self.cleaned_data["email"] or "").strip().lower()
         password = self.cleaned_data["password"]
         name_parts = name.split(None, 1)
@@ -72,7 +89,7 @@ class RegistrationForm(forms.Form):
         last_name = name_parts[1] if len(name_parts) > 1 else ""
 
         user = User(
-            username=email,
+            username=username,
             email=email,
             first_name=first_name,
             last_name=last_name,
@@ -216,6 +233,10 @@ class DashboardProfileForm(forms.ModelForm):
         max_length=150,
         widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Full Name"}),
     )
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Username"}),
+    )
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"}),
     )
@@ -234,6 +255,7 @@ class DashboardProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if user is not None:
             self.fields["name"].initial = user.get_full_name().strip() or user.email or user.username
+            self.fields["username"].initial = user.username
             self.fields["email"].initial = user.email
 
     def clean_email(self):
@@ -245,6 +267,15 @@ class DashboardProfileForm(forms.ModelForm):
             raise ValidationError("An account with this email already exists.")
         return email
 
+    def clean_username(self):
+        username = (self.cleaned_data.get("username") or "").strip()
+        existing = User.objects.filter(username__iexact=username)
+        if self.user is not None:
+            existing = existing.exclude(pk=self.user.pk)
+        if existing.exists():
+            raise ValidationError("An account with this username already exists.")
+        return username
+
     @transaction.atomic
     def save(self, commit=True):
         profile = super().save(commit=False)
@@ -252,14 +283,15 @@ class DashboardProfileForm(forms.ModelForm):
             raise ValidationError("User is required for profile updates.")
 
         full_name = (self.cleaned_data.get("name") or "").strip()
+        username = self.cleaned_data["username"]
         email = self.cleaned_data["email"]
         first_name, _, last_name = full_name.partition(" ")
         self.user.first_name = first_name
         self.user.last_name = last_name
+        self.user.username = username
         self.user.email = email
-        self.user.username = email
         if commit:
-            self.user.save(update_fields=["first_name", "last_name", "email", "username"])
+            self.user.save(update_fields=["first_name", "last_name", "username", "email"])
             profile.user = self.user
             profile.save()
             self.save_m2m()

@@ -1152,7 +1152,7 @@ def auth_login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user is None:
-            form.add_error(None, "Invalid email or password.")
+            form.add_error(None, "Invalid username or password.")
         elif not user.is_active:
             form.add_error(None, "This account is inactive.")
         else:

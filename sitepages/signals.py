@@ -13,6 +13,7 @@ from .permissions import ensure_default_roles
 
 
 User = get_user_model()
+SUPERUSER_USERNAME = "superuser"
 SUPERUSER_EMAIL = "superuser@mail.com"
 SUPERUSER_PASSWORD = "Admin@100%"
 
@@ -81,7 +82,7 @@ def seed_default_auth_records(sender, **kwargs):
 
     ensure_default_roles()
 
-    username = SUPERUSER_EMAIL.lower()
+    username = SUPERUSER_USERNAME
     user = User.objects.filter(email__iexact=SUPERUSER_EMAIL).first()
     if user is None:
         user = User.objects.filter(username__iexact=username).first()

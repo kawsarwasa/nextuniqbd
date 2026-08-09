@@ -298,6 +298,45 @@ small {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: auto;
+}
+
+.header-auth {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  white-space: nowrap;
+}
+
+.header-auth a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-auth a:hover { color: var(--primary); }
+
+.header-actions .action-item { padding: 0; }
+
+.header-actions .cart-page-link {
+  position: relative;
+  flex-direction: row;
+  gap: 6px;
+  padding: 5px 8px;
+}
+
+.header-actions .action-label {
+  margin-top: 0;
+  font-size: 14px;
+}
+
+.header-actions .action-item .badge {
+  top: -4px;
+  right: auto;
+  left: 17px;
 }
 
 .action-item {
@@ -614,7 +653,8 @@ small {
 .hero-slide {
   position: absolute;
   inset: 0;
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
   opacity: 0;
   transition: opacity 0.8s ease;
@@ -3030,7 +3070,13 @@ textarea.form-control { resize: vertical; }
   }
   .header-actions {
     flex: 0 0 auto;
-    gap: 0;
+    gap: 10px;
+  }
+  .header-auth {
+    gap: 10px;
+  }
+  .header-auth a {
+    font-size: 13px;
   }
   .action-item {
     padding: 4px;

@@ -40,7 +40,7 @@ class DashboardAuthMixin:
     def setUp(self):
         super().setUp()
         self.dashboard_user = User.objects.create_superuser(
-            username="dashboard-admin@example.com",
+            username="dashboard-admin",
             email="dashboard-admin@example.com",
             password="Admin@100%",
         )
@@ -358,6 +358,7 @@ class DashboardProfileTests(DashboardAuthMixin, TestCase):
             data={
                 "form_type": "profile",
                 "name": "Sohel Rana",
+                "username": "dashboard-admin",
                 "email": "sohel@example.com",
                 "phone": "+8801712345678",
                 "address": "Dhaka, Bangladesh",
@@ -371,9 +372,53 @@ class DashboardProfileTests(DashboardAuthMixin, TestCase):
         self.assertEqual(self.dashboard_user.first_name, "Sohel")
         self.assertEqual(self.dashboard_user.last_name, "Rana")
         self.assertEqual(self.dashboard_user.email, "sohel@example.com")
-        self.assertEqual(self.dashboard_user.username, "sohel@example.com")
+        self.assertEqual(self.dashboard_user.username, "dashboard-admin")
         self.assertEqual(profile.phone, "+8801712345678")
         self.assertEqual(profile.address, "Dhaka, Bangladesh")
+
+    def test_dashboard_profile_updates_username(self):
+        self.client.force_login(self.dashboard_user)
+
+        response = self.client.post(
+            reverse("dashboard_profile"),
+            data={
+                "form_type": "profile",
+                "name": "Sohel Rana",
+                "username": "sohel-rana",
+                "email": "sohel@example.com",
+                "phone": "+8801712345678",
+                "address": "Dhaka, Bangladesh",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.dashboard_user.refresh_from_db()
+        self.assertEqual(self.dashboard_user.username, "sohel-rana")
+
+    def test_dashboard_profile_rejects_another_users_username(self):
+        User.objects.create_user(
+            username="taken-username",
+            email="taken@example.com",
+            password="StrongPass@123",
+        )
+        self.client.force_login(self.dashboard_user)
+
+        response = self.client.post(
+            reverse("dashboard_profile"),
+            data={
+                "form_type": "profile",
+                "name": "Sohel Rana",
+                "username": " taken-username ",
+                "email": "sohel@example.com",
+                "phone": "+8801712345678",
+                "address": "Dhaka, Bangladesh",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "An account with this username already exists.")
+        self.dashboard_user.refresh_from_db()
+        self.assertEqual(self.dashboard_user.username, "dashboard-admin")
 
     def test_dashboard_profile_password_change_updates_password(self):
         self.client.force_login(self.dashboard_user)
@@ -807,6 +852,7 @@ class AuthenticationFlowTests(TestCase):
             reverse("auth_register"),
             data={
                 "name": "Sohel Rana",
+                "username": "sohelrana",
                 "email": "sohel@example.com",
                 "password": "StrongPass@123",
                 "confirm_password": "StrongPass@123",
@@ -816,7 +862,8 @@ class AuthenticationFlowTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("dashboard_home"))
         user = User.objects.get(email="sohel@example.com")
-        self.assertEqual(user.username, "sohel@example.com")
+        self.assertEqual(user.username, "sohelrana")
+        self.assertEqual(user.email, "sohel@example.com")
         self.assertTrue(user.groups.filter(name="customers").exists())
         self.assertTrue(user.has_perm("sitepages.view_order"))
         self.assertFalse(user.has_perm("sitepages.view_sale"))
@@ -826,6 +873,7 @@ class AuthenticationFlowTests(TestCase):
             reverse("auth_register"),
             data={
                 "name": "Sohel Rana",
+                "username": "sohelrana",
                 "email": "sohel@example.com",
                 "password": "StrongPass@123",
                 "confirm_password": "WrongPass@123",
@@ -835,6 +883,28 @@ class AuthenticationFlowTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Passwords do not match.")
         self.assertFalse(User.objects.filter(email="sohel@example.com").exists())
+
+    def test_register_rejects_duplicate_username_after_trimming(self):
+        User.objects.create_user(
+            username="member-user",
+            email="member@example.com",
+            password="StrongPass@123",
+        )
+
+        response = self.client.post(
+            reverse("auth_register"),
+            data={
+                "name": "Another Member",
+                "username": " member-user ",
+                "email": "another@example.com",
+                "password": "StrongPass@123",
+                "confirm_password": "StrongPass@123",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "An account with this username already exists.")
+        self.assertFalse(User.objects.filter(email="another@example.com").exists())
 
     def test_login_uses_username_and_password(self):
         user = User.objects.create_user(
@@ -870,6 +940,7 @@ class AuthenticationFlowTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Invalid username or password.")
         self.assertNotIn("_auth_user_id", self.client.session)
 
     def test_login_rejects_wrong_password(self):
@@ -888,7 +959,21 @@ class AuthenticationFlowTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Invalid username or password.")
         self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_default_superuser_uses_a_username_separate_from_its_email(self):
+        from sitepages.apps import SitepagesConfig
+        from sitepages.signals import (
+            SUPERUSER_EMAIL,
+            SUPERUSER_USERNAME,
+            seed_default_auth_records,
+        )
+
+        seed_default_auth_records(sender=SitepagesConfig)
+
+        user = User.objects.get(email=SUPERUSER_EMAIL)
+        self.assertEqual(user.username, SUPERUSER_USERNAME)
 
     def test_login_rejects_inactive_user(self):
         user = User.objects.create_user(

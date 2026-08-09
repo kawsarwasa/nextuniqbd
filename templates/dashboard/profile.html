@@ -25,11 +25,12 @@
                 <div class="dashboard-profile-panel text-center">
                   <img
                     src="{% if dashboard_profile.image %}{{ dashboard_profile.image.url }}{% else %}{% static 'dashboard/assets/img/user2-160x160.jpg' %}{% endif %}"
-                    alt="{{ dashboard_profile_display_name }}"
+                    alt="{{ request.user.get_full_name|default:request.user.username }}"
                     class="dashboard-profile-avatar"
                   >
-                  <div class="fw-semibold mt-3">{{ dashboard_profile_display_name }}</div>
-                  <div class="text-muted small">{{ request.user.email }}</div>
+                  <div class="fw-semibold mt-3">{{ request.user.get_full_name|default:request.user.username }}</div>
+                  <div class="text-muted small">@{{ request.user.username }}</div>
+                  <a class="text-muted small" href="mailto:{{ request.user.email }}">{{ request.user.email }}</a>
                 </div>
               </div>
               <div class="col-lg-8">
@@ -44,6 +45,13 @@
                   <label class="form-label" for="{{ profile_form.name.id_for_label }}">Name</label>
                   {{ profile_form.name }}
                   {% for error in profile_form.name.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                  {% endfor %}
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="{{ profile_form.username.id_for_label }}">Username</label>
+                  {{ profile_form.username }}
+                  {% for error in profile_form.username.errors %}
                     <div class="invalid-feedback d-block">{{ error }}</div>
                   {% endfor %}
                 </div>

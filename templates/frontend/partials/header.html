@@ -27,6 +27,17 @@
     </form>
 
     <div class="header-actions">
+      <div class="header-auth">
+        {% if request.user.is_authenticated %}
+          <a href="{% if request.user.is_superuser or perms.auth.view_user or perms.category.view_category or perms.category.view_brand or perms.category.view_product or perms.purchase.view_purchase or perms.sitepages.view_order or perms.blog.view_blogpost or perms.sitepages.view_heroslide or perms.company.view_companyprofile %}{% url 'dashboard_home' %}{% else %}{% url 'frontend_home' %}{% endif %}">
+            <i class="fa fa-user"></i>
+            <span>{{ request.user.username }}</span>
+          </a>
+        {% else %}
+          <a href="{% url 'auth_login' %}"><i class="fa fa-sign-in"></i><span>Login</span></a>
+          <a href="{% url 'auth_register' %}"><i class="fa fa-user-plus"></i><span>Register</span></a>
+        {% endif %}
+      </div>
       <div class="action-item cart-icon">
         <a href="{% url 'frontend_cart' %}" class="cart-page-link" aria-label="View cart">
           <i class="fa fa-shopping-cart"></i>
