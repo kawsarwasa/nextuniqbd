@@ -648,12 +648,12 @@ small {
    ============================================= */
 .hero-section { position: relative; overflow: hidden; }
 
-.hero-carousel { position: relative; height: 560px; }
+.hero-carousel { position: relative; aspect-ratio: 7 / 3; }
 
 .hero-slide {
   position: absolute;
   inset: 0;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0;
@@ -2153,7 +2153,6 @@ small {
   .header-inner { gap: 12px; }
   .site-logo-mark { flex-basis: 52px; width: 52px; height: 52px; }
   .header .logo .site-logo-link { font-size: 19px; }
-  .hero-carousel { height: 400px; }
   .hero-content h1 { font-size: 30px; }
   .features-grid { grid-template-columns: repeat(2, 1fr); }
   .categories-grid { grid-template-columns: repeat(2, 1fr); }

@@ -163,6 +163,9 @@ class HeroSlideDashboardTests(DashboardAuthMixin, TestCase):
                     title="Summer Sale",
                     image=SimpleUploadedFile("test.jpg", image_buffer.getvalue(), content_type="image/jpeg"),
                 )
+                with Image.open(slide.image.path) as processed_image:
+                    self.assertEqual(processed_image.size, HeroSlide.IMAGE_SIZE)
+                    self.assertEqual(processed_image.format, "JPEG")
 
         self.assertEqual(slide.slug, "summer-hero")
 

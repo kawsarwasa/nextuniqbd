@@ -68,6 +68,7 @@
               <div class="col-12">
                 <label for="{{ form.image.id_for_label }}" class="form-label">Slide Image</label>
                 {{ form.image }}
+                <div class="form-text">Recommended image size: 1400 × 600 px (7:3 ratio). Other image sizes will be automatically cropped and resized.</div>
                 {% if form.image.help_text %}
                   <div class="form-text">{{ form.image.help_text }}</div>
                 {% endif %}
