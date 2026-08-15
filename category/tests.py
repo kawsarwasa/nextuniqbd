@@ -1,15 +1,17 @@
-from io import BytesIO
+from io import BytesIO, StringIO
 from tempfile import TemporaryDirectory
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import Permission
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.urls import reverse
 from PIL import Image
 
 from .forms import ProductForm
-from .image_derivatives import product_image_variant_name
+from .image_derivatives import product_image_legacy_derivative_name, product_image_optimized_name
 from .models import Brand, Category, Product, ProductImage, ProductReview, StockTransaction
 
 
@@ -29,30 +31,32 @@ class ProductFormTests(TestCase):
         self.assertIn("is_featured", form.fields)
         self.assertFalse(form.fields["is_featured"].initial)
 
-    def test_form_accepts_manual_sku_and_normalizes_availability(self):
-        form = ProductForm(
-            data={
-                "category": self.category.pk,
-                "name": "Wireless Mouse",
-                "regular_price": "1200",
-                "current_price": "999",
-                "sku": "nubabc123xyz",
-                "brand": self.brand.pk,
-                "status": Product.Status.PUBLISHED,
-                "availability": ProductForm.AVAILABILITY_OUT_OF_STOCK,
-                "track_stock": "on",
-                "stock_quantity": "0",
-                "low_stock_threshold": "5",
-                "short_description": "Compact mouse",
-                "full_description_html": "<p>Compact mouse</p>",
-            }
-        )
+    def test_form_accepts_flexible_case_preserving_skus(self):
+        for sku in ("NUB123", "NUBabc", "NUBAb12", "NUBxyz45", "NUB10001"):
+            with self.subTest(sku=sku):
+                form = ProductForm(
+                    data={
+                        "category": self.category.pk,
+                        "name": "Wireless Mouse",
+                        "regular_price": "1200",
+                        "current_price": "999",
+                        "sku": sku,
+                        "brand": self.brand.pk,
+                        "status": Product.Status.PUBLISHED,
+                        "availability": ProductForm.AVAILABILITY_OUT_OF_STOCK,
+                        "track_stock": "on",
+                        "stock_quantity": "0",
+                        "low_stock_threshold": "5",
+                        "short_description": "Compact mouse",
+                        "full_description_html": "<p>Compact mouse</p>",
+                    }
+                )
 
-        self.assertTrue(form.is_valid(), form.errors)
-        self.assertEqual(form.cleaned_data["availability"], ProductForm.AVAILABILITY_OUT_OF_STOCK)
-        self.assertEqual(form.cleaned_data["sku"], "NUBABC123XYZ")
+                self.assertTrue(form.is_valid(), form.errors)
+                self.assertEqual(form.cleaned_data["availability"], ProductForm.AVAILABILITY_OUT_OF_STOCK)
+                self.assertEqual(form.cleaned_data["sku"], sku)
 
-    def test_form_requires_nine_manual_sku_characters_after_prefix(self):
+    def test_form_requires_a_sku_suffix(self):
         form = ProductForm(
             data={
                 "category": self.category.pk,
@@ -72,7 +76,29 @@ class ProductFormTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertIn("sku", form.errors)
+        self.assertEqual(form.errors["sku"], ["Enter at least one letter or number after NUB."])
+
+    def test_form_rejects_sku_without_nub_prefix(self):
+        form = ProductForm(
+            data={
+                "category": self.category.pk,
+                "name": "Wireless Mouse",
+                "regular_price": "1200",
+                "current_price": "999",
+                "sku": "ABC123",
+                "brand": self.brand.pk,
+                "status": Product.Status.PUBLISHED,
+                "availability": ProductForm.AVAILABILITY_IN_STOCK,
+                "track_stock": "on",
+                "stock_quantity": "0",
+                "low_stock_threshold": "5",
+                "short_description": "Compact mouse",
+                "full_description_html": "<p>Compact mouse</p>",
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["sku"], ["SKU must start with NUB."])
 
     def test_form_rejects_duplicate_manual_sku_on_create(self):
         Product.objects.create(
@@ -104,7 +130,7 @@ class ProductFormTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertIn("sku", form.errors)
+        self.assertIn("A product with this SKU already exists.", form.errors["sku"])
 
     def test_edit_form_allows_manual_sku_update(self):
         product = Product.objects.create(
@@ -138,6 +164,39 @@ class ProductFormTests(TestCase):
 
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.cleaned_data["sku"], "NUBDEF456UVW")
+
+    def test_edit_form_allows_its_existing_sku(self):
+        product = Product.objects.create(
+            category=self.category,
+            brand=self.brand,
+            name="Existing Mouse",
+            regular_price="1200",
+            current_price="999",
+            sku="NUBabc",
+            status=Product.Status.PUBLISHED,
+            availability=ProductForm.AVAILABILITY_IN_STOCK,
+        )
+        form = ProductForm(
+            data={
+                "category": self.category.pk,
+                "name": "Existing Mouse",
+                "regular_price": "1200",
+                "current_price": "999",
+                "sku": "NUBabc",
+                "brand": self.brand.pk,
+                "status": Product.Status.PUBLISHED,
+                "availability": ProductForm.AVAILABILITY_IN_STOCK,
+                "track_stock": "on",
+                "stock_quantity": "0",
+                "low_stock_threshold": "5",
+                "short_description": "Compact mouse",
+                "full_description_html": "<p>Compact mouse</p>",
+            },
+            instance=product,
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["sku"], "NUBabc")
 
     def test_form_rejects_negative_stock_values(self):
         form = ProductForm(
@@ -176,7 +235,7 @@ class ProductModelTests(TestCase):
             availability="",
         )
 
-        self.assertRegex(product.sku, r"^NUB[A-Z0-9]{9}$")
+        self.assertRegex(product.sku, r"^NUB[A-Za-z0-9]+$")
 
         another_product = Product.objects.create(
             category=category,
@@ -188,7 +247,7 @@ class ProductModelTests(TestCase):
             availability="",
         )
 
-        self.assertRegex(another_product.sku, r"^NUB[A-Z0-9]{9}$")
+        self.assertRegex(another_product.sku, r"^NUB[A-Za-z0-9]+$")
         self.assertNotEqual(product.sku, another_product.sku)
 
     def test_product_save_replaces_invalid_manual_sku(self):
@@ -203,7 +262,21 @@ class ProductModelTests(TestCase):
             availability="In Stock",
         )
 
-        self.assertRegex(product.sku, r"^NUB[A-Z0-9]{9}$")
+        self.assertRegex(product.sku, r"^NUB[A-Za-z0-9]+$")
+
+    def test_product_save_preserves_valid_manually_entered_sku_case(self):
+        category = Category.objects.create(name="Accessories")
+        product = Product.objects.create(
+            category=category,
+            name="Travel Bag",
+            regular_price="100",
+            current_price="80",
+            sku="NUBAb12",
+            status=Product.Status.DRAFT,
+            availability="In Stock",
+        )
+
+        self.assertEqual(product.sku, "NUBAb12")
 
     def test_product_review_properties_reflect_related_reviews(self):
         category = Category.objects.create(name="Home")
@@ -751,26 +824,80 @@ class ProductImageDerivativeTests(TestCase):
         Image.new("RGB", (width, height), "#ff5c00").save(output, format="PNG")
         return SimpleUploadedFile("product.png", output.getvalue(), content_type="image/png")
 
-    def test_creates_size_limited_webp_derivatives_without_replacing_original(self):
-        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image())
+    def test_creates_one_optimized_webp_without_replacing_original(self):
+        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image(1200, 900))
         storage = product_image.image.storage
-        card_name = product_image_variant_name(product_image.image.name, "card")
-        detail_name = product_image_variant_name(product_image.image.name, "detail")
+        optimized_name = product_image_optimized_name(product_image.image.name)
+        card_name = product_image_legacy_derivative_name(product_image.image.name, "card")
+        detail_name = product_image_legacy_derivative_name(product_image.image.name, "detail")
 
         self.assertTrue(storage.exists(product_image.image.name))
-        self.assertTrue(storage.exists(card_name))
-        self.assertTrue(storage.exists(detail_name))
-        self.assertIn(".card.webp", product_image.card_url)
-        self.assertIn(".detail.webp", product_image.detail_url)
+        self.assertTrue(storage.exists(optimized_name))
+        self.assertFalse(storage.exists(card_name))
+        self.assertFalse(storage.exists(detail_name))
+        self.assertIn(".optimized.webp", product_image.optimized_url)
+        self.assertEqual(product_image.card_url, product_image.optimized_url)
+        self.assertEqual(product_image.detail_url, product_image.optimized_url)
 
-        with storage.open(card_name, "rb") as card_file:
-            with Image.open(card_file) as card_image:
-                self.assertLessEqual(card_image.width, 400)
-                self.assertLessEqual(card_image.height, 400)
+        with storage.open(optimized_name, "rb") as optimized_file:
+            with Image.open(optimized_file) as optimized_image:
+                self.assertLessEqual(optimized_image.width, 800)
+                self.assertLessEqual(optimized_image.height, 800)
 
-    def test_card_url_falls_back_to_original_when_derivative_is_missing(self):
+    def test_optimized_url_falls_back_to_original_when_derivative_is_missing(self):
         product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image(120, 80))
         storage = product_image.image.storage
-        storage.delete(product_image_variant_name(product_image.image.name, "card"))
+        storage.delete(product_image_optimized_name(product_image.image.name))
 
+        self.assertEqual(product_image.optimized_url, product_image.image.url)
         self.assertEqual(product_image.card_url, product_image.image.url)
+        self.assertEqual(product_image.detail_url, product_image.image.url)
+
+    def test_deleting_image_removes_original_and_optimized_derivative(self):
+        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image())
+        storage = product_image.image.storage
+        image_name = product_image.image.name
+        optimized_name = product_image_optimized_name(image_name)
+
+        product_image.delete()
+
+        self.assertFalse(storage.exists(image_name))
+        self.assertFalse(storage.exists(optimized_name))
+
+    def test_legacy_cleanup_only_removes_known_legacy_derivatives(self):
+        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image())
+        storage = product_image.image.storage
+        image_name = product_image.image.name
+        optimized_name = product_image_optimized_name(image_name)
+        card_name = product_image_legacy_derivative_name(image_name, "card")
+        detail_name = product_image_legacy_derivative_name(image_name, "detail")
+        storage.save(card_name, ContentFile(b"legacy card"))
+        storage.save(detail_name, ContentFile(b"legacy detail"))
+
+        dry_run_output = StringIO()
+        call_command("cleanup_legacy_product_image_derivatives", stdout=dry_run_output)
+
+        self.assertIn("planned removal of 2 legacy derivatives", dry_run_output.getvalue())
+        self.assertTrue(storage.exists(image_name))
+        self.assertTrue(storage.exists(optimized_name))
+        self.assertTrue(storage.exists(card_name))
+        self.assertTrue(storage.exists(detail_name))
+
+        call_command("cleanup_legacy_product_image_derivatives", "--write", stdout=StringIO())
+
+        self.assertTrue(storage.exists(image_name))
+        self.assertTrue(storage.exists(optimized_name))
+        self.assertFalse(storage.exists(card_name))
+        self.assertFalse(storage.exists(detail_name))
+
+    def test_rebuild_command_creates_missing_optimized_derivative(self):
+        product_image = ProductImage.objects.create(product=self.product, image=self.uploaded_image())
+        storage = product_image.image.storage
+        optimized_name = product_image_optimized_name(product_image.image.name)
+        storage.delete(optimized_name)
+
+        output = StringIO()
+        call_command("rebuild_product_image_derivatives", stdout=output)
+
+        self.assertIn("generated 1 optimized derivatives", output.getvalue())
+        self.assertTrue(storage.exists(optimized_name))

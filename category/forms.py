@@ -140,14 +140,9 @@ class ProductForm(forms.ModelForm):
             "current_price": forms.NumberInput(attrs={"class": "form-control", "step": "0.01", "min": "0"}),
             "sku": forms.TextInput(
                 attrs={
-                    "class": "form-control text-uppercase js-sku-input",
-                    "placeholder": "NUBXXXXXXXXX",
-                    "maxlength": str(Product.SKU_LENGTH),
-                    "minlength": str(Product.SKU_LENGTH),
-                    "pattern": f"{Product.SKU_PREFIX}[A-Z0-9]{{{Product.SKU_RANDOM_LENGTH}}}",
+                    "class": "form-control",
+                    "placeholder": "NUBabc123",
                     "autocomplete": "off",
-                    "data-sku-prefix": Product.SKU_PREFIX,
-                    "data-sku-suffix-length": str(Product.SKU_RANDOM_LENGTH),
                 }
             ),
             "brand": forms.Select(
@@ -200,16 +195,14 @@ class ProductForm(forms.ModelForm):
         return cls.AVAILABILITY_IN_STOCK
 
     def clean_sku(self):
-        sku = (self.cleaned_data.get("sku") or "").strip().upper()
+        sku = (self.cleaned_data.get("sku") or "").strip()
         prefix = Product.SKU_PREFIX
         suffix = sku[len(prefix):] if sku.startswith(prefix) else ""
 
         if not sku.startswith(prefix):
             raise forms.ValidationError(f"SKU must start with {prefix}.")
-        if len(suffix) != Product.SKU_RANDOM_LENGTH:
-            raise forms.ValidationError(
-                f"Enter exactly {Product.SKU_RANDOM_LENGTH} letters or numbers after {prefix}."
-            )
+        if not suffix:
+            raise forms.ValidationError(f"Enter at least one letter or number after {prefix}.")
         if not all(character in Product.SKU_ALPHABET for character in suffix):
             raise forms.ValidationError("SKU suffix can only contain letters and numbers.")
 

@@ -16,7 +16,7 @@ HTTPS redirect and secure cookies default on when debug is false. Enable `DJANGO
 
 ## Compression and caching
 
-Enable gzip and Brotli at the reverse proxy/CDN for HTML, CSS, JavaScript, SVG and JSON. Manifest static storage creates content-hashed filenames; serve those with `Cache-Control: public, max-age=31536000, immutable`. Give HTML short/no-cache policy and user uploads an application-appropriate policy. WhiteNoise is intentionally not added because the existing Passenger/Apache-style deployment can serve static files more efficiently; add it only when no external static server exists.
+Enable gzip and Brotli at the reverse proxy/CDN for HTML, CSS, JavaScript, SVG and JSON. WhiteNoise's compressed manifest storage creates content-hashed filenames; serve those with `Cache-Control: public, max-age=31536000, immutable`. Give HTML short/no-cache policy and user uploads an application-appropriate policy. WhiteNoise serves collected static files when Apache/cPanel is not configured to serve them directly.
 
 ## Media maintenance and images
 

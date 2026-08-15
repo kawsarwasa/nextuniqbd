@@ -1,4 +1,4 @@
-"""Non-destructive image derivatives for storefront product media."""
+"""Non-destructive optimized images for storefront product media."""
 
 from io import BytesIO
 from pathlib import PurePosixPath
@@ -7,82 +7,86 @@ from django.core.files.base import ContentFile
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 
-PRODUCT_IMAGE_VARIANTS = {
-    "card": (400, 400),
-    "detail": (1000, 1000),
-}
+PRODUCT_IMAGE_MAX_SIZE = (800, 800)
 WEBP_QUALITY = 82
+LEGACY_PRODUCT_IMAGE_VARIANTS = ("card", "detail")
 
 
-def product_image_variant_name(source_name, variant):
-    """Return the storage-relative name of a product-image WebP derivative."""
-    if variant not in PRODUCT_IMAGE_VARIANTS:
-        raise ValueError(f"Unknown product image variant: {variant}")
+def product_image_optimized_name(source_name):
+    """Return the storage-relative name of a product image's optimized WebP."""
+    source_path = PurePosixPath(source_name)
+    return str(source_path.with_name(f"{source_path.stem}.optimized.webp"))
+
+
+def product_image_legacy_derivative_name(source_name, variant):
+    """Return a known legacy derivative name for targeted cleanup only."""
+    if variant not in LEGACY_PRODUCT_IMAGE_VARIANTS:
+        raise ValueError(f"Unknown legacy product image variant: {variant}")
 
     source_path = PurePosixPath(source_name)
     return str(source_path.with_name(f"{source_path.stem}.{variant}.webp"))
 
 
-def product_image_variant_url(image_field, variant):
-    """Use an existing derivative when available, otherwise retain the original."""
+def product_image_optimized_url(image_field):
+    """Use the optimized image when available, otherwise retain the original."""
     if not image_field or not image_field.name:
         return ""
 
-    derivative_name = product_image_variant_name(image_field.name, variant)
+    optimized_name = product_image_optimized_name(image_field.name)
     storage = image_field.storage
-    if storage.exists(derivative_name):
-        return storage.url(derivative_name)
+    if storage.exists(optimized_name):
+        return storage.url(optimized_name)
     return image_field.url
 
 
-def generate_product_image_derivatives(image_field, *, force=False):
-    """Create size-limited WebP sidecars without modifying the uploaded original.
+def generate_product_image_derivative(image_field, *, force=False):
+    """Create one size-limited WebP sidecar without changing the original upload.
 
-    The helper deliberately skips unavailable, animated, and unreadable files. That
-    makes old database rows and remote-storage failures fall back safely to the
-    original image URL.
+    Unavailable, animated, and unreadable images are intentionally skipped so the
+    storefront can use the original image as a safe fallback.
     """
     if not image_field or not image_field.name:
-        return {}
+        return None
 
     storage = image_field.storage
+    target_name = product_image_optimized_name(image_field.name)
+    if storage.exists(target_name) and not force:
+        return storage.url(target_name)
+
     try:
         with storage.open(image_field.name, "rb") as source_file:
             with Image.open(source_file) as opened:
                 if getattr(opened, "is_animated", False):
-                    return {}
+                    return None
+
                 source = ImageOps.exif_transpose(opened)
                 try:
-                    if source.mode not in {"RGB", "RGBA"}:
-                        normalized = source.convert("RGBA" if "A" in source.getbands() else "RGB")
+                    has_transparency = "A" in source.getbands() or "transparency" in source.info
+                    target_mode = "RGBA" if has_transparency else "RGB"
+                    if source.mode != target_mode:
+                        normalized = source.convert(target_mode)
                         source.close()
                         source = normalized
 
-                    generated = {}
-                    for variant, max_size in PRODUCT_IMAGE_VARIANTS.items():
-                        target_name = product_image_variant_name(image_field.name, variant)
-                        if storage.exists(target_name) and not force:
-                            generated[variant] = storage.url(target_name)
-                            continue
-
-                        # Storage backends usually avoid overwriting an existing
-                        # name.  Explicitly replace only the derivative when
-                        # --force is requested; uploaded originals stay intact.
+                    derived = source.copy()
+                    output = BytesIO()
+                    try:
+                        derived.thumbnail(PRODUCT_IMAGE_MAX_SIZE, Image.Resampling.LANCZOS)
+                        derived.save(output, format="WEBP", quality=WEBP_QUALITY, method=6)
                         if force and storage.exists(target_name):
                             storage.delete(target_name)
-
-                        derived = source.copy()
-                        derived.thumbnail(max_size, Image.Resampling.LANCZOS)
-                        output = BytesIO()
-                        try:
-                            derived.save(output, format="WEBP", quality=WEBP_QUALITY, method=6)
-                            storage.save(target_name, ContentFile(output.getvalue()))
-                            generated[variant] = storage.url(target_name)
-                        finally:
-                            output.close()
-                            derived.close()
-                    return generated
+                        storage.save(target_name, ContentFile(output.getvalue()))
+                        return storage.url(target_name)
+                    finally:
+                        output.close()
+                        derived.close()
                 finally:
                     source.close()
-    except (FileNotFoundError, OSError, UnidentifiedImageError):
-        return {}
+    except (FileNotFoundError, OSError, UnidentifiedImageError, ValueError):
+        return None
+
+
+def generate_product_image_derivatives(image_field, *, force=False):
+    """Compatibility wrapper for callers using the previous plural helper."""
+    optimized_url = generate_product_image_derivative(image_field, force=force)
+    return {"optimized": optimized_url} if optimized_url else {}

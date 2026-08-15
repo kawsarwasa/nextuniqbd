@@ -52,7 +52,7 @@
               <div class="col-md-6">
                 <label for="{{ form.sku.id_for_label }}" class="form-label">SKU</label>
                 {{ form.sku }}
-                <div class="form-text">Keep NUB and enter exactly 9 letters or numbers after it.</div>
+                <div class="form-text">SKU must start with NUB, followed by at least one letter or number.</div>
                 {% if form.sku.errors %}
                   <div class="text-danger small mt-1">{{ form.sku.errors|join:", " }}</div>
                 {% endif %}
@@ -223,7 +223,6 @@
       const removeImageInputs = Array.from(document.querySelectorAll('input[name="remove_images"]'));
       const availabilityInputs = Array.from(document.querySelectorAll('input[name="{{ form.availability.html_name }}"]'));
       const searchableSelects = Array.from(document.querySelectorAll('.js-searchable-select'));
-      const skuInput = document.querySelector('.js-sku-input');
 
       if (!editorElement || !hiddenInput || !form) {
         return;
@@ -248,46 +247,6 @@
       form.addEventListener('submit', () => {
         hiddenInput.value = quill.root.innerHTML;
       });
-
-      if (skuInput) {
-        const skuPrefix = skuInput.dataset.skuPrefix || 'NUB';
-        const suffixLength = Number(skuInput.dataset.skuSuffixLength || 9);
-        const maxLength = skuPrefix.length + suffixLength;
-
-        const normalizeSku = () => {
-          const value = skuInput.value.toUpperCase();
-          const rawSuffix = value.startsWith(skuPrefix) ? value.slice(skuPrefix.length) : value;
-          const suffix = rawSuffix
-            .replace(/[^A-Z0-9]/g, '')
-            .slice(0, suffixLength);
-
-          skuInput.value = `${skuPrefix}${suffix}`;
-        };
-
-        normalizeSku();
-
-        skuInput.addEventListener('input', normalizeSku);
-        skuInput.addEventListener('focus', () => {
-          normalizeSku();
-          if (skuInput.selectionStart < skuPrefix.length) {
-            skuInput.setSelectionRange(skuPrefix.length, skuInput.value.length);
-          }
-        });
-        skuInput.addEventListener('keydown', (event) => {
-          const selectionStart = skuInput.selectionStart || 0;
-          const selectionEnd = skuInput.selectionEnd || 0;
-          const isDeletingPrefix =
-            (event.key === 'Backspace' && selectionStart <= skuPrefix.length && selectionEnd <= skuPrefix.length) ||
-            (event.key === 'Delete' && selectionStart < skuPrefix.length);
-
-          if (isDeletingPrefix) {
-            event.preventDefault();
-            skuInput.setSelectionRange(skuPrefix.length, skuPrefix.length);
-          }
-        });
-        skuInput.addEventListener('blur', normalizeSku);
-        skuInput.maxLength = maxLength;
-      }
 
       availabilityInputs.forEach((input) => {
         input.addEventListener('change', () => {

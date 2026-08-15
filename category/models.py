@@ -13,7 +13,11 @@ from django.dispatch import receiver
 from django.template.defaultfilters import slugify
 from PIL import Image, ImageOps
 
-from .image_derivatives import generate_product_image_derivatives, product_image_variant_url
+from .image_derivatives import (
+    generate_product_image_derivative,
+    product_image_optimized_name,
+    product_image_optimized_url,
+)
 
 
 class Category(models.Model):
@@ -206,9 +210,8 @@ class Brand(models.Model):
 
 class Product(models.Model):
     SKU_PREFIX = "NUB"
-    SKU_LENGTH = 12
-    SKU_RANDOM_LENGTH = SKU_LENGTH - len(SKU_PREFIX)
-    SKU_ALPHABET = string.ascii_uppercase + string.digits
+    SKU_ALPHABET = string.ascii_letters + string.digits
+    GENERATED_SKU_SUFFIX_LENGTH = 8
 
     class Status(models.TextChoices):
         DRAFT = "draft", "Draft"
@@ -231,7 +234,7 @@ class Product(models.Model):
     slug = models.SlugField(max_length=275, unique=True, blank=True)
     regular_price = models.DecimalField(max_digits=12, decimal_places=2)
     current_price = models.DecimalField(max_digits=12, decimal_places=2)
-    sku = models.CharField(max_length=SKU_LENGTH, unique=True)
+    sku = models.CharField(max_length=64, unique=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     is_featured = models.BooleanField(default=False)
     availability = models.CharField(max_length=100, blank=True)
@@ -291,16 +294,17 @@ class Product(models.Model):
     @classmethod
     def generate_sku_candidate(cls):
         suffix = "".join(
-            secrets.choice(cls.SKU_ALPHABET) for _ in range(cls.SKU_RANDOM_LENGTH)
+            secrets.choice(cls.SKU_ALPHABET) for _ in range(cls.GENERATED_SKU_SUFFIX_LENGTH)
         )
         return f"{cls.SKU_PREFIX}{suffix}"
 
     @classmethod
     def is_valid_sku(cls, value):
-        if not isinstance(value, str) or len(value) != cls.SKU_LENGTH:
+        if not isinstance(value, str) or not value.startswith(cls.SKU_PREFIX):
             return False
-        return value.startswith(cls.SKU_PREFIX) and all(
-            character in cls.SKU_ALPHABET for character in value[len(cls.SKU_PREFIX):]
+        suffix = value[len(cls.SKU_PREFIX):]
+        return bool(suffix) and len(value) <= cls._meta.get_field("sku").max_length and all(
+            character in cls.SKU_ALPHABET for character in suffix
         )
 
     @classmethod
@@ -453,12 +457,16 @@ class ProductImage(models.Model):
         return f"{self.product.name} image {self.pk}"
 
     @property
+    def optimized_url(self):
+        return product_image_optimized_url(self.image)
+
+    @property
     def card_url(self):
-        return product_image_variant_url(self.image, "card")
+        return self.optimized_url
 
     @property
     def detail_url(self):
-        return product_image_variant_url(self.image, "detail")
+        return self.optimized_url
 
     def save(self, *args, **kwargs):
         image_changed = bool(self.image) and (
@@ -468,7 +476,7 @@ class ProductImage(models.Model):
         )
         super().save(*args, **kwargs)
         if image_changed:
-            generate_product_image_derivatives(self.image)
+            generate_product_image_derivative(self.image)
 
 
 class ProductReview(models.Model):
@@ -512,7 +520,7 @@ def delete_product_image_file(sender, instance, **kwargs):
     if not instance.image or not instance.image.name:
         return
 
-    # Keep sidecar variants in sync with their source image.  Check for another
+    # Keep the optimized sidecar in sync with its source image. Check for another
     # record using the same file name before removing anything from storage.
     if ProductImage.objects.filter(image=instance.image.name).exists():
         return
@@ -520,8 +528,7 @@ def delete_product_image_file(sender, instance, **kwargs):
     storage = instance.image.storage
     for name in (
         instance.image.name,
-        product_image_variant_name(instance.image.name, "card"),
-        product_image_variant_name(instance.image.name, "detail"),
+        product_image_optimized_name(instance.image.name),
     ):
         if storage.exists(name):
             storage.delete(name)
