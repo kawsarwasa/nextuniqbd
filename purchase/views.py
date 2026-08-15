@@ -12,7 +12,7 @@ from sitepages.permissions import DashboardPermissionMixin
 
 from .forms import PurchaseForm, PurchaseItemEditFormSet, PurchaseItemForm, PurchaseItemFormSet
 from .models import Purchase
-from .services import reverse_received_purchase_stock, sync_received_purchase_stock
+from .services import delete_received_purchase, sync_received_purchase_stock
 
 
 def build_purchase_dashboard_stats():
@@ -49,7 +49,7 @@ class PurchaseDashboardMixin(DashboardPermissionMixin):
 
 class PurchaseListView(PurchaseDashboardMixin, ListView):
     context_object_name = "purchases"
-    paginate_by = 30
+    paginate_by = 20
     template_name = "dashboard/purchases/list.html"
 
     def get_queryset(self):
@@ -174,8 +174,7 @@ class PurchaseDeleteView(DashboardPermissionMixin, View):
             with transaction.atomic():
                 purchase = get_object_or_404(Purchase.objects.select_for_update(), pk=pk)
                 purchase_label = purchase.purchase_id
-                reverse_received_purchase_stock(purchase.pk, user=request.user)
-                purchase.delete()
+                delete_received_purchase(purchase.pk, user=request.user)
         except ValidationError as error:
             messages.error(request, error.messages[0])
             return redirect("dashboard_purchase_list")

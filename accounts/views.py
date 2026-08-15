@@ -61,7 +61,7 @@ class DashboardProfileView(DashboardAccessMixin, View):
 class DashboardUserListView(DashboardPermissionMixin, ListView):
     model = User
     context_object_name = "users"
-    paginate_by = 12
+    paginate_by = 20
     permission_required = "auth.view_user"
     template_name = "dashboard/users/list.html"
 
@@ -146,14 +146,18 @@ class DashboardRoleListView(DashboardPermissionMixin, View):
     def get(self, request):
         edit_role = self.get_edit_role(request.GET.get("edit"))
         form = RoleForm(role=edit_role)
-        return render(request, self.template_name, build_dashboard_role_list_context(form, edit_role))
+        return render(
+            request,
+            self.template_name,
+            build_dashboard_role_list_context(form, edit_role, request=request, page_number=request.GET.get("page")),
+        )
 
     def post(self, request):
         edit_role = self.get_edit_role(request.POST.get("role_id"))
         if edit_role and get_role_profile(edit_role).is_system and request.POST.get("action") == "delete":
             messages.error(request, "System roles cannot be deleted.")
             form = RoleForm(role=edit_role)
-            return render(request, self.template_name, build_dashboard_role_list_context(form, edit_role))
+            return render(request, self.template_name, build_dashboard_role_list_context(form, edit_role, request=request))
 
         if request.POST.get("action") == "delete" and edit_role:
             edit_role.delete()
@@ -165,7 +169,7 @@ class DashboardRoleListView(DashboardPermissionMixin, View):
             form.save()
             messages.success(request, "Role saved successfully.", extra_tags="toast-edit")
             return redirect("dashboard_role_list")
-        return render(request, self.template_name, build_dashboard_role_list_context(form, edit_role))
+        return render(request, self.template_name, build_dashboard_role_list_context(form, edit_role, request=request))
 
 
 class DashboardRoleStatusToggleView(DashboardPermissionMixin, View):

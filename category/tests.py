@@ -1,3 +1,4 @@
+from datetime import timedelta
 from io import BytesIO, StringIO
 from tempfile import TemporaryDirectory
 
@@ -9,6 +10,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
 from PIL import Image
+
+from purchase.models import Purchase, PurchaseItem, PurchaseStockApplication
+from purchase.services import sync_received_purchase_stock
+from sitepages.models import Order, OrderItem, OrderStatusHistory, Sale, SaleItem
 
 from .forms import ProductForm
 from .image_derivatives import product_image_legacy_derivative_name, product_image_optimized_name
@@ -348,7 +353,7 @@ class ProductListPaginationTests(TestCase):
             password="test-password",
         )
         self.client.force_login(self.user)
-        for index in range(11):
+        for index in range(21):
             Product.objects.create(
                 category=self.category,
                 name=f"Page Product {index}",
@@ -357,15 +362,68 @@ class ProductListPaginationTests(TestCase):
                 sku=f"NUBPAGE{index:05d}",
             )
 
-    def test_product_list_shows_ten_products_per_page_with_numbered_navigation(self):
+    def test_product_list_shows_twenty_products_per_page_with_numbered_navigation(self):
         response = self.client.get(reverse("dashboard_product_list"))
         second_page = self.client.get(reverse("dashboard_product_list"), {"page": 2})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context["products"]), 10)
+        self.assertEqual(len(response.context["products"]), 20)
         self.assertContains(response, "product-pagination")
         self.assertContains(response, '?page=2')
         self.assertEqual(len(second_page.context["products"]), 1)
+
+    def test_product_list_handles_an_invalid_page_without_losing_the_queryset(self):
+        response = self.client.get(reverse("dashboard_product_list"), {"page": "not-a-page"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["products"]), 20)
+
+    def test_active_products_are_newest_first_before_inactive_products(self):
+        Product.objects.all().delete()
+        active_old = Product.objects.create(
+            category=self.category,
+            name="Active old",
+            regular_price="100",
+            current_price="90",
+            sku="NUBACTIVEOLD",
+            status=Product.Status.PUBLISHED,
+        )
+        active_new = Product.objects.create(
+            category=self.category,
+            name="Active new",
+            regular_price="100",
+            current_price="90",
+            sku="NUBACTIVENEW",
+            status=Product.Status.DRAFT,
+        )
+        inactive_old = Product.objects.create(
+            category=self.category,
+            name="Inactive old",
+            regular_price="100",
+            current_price="90",
+            sku="NUBINACTIVEOLD",
+            status=Product.Status.INACTIVE,
+        )
+        inactive_new = Product.objects.create(
+            category=self.category,
+            name="Inactive new",
+            regular_price="100",
+            current_price="90",
+            sku="NUBINACTIVENEW",
+            status=Product.Status.INACTIVE,
+        )
+        now = timezone.now()
+        Product.objects.filter(pk=active_old.pk).update(created_at=now - timedelta(days=4))
+        Product.objects.filter(pk=active_new.pk).update(created_at=now - timedelta(days=3))
+        Product.objects.filter(pk=inactive_old.pk).update(created_at=now - timedelta(days=2))
+        Product.objects.filter(pk=inactive_new.pk).update(created_at=now - timedelta(days=1))
+
+        response = self.client.get(reverse("dashboard_product_list"))
+        product_ids = [product.pk for product in response.context["products"]]
+
+        self.assertLess(product_ids.index(active_new.pk), product_ids.index(active_old.pk))
+        self.assertLess(product_ids.index(active_old.pk), product_ids.index(inactive_new.pk))
+        self.assertLess(product_ids.index(inactive_new.pk), product_ids.index(inactive_old.pk))
 
 
 class ProductListSummaryTests(TestCase):
@@ -462,7 +520,7 @@ class ProductListFilterTests(TestCase):
                 stock_quantity=10,
                 low_stock_threshold=5,
             )
-            for index in range(11)
+            for index in range(21)
         ]
         self.low_stock_product = self.create_product(
             "Low stock product",
@@ -508,7 +566,7 @@ class ProductListFilterTests(TestCase):
         response = self.client.get(reverse("dashboard_product_list"), filters)
         second_page = self.client.get(reverse("dashboard_product_list"), {**filters, "page": 2})
 
-        self.assertEqual(len(response.context["products"]), 10)
+        self.assertEqual(len(response.context["products"]), 20)
         self.assertEqual(len(second_page.context["products"]), 1)
         self.assertEqual(response.context["filters"], filters)
         self.assertContains(
@@ -631,6 +689,41 @@ class ProductManagementActionTests(TestCase):
         data.update(kwargs)
         return Product.objects.create(**data)
 
+    @staticmethod
+    def create_order_item(product):
+        order = Order.objects.create(
+            full_name="History Customer",
+            phone="01700000000",
+            address="History address",
+            district="Dhaka",
+        )
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=product,
+            product_name=product.name,
+            product_slug=product.slug,
+            product_sku=product.sku,
+            quantity=1,
+            unit_price=product.current_price,
+            subtotal=product.current_price,
+        )
+        return order, order_item
+
+    def assert_product_is_inactivated_by_delete(self, product):
+        self.client.force_login(self.admin)
+        response = self.client.post(
+            reverse("dashboard_product_delete", args=[product.pk]),
+            follow=True,
+        )
+
+        self.assertContains(
+            response,
+            "so it was made inactive instead of being permanently deleted.",
+        )
+        product.refresh_from_db()
+        self.assertEqual(product.status, Product.Status.INACTIVE)
+        return product
+
     def test_bulk_status_action_requires_change_permission(self):
         viewer = get_user_model().objects.create_user(username="product-action-viewer", password="test-password")
         viewer.user_permissions.add(
@@ -670,7 +763,205 @@ class ProductManagementActionTests(TestCase):
         self.product.refresh_from_db()
         self.assertEqual(self.product.status, Product.Status.PUBLISHED)
         self.assertFalse(Product.objects.filter(pk=deletable_product.pk).exists())
-        self.assertTrue(Product.objects.filter(pk=protected_product.pk).exists())
+        self.assertFalse(Product.objects.filter(pk=protected_product.pk).exists())
+
+    def test_delete_with_opening_stock_permanently_deletes_product_and_its_image(self):
+        product = self.create_product("Stock history product", "NUBACTIONSTOCK")
+        StockTransaction.objects.create(
+            product=product,
+            transaction_type=StockTransaction.TransactionType.OPENING_STOCK,
+            quantity_change=1,
+            balance_after=1,
+        )
+        with TemporaryDirectory() as media_root, self.settings(MEDIA_ROOT=media_root):
+            image = ProductImage.objects.create(
+                product=product,
+                image=SimpleUploadedFile("history-image.png", b"not-an-image", content_type="image/png"),
+            )
+            image_name = image.image.name
+            storage = image.image.storage
+            product_id = product.pk
+
+            self.client.force_login(self.admin)
+            response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
+
+            self.assertContains(response, '"Stock history product" deleted successfully.')
+            self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+            self.assertFalse(StockTransaction.objects.filter(product_id=product_id).exists())
+            self.assertFalse(ProductImage.objects.filter(pk=image.pk).exists())
+            self.assertFalse(storage.exists(image_name))
+
+    def test_manual_stock_adjustment_does_not_block_product_deletion(self):
+        product = self.create_product("Manual adjustment product", "NUBACTIONMANUAL")
+        StockTransaction.objects.create(
+            product=product,
+            transaction_type=StockTransaction.TransactionType.MANUAL_ADJUSTMENT,
+            quantity_change=2,
+            balance_after=2,
+            reference="Dashboard product edit",
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
+
+        self.assertContains(response, '"Manual adjustment product" deleted successfully.')
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+
+    def test_stale_reversed_purchase_stock_rows_do_not_block_product_deletion(self):
+        product = self.create_product("Stale purchase stock product", "NUBACTIONSTALE")
+        stale_reference = "Purchase 999999999999 / item 1"
+        StockTransaction.objects.create(
+            product=product,
+            transaction_type=StockTransaction.TransactionType.PURCHASE,
+            quantity_change=1,
+            balance_after=1,
+            reference=stale_reference,
+        )
+        StockTransaction.objects.create(
+            product=product,
+            transaction_type=StockTransaction.TransactionType.PURCHASE_RETURN,
+            quantity_change=-1,
+            balance_after=0,
+            reference=stale_reference,
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
+
+        self.assertContains(response, '"Stale purchase stock product" deleted successfully.')
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+
+    def test_delete_with_purchase_history_inactivates_product_and_keeps_purchase_item(self):
+        product = self.create_product("Purchase history product", "NUBACTIONPURCHASE")
+        purchase = Purchase.objects.create()
+        purchase_item = PurchaseItem.objects.create(
+            purchase=purchase,
+            product=product,
+            product_name=product.name,
+            quantity=1,
+            unit_price="90",
+            subtotal="90",
+        )
+
+        self.assert_product_is_inactivated_by_delete(product)
+
+        purchase_item.refresh_from_db()
+        self.assertEqual(purchase_item.product_id, product.pk)
+
+    def test_product_is_permanently_deleted_after_its_received_purchase_is_deleted(self):
+        product = self.create_product("Deleted purchase product", "NUBACTIONPURCHASEDELETE")
+        purchase = Purchase.objects.create()
+        purchase_item = PurchaseItem.objects.create(
+            purchase=purchase,
+            product=product,
+            product_name=product.name,
+            quantity=3,
+            unit_price="90",
+            subtotal="270",
+        )
+        sync_received_purchase_stock(purchase.pk, user=self.admin)
+        self.client.force_login(self.admin)
+
+        purchase_response = self.client.post(reverse("dashboard_purchase_delete", args=[purchase.pk]))
+
+        self.assertEqual(purchase_response.status_code, 302)
+        self.assertFalse(Purchase.objects.filter(pk=purchase.pk).exists())
+        self.assertFalse(PurchaseItem.objects.filter(pk=purchase_item.pk).exists())
+        self.assertFalse(PurchaseStockApplication.objects.filter(purchase_id=purchase.pk).exists())
+        product.refresh_from_db()
+        self.assertEqual(product.stock_quantity, 0)
+        self.assertFalse(StockTransaction.objects.filter(product=product).exists())
+
+        product_response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]))
+
+        self.assertEqual(product_response.status_code, 302)
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+
+    def test_delete_with_order_history_inactivates_product_and_keeps_order_item(self):
+        product = self.create_product("Order history product", "NUBACTIONORDER")
+        _, order_item = self.create_order_item(product)
+
+        self.assert_product_is_inactivated_by_delete(product)
+
+        order_item.refresh_from_db()
+        self.assertEqual(order_item.product_id, product.pk)
+
+    def test_delete_with_sale_history_inactivates_product_and_keeps_sale_item(self):
+        product = self.create_product("Sale history product", "NUBACTIONSALE")
+        StockTransaction.objects.create(
+            product=product,
+            transaction_type=StockTransaction.TransactionType.OPENING_STOCK,
+            quantity_change=1,
+            balance_after=1,
+        )
+        order, order_item = self.create_order_item(product)
+        sale = Sale.objects.create(
+            sale_id=Sale.build_sale_id(order),
+            order=order,
+            full_name=order.full_name,
+            phone=order.phone,
+            email=order.email,
+            subtotal_amount=product.current_price,
+            total_amount=product.current_price,
+            item_count=1,
+        )
+        sale_item = SaleItem.objects.create(
+            sale=sale,
+            order_item=order_item,
+            product=product,
+            product_name=product.name,
+            product_sku=product.sku,
+            quantity=1,
+            unit_price=product.current_price,
+            subtotal=product.current_price,
+        )
+
+        self.assert_product_is_inactivated_by_delete(product)
+
+        sale_item.refresh_from_db()
+        self.assertEqual(sale_item.product_id, product.pk)
+
+    def test_delete_without_transaction_history_permanently_deletes_product(self):
+        product = self.create_product("Disposable product", "NUBACTIONDELETE")
+        self.client.force_login(self.admin)
+
+        response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
+
+        self.assertContains(response, '"Disposable product" deleted successfully.')
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+
+    def test_inactive_product_without_history_is_permanently_deleted(self):
+        product = self.create_product(
+            "Inactive disposable product",
+            "NUBACTIONINACTIVE",
+            status=Product.Status.INACTIVE,
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
+
+        self.assertContains(response, '"Inactive disposable product" deleted successfully.')
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
+
+    def test_unrelated_order_audit_history_does_not_block_product_deletion(self):
+        product = self.create_product("Audit-only product", "NUBACTIONAUDIT")
+        audit_order = Order.objects.create(
+            full_name="Audit Customer",
+            phone="01700000001",
+            address="Audit address",
+            district="Dhaka",
+        )
+        OrderStatusHistory.objects.create(
+            order=audit_order,
+            status=Order.Status.PENDING,
+            note="Unrelated audit entry.",
+        )
+        self.client.force_login(self.admin)
+
+        response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Product.objects.filter(pk=product.pk).exists())
 
     def test_duplicate_creates_a_draft_without_stock_or_related_history(self):
         source = self.create_product(
@@ -800,6 +1091,25 @@ class ProductStockWorkflowTests(TestCase):
         response = self.client.post(edit_url, self.product_data(stock_quantity="7"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(StockTransaction.objects.filter(product=product).count(), 1)
+
+    def test_edit_page_can_reactivate_an_inactive_product(self):
+        product = Product.objects.create(
+            category=self.category,
+            name="Inactive product",
+            regular_price="1200",
+            current_price="999",
+            sku="NUBREACTIVATE",
+            status=Product.Status.INACTIVE,
+        )
+
+        response = self.client.post(
+            reverse("dashboard_product_edit", args=[product.pk]),
+            self.product_data(name=product.name, sku=product.sku, status=Product.Status.PUBLISHED),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.status, Product.Status.PUBLISHED)
 
 
 class ProductImageDerivativeTests(TestCase):

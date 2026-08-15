@@ -30,6 +30,7 @@ from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
 from category.models import Brand, Category, Product, ProductImage, ProductReview
+from .dashboard_pagination import DEFAULT_DASHBOARD_PAGE_SIZE, build_dashboard_pagination_context
 from .abandoned_checkout import (
     create_or_update_abandoned_checkout,
     mark_pending_abandoned_checkout_converted,
@@ -632,23 +633,30 @@ def build_dashboard_user_context(target_user, selected_role):
     }
 
 
-def build_dashboard_role_list_context(form, edit_role=None):
+def build_dashboard_role_list_context(form, edit_role=None, *, request=None, page_number=None):
     from .permissions import ensure_default_roles
 
     ensure_default_roles()
-    roles = list(Group.objects.select_related("role_profile").order_by("name"))
+    roles_queryset = Group.objects.select_related("role_profile").order_by("name")
+    paginator = Paginator(roles_queryset, DEFAULT_DASHBOARD_PAGE_SIZE)
+    page_obj = paginator.get_page(page_number)
+    roles = list(page_obj.object_list)
     for role in roles:
         role.profile = get_role_profile(role)
 
-    active_role_total = sum(1 for role in roles if role.profile.is_active)
-    return {
+    active_role_total = RoleProfile.objects.filter(is_active=True).count()
+    context = {
         "form": form,
         "roles": roles,
         "editing_role": edit_role,
-        "role_total": len(roles),
+        "role_total": paginator.count,
         "role_active_total": active_role_total,
-        "role_inactive_total": len(roles) - active_role_total,
+        "role_inactive_total": paginator.count - active_role_total,
+        "page_obj": page_obj,
     }
+    if request is not None:
+        context.update(build_dashboard_pagination_context(request, page_obj))
+    return context
 
 
 def build_dashboard_role_permission_context(role):
@@ -783,7 +791,7 @@ def attach_dashboard_order_metadata(order):
     return order
 
 
-def build_dashboard_order_list_context(user, page_number=None, paginate_by=30):
+def build_dashboard_order_list_context(user, page_number=None, paginate_by=DEFAULT_DASHBOARD_PAGE_SIZE, request=None):
     visible_orders = get_visible_orders_queryset(user)
     paginator = Paginator(visible_orders, paginate_by)
     page_obj = paginator.get_page(page_number)
@@ -791,7 +799,7 @@ def build_dashboard_order_list_context(user, page_number=None, paginate_by=30):
     visible_sales = Sale.objects.all()
     if not (getattr(user, "is_staff", False) or getattr(user, "is_superuser", False)):
         visible_sales = visible_sales.filter(user=user)
-    return {
+    context = {
         "orders": orders,
         "page_obj": page_obj,
         "order_total": paginator.count,
@@ -799,6 +807,9 @@ def build_dashboard_order_list_context(user, page_number=None, paginate_by=30):
         "cancelled_order_total": visible_orders.filter(status=Order.Status.CANCELLED).count(),
         "sale_total": visible_sales.count(),
     }
+    if request is not None:
+        context.update(build_dashboard_pagination_context(request, page_obj))
+    return context
 
 
 def build_dashboard_order_detail_context(order, status_form=None, include_tracking=False):

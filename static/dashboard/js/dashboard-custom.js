@@ -55,31 +55,86 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const deleteModalElement = document.getElementById('dashboardDeleteConfirmModal');
-  if (deleteModalElement && typeof bootstrap !== 'undefined') {
+  const BootstrapModal = window.bootstrap?.Modal;
+  if (deleteModalElement && BootstrapModal && !deleteModalElement.dataset.deleteConfirmInitialized) {
+    deleteModalElement.dataset.deleteConfirmInitialized = 'true';
+    const deleteModal = BootstrapModal.getOrCreateInstance(deleteModalElement);
+    const confirmButton = deleteModalElement.querySelector('.js-confirm-delete');
+    const itemNameElement = deleteModalElement.querySelector('.js-delete-item-name');
+    let activeForm = null;
+    let generatedDeleteForm = null;
 
-  const deleteModal = new bootstrap.Modal(deleteModalElement);
-  const confirmButton = deleteModalElement.querySelector('.js-confirm-delete');
-  const itemNameElement = deleteModalElement.querySelector('.js-delete-item-name');
-  let activeForm = null;
+  const showDeleteConfirmation = (trigger, formElement) => {
+    activeForm = formElement;
+    if (itemNameElement) {
+      itemNameElement.textContent = trigger.dataset.deleteItemName
+        || trigger.getAttribute('aria-label')?.replace(/^Delete\s*/i, '')
+        || 'this item';
+    }
+    deleteModal.show();
+  };
 
-  document.querySelectorAll('.js-delete-trigger').forEach((trigger) => {
-    trigger.addEventListener('click', () => {
-      const formId = trigger.dataset.deleteFormId;
-      activeForm = formId ? document.getElementById(formId) : null;
-      if (itemNameElement) {
-        itemNameElement.textContent = trigger.dataset.deleteItemName || 'this item';
-      }
-      deleteModal.show();
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const trigger = event.target.closest('.js-delete-trigger');
+    if (!trigger) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    const formId = trigger.dataset.deleteFormId;
+    const formElement = formId ? document.getElementById(formId) : null;
+    if (!formElement) {
+      console.error('Delete form not found:', formId);
+      return;
+    }
+
+    showDeleteConfirmation(trigger, formElement);
+  });
+
+  document.querySelectorAll('a[href*="/delete/"]').forEach((trigger) => {
+    if (trigger.dataset.deleteConfirmBound) {
+      return;
+    }
+    trigger.dataset.deleteConfirmBound = 'true';
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const formElement = document.createElement('form');
+      formElement.method = 'post';
+      formElement.action = trigger.href;
+      formElement.className = 'd-none';
+      const csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = 'csrfmiddlewaretoken';
+      csrfInput.value = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      formElement.append(csrfInput);
+      document.body.append(formElement);
+      generatedDeleteForm = formElement;
+      showDeleteConfirmation(trigger, formElement);
     });
   });
 
   document.querySelectorAll('.js-product-bulk-form').forEach((formElement) => {
+    if (formElement.dataset.deleteConfirmBound) {
+      return;
+    }
+    formElement.dataset.deleteConfirmBound = 'true';
     formElement.addEventListener('submit', (event) => {
       const action = formElement.querySelector('[name="action"]')?.value;
       if (action !== 'delete') {
         return;
       }
+      if (formElement.dataset.deleteConfirmed === 'true') {
+        delete formElement.dataset.deleteConfirmed;
+        return;
+      }
       event.preventDefault();
+      event.stopPropagation();
       activeForm = formElement;
       if (itemNameElement) {
         itemNameElement.textContent = 'the selected products';
@@ -88,19 +143,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-    confirmButton?.addEventListener('click', () => {
-      if (activeForm) {
-        activeForm.submit();
+    confirmButton?.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!activeForm) {
+        return;
+      }
+
+      const formToSubmit = activeForm;
+      activeForm = null;
+      const generatedFormToSubmit = generatedDeleteForm;
+      generatedDeleteForm = null;
+      confirmButton.disabled = true;
+      deleteModal.hide();
+      if (formToSubmit.matches('.js-product-bulk-form')) {
+        formToSubmit.dataset.deleteConfirmed = 'true';
+      }
+      if (typeof formToSubmit.requestSubmit === 'function') {
+        formToSubmit.requestSubmit();
+      } else {
+        formToSubmit.submit();
+      }
+      generatedFormToSubmit?.remove();
+    });
+    deleteModalElement.addEventListener('hidden.bs.modal', () => {
+      activeForm = null;
+      generatedDeleteForm?.remove();
+      generatedDeleteForm = null;
+      if (confirmButton) {
+        confirmButton.disabled = false;
       }
     });
   }
 
   const trackingModalElement = document.getElementById('dashboardOrderTrackingModal');
-  if (!trackingModalElement || typeof bootstrap === 'undefined') {
+  if (!trackingModalElement || !BootstrapModal) {
     return;
   }
 
-  const trackingModal = new bootstrap.Modal(trackingModalElement);
+  const trackingModal = BootstrapModal.getOrCreateInstance(trackingModalElement);
   const trackingTitle = trackingModalElement.querySelector('.modal-title');
   const trackingBody = trackingModalElement.querySelector('.js-order-tracking-body');
   const trackingDetailLink = trackingModalElement.querySelector('.js-order-tracking-detail');

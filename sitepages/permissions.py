@@ -11,6 +11,7 @@ from company.models import CompanyProfile
 from finance.models import CashTransaction, DueAccount, DuePayment, TransactionCategory
 from purchase.models import Purchase
 
+from .dashboard_pagination import DashboardPaginationContextMixin
 from .models import (
     AbandonedCheckout,
     HeroSlide,
@@ -256,7 +257,7 @@ class DashboardAccessMixin(LoginRequiredMixin):
     redirect_field_name = "next"
 
 
-class DashboardPermissionMixin(DashboardAccessMixin, PermissionRequiredMixin):
+class DashboardPermissionMixin(DashboardPaginationContextMixin, DashboardAccessMixin, PermissionRequiredMixin):
     raise_exception = False
     permission_denied_message = "You do not have permission to open that dashboard page."
 

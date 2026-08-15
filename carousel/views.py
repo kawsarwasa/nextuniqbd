@@ -24,7 +24,7 @@ class HeroSlideDashboardMixin(DashboardPermissionMixin):
 
 class HeroSlideListView(HeroSlideDashboardMixin, ListView):
     context_object_name = "hero_slides"
-    paginate_by = 10
+    paginate_by = 20
     template_name = "dashboard/carousel/list.html"
 
     def get_queryset(self):

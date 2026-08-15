@@ -102,11 +102,37 @@ REVIEW_TEMPLATES = [
 ]
 
 class Command(BaseCommand):
-    help = "Create or refresh 30 dummy dashboard products with real downloaded images."
+    help = "Create or refresh dummy dashboard products with real downloaded images."
     IMAGE_COUNT_PER_PRODUCT = 4
     IMAGE_SIZE = (1200, 1200)
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--count",
+            type=int,
+            default=len(PRODUCT_NAMES),
+            help=f"Number of demo products to seed (1-{len(PRODUCT_NAMES)}; default: {len(PRODUCT_NAMES)}).",
+        )
+        parser.add_argument(
+            "--images-per-product",
+            type=int,
+            default=self.IMAGE_COUNT_PER_PRODUCT,
+            help=(
+                "Number of downloaded images for each demo product "
+                f"(minimum: 1; default: {self.IMAGE_COUNT_PER_PRODUCT})."
+            ),
+        )
+
     def handle(self, *args, **options):
+        product_count = options["count"]
+        images_per_product = options["images_per_product"]
+        if not 1 <= product_count <= len(PRODUCT_NAMES):
+            raise CommandError(
+                f"--count must be between 1 and {len(PRODUCT_NAMES)}."
+            )
+        if images_per_product < 1:
+            raise CommandError("--images-per-product must be at least 1.")
+
         categories = list(Category.objects.order_by("id"))
         brands = list(Brand.objects.order_by("id"))
         self.image_cache = {}
@@ -121,7 +147,7 @@ class Command(BaseCommand):
         updated = 0
 
         with transaction.atomic():
-            for index, product_name in enumerate(PRODUCT_NAMES, start=1):
+            for index, product_name in enumerate(PRODUCT_NAMES[:product_count], start=1):
                 category = categories[(index - 1) % len(categories)]
                 brand = brands[(index - 1) % len(brands)]
                 regular_price = 65 + (index * 7)
@@ -153,7 +179,7 @@ class Command(BaseCommand):
                 )
 
                 product.images.all().delete()
-                for image_index in range(1, self.IMAGE_COUNT_PER_PRODUCT + 1):
+                for image_index in range(1, images_per_product + 1):
                     image_file = self._build_image(
                         index=index,
                         image_index=image_index,
@@ -186,9 +212,9 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                "Seeded 30 dummy products with real images. "
+                f"Seeded {product_count} dummy products with real images. "
                 f"created={created} updated={updated} "
-                f"images_per_product={self.IMAGE_COUNT_PER_PRODUCT} "
+                f"images_per_product={images_per_product} "
                 f"reviews_per_product={len(REVIEW_TEMPLATES)}"
             )
         )

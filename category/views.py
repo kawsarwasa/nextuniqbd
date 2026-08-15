@@ -1,6 +1,8 @@
+import re
+
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Count, F, OuterRef, ProtectedError, Q, Subquery, Sum
+from django.db.models import Case, Count, F, IntegerField, OuterRef, ProtectedError, Q, Subquery, Sum, When
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -11,37 +13,91 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from sitepages.permissions import DashboardPermissionMixin
 
-from purchase.models import PurchaseItem
+from purchase.models import Purchase, PurchaseItem
 
 from .forms import BrandForm, CategoryForm, ProductForm
 from .models import Brand, Category, Product, ProductImage, StockTransaction
 
 
-def product_deletion_blockers(product):
+_PURCHASE_STOCK_REFERENCE_RE = re.compile(r"^Purchase (?P<purchase_id>\d{12}) / item ")
+
+
+def product_has_blocking_stock_history(product):
+    """Keep business stock history, but ignore product-local and deleted-purchase rows."""
+    stock_transactions = list(
+        product.stock_transactions.only("transaction_type", "reference")
+    )
+    purchase_transaction_types = {
+        StockTransaction.TransactionType.PURCHASE,
+        StockTransaction.TransactionType.PURCHASE_RETURN,
+    }
+    product_local_transaction_types = {
+        StockTransaction.TransactionType.OPENING_STOCK,
+        StockTransaction.TransactionType.MANUAL_ADJUSTMENT,
+    }
+    purchase_ids = {
+        match.group("purchase_id")
+        for transaction in stock_transactions
+        if transaction.transaction_type in purchase_transaction_types
+        if (match := _PURCHASE_STOCK_REFERENCE_RE.match(transaction.reference))
+    }
+    active_purchase_ids = set(
+        Purchase.objects.filter(purchase_id__in=purchase_ids).values_list(
+            "purchase_id", flat=True
+        )
+    )
+
+    for transaction in stock_transactions:
+        if transaction.transaction_type in product_local_transaction_types:
+            continue
+        if transaction.transaction_type not in purchase_transaction_types:
+            return True
+        match = _PURCHASE_STOCK_REFERENCE_RE.match(transaction.reference)
+        if match is None or match.group("purchase_id") in active_purchase_ids:
+            return True
+    return False
+
+
+def product_blocking_history(product):
+    """Return the current business records that require a product to be retained."""
     blockers = []
-    if product.stock_transactions.exists():
-        blockers.append("stock transactions")
-    if product.order_items.exists() or product.order_stock_applications.exists() or product.sale_items.exists():
-        blockers.append("order or sale records")
-    if product.purchase_items.exists() or product.purchase_stock_applications.exists():
+    if product.sale_items.exists():
+        blockers.append("sale records")
+    if product.order_items.exists() or product.order_stock_applications.exists():
+        blockers.append("order records")
+    if (
+        product.purchase_items.filter(purchase__isnull=False).exists()
+        or product.purchase_stock_applications.filter(purchase__isnull=False).exists()
+    ):
         blockers.append("purchase records")
+    if product_has_blocking_stock_history(product):
+        blockers.append("stock transactions")
     return blockers
+
+
+def product_has_blocking_history(product):
+    """Whether current, product-linked business history prevents permanent deletion."""
+    return bool(product_blocking_history(product))
 
 
 def delete_products_safely(products):
     deleted_names = []
-    blocked_products = []
+    inactivated_products = []
     for product in products:
-        blockers = product_deletion_blockers(product)
+        blockers = product_blocking_history(product)
         if blockers:
-            blocked_products.append((product.name, blockers))
+            product.status = Product.Status.INACTIVE
+            product.save(update_fields=["status", "updated_at"])
+            inactivated_products.append((product.name, blockers))
             continue
         try:
             product.delete()
             deleted_names.append(product.name)
         except ProtectedError:
-            blocked_products.append((product.name, ["protected related records"]))
-    return deleted_names, blocked_products
+            product.status = Product.Status.INACTIVE
+            product.save(update_fields=["status", "updated_at"])
+            inactivated_products.append((product.name, ["protected related records"]))
+    return deleted_names, inactivated_products
 
 
 class CategoryDashboardMixin(DashboardPermissionMixin):
@@ -59,7 +115,7 @@ class CategoryDashboardMixin(DashboardPermissionMixin):
 
 class CategoryListView(CategoryDashboardMixin, ListView):
     context_object_name = "categories"
-    paginate_by = 10
+    paginate_by = 20
     template_name = "dashboard/categories/list.html"
 
     def get_queryset(self):
@@ -147,7 +203,7 @@ class BrandDashboardMixin(DashboardPermissionMixin):
 
 class BrandListView(BrandDashboardMixin, ListView):
     context_object_name = "brands"
-    paginate_by = 10
+    paginate_by = 20
     template_name = "dashboard/brands/list.html"
 
     def get_queryset(self):
@@ -272,7 +328,7 @@ class ProductDashboardMixin(DashboardPermissionMixin):
 
 class ProductListView(ProductDashboardMixin, ListView):
     context_object_name = "products"
-    paginate_by = 10
+    paginate_by = 20
     template_name = "dashboard/products/list.html"
     sortable_fields = {
         "name": "name",
@@ -311,12 +367,17 @@ class ProductListView(ProductDashboardMixin, ListView):
         elif stock_status == "in":
             queryset = queryset.filter(track_stock=True, stock_quantity__gt=F("low_stock_threshold"))
 
+        activity_order = Case(
+            When(status=Product.Status.INACTIVE, then=1),
+            default=0,
+            output_field=IntegerField(),
+        )
         sort_field = sort.lstrip("-")
         if sort_field in self.sortable_fields:
             ordering = f"{'-' if sort.startswith('-') else ''}{self.sortable_fields[sort_field]}"
+            return queryset.order_by(activity_order, ordering, "-created_at", "-id")
         else:
-            ordering = "-id"
-        return queryset.order_by(ordering)
+            return queryset.order_by(activity_order, "-created_at", "-id")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -350,6 +411,11 @@ class ProductListView(ProductDashboardMixin, ListView):
                 "brands": Brand.objects.only("id", "name").order_by("name", "id"),
                 "filters": filters,
                 "pagination_query": query_params.urlencode(),
+                "pagination_page_numbers": context["page_obj"].paginator.get_elided_page_range(
+                    context["page_obj"].number,
+                    on_each_side=1,
+                    on_ends=1,
+                ),
                 "sort_query": sort_query_params.urlencode(),
                 "sort_options": sort_options,
             }
@@ -492,19 +558,27 @@ class ProductDeleteView(DashboardPermissionMixin, View):
 
     def post(self, request, pk):
         product = get_object_or_404(Product, pk=pk)
-        deleted_names, blocked_products = delete_products_safely([product])
+        deleted_names, inactivated_products = delete_products_safely([product])
         if deleted_names:
             messages.error(
                 request,
                 f'"{deleted_names[0]}" deleted successfully.',
                 extra_tags="toast-delete",
             )
-        else:
-            blocker_labels = ", ".join(blocked_products[0][1])
-            messages.warning(
+        elif inactivated_products:
+            blockers = inactivated_products[0][1]
+            if blockers == ["protected related records"]:
+                message = (
+                    "This product has protected related records, so it was made inactive instead of being permanently deleted."
+                )
+            else:
+                message = (
+                    f"This product has {', '.join(blockers)}, so it was made inactive instead of being permanently deleted."
+                )
+            messages.info(
                 request,
-                f'"{product.name}" was not deleted because it has linked {blocker_labels}.',
-                extra_tags="toast-warning",
+                message,
+                extra_tags="toast-edit",
             )
         return redirect("dashboard_product_list")
 
@@ -550,18 +624,18 @@ class ProductBulkActionView(DashboardPermissionMixin, View):
                 "purchase_items",
                 "purchase_stock_applications",
             )
-            deleted_names, blocked_products = delete_products_safely(products)
+            deleted_names, inactivated_products = delete_products_safely(products)
             if deleted_names:
                 messages.error(
                     request,
                     f"Deleted {len(deleted_names)} product(s).",
                     extra_tags="toast-delete",
                 )
-            if blocked_products:
-                messages.warning(
+            if inactivated_products:
+                messages.info(
                     request,
-                    f"{len(blocked_products)} product(s) were not deleted because they have linked records.",
-                    extra_tags="toast-warning",
+                    f"{len(inactivated_products)} product(s) had transaction history and were made inactive instead of permanently deleted.",
+                    extra_tags="toast-edit",
                 )
         else:
             messages.error(request, "Choose a valid bulk action.")
@@ -629,7 +703,7 @@ def inventory_products_queryset():
 
 class InventoryReportView(InventoryDashboardMixin, ListView):
     context_object_name = "products"
-    paginate_by = 25
+    paginate_by = 20
     template_name = "dashboard/inventory/report.html"
 
     def get_queryset(self):
@@ -669,7 +743,7 @@ class InventoryReportView(InventoryDashboardMixin, ListView):
 
 class StockHistoryView(InventoryDashboardMixin, ListView):
     context_object_name = "transactions"
-    paginate_by = 30
+    paginate_by = 20
     template_name = "dashboard/inventory/history.html"
 
     def get_queryset(self):

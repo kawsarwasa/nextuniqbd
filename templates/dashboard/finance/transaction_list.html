@@ -56,10 +56,10 @@
                 <td class="text-end text-nowrap">
                   {% if item.source_type == 'manual' and item.transaction_type == 'cash_in' %}
                     {% if perms.finance.change_cashtransaction %}<a class="btn btn-outline-primary btn-sm" href="{% url 'finance:cash_in_update' item.pk %}" title="Edit Cash In" aria-label="Edit Cash In"><i class="bi bi-pencil" aria-hidden="true"></i></a>{% endif %}
-                    {% if perms.finance.delete_cashtransaction %}<a class="btn btn-outline-danger btn-sm" href="{% url 'finance:cash_in_delete' item.pk %}" title="Delete Cash In" aria-label="Delete Cash In"><i class="bi bi-trash3" aria-hidden="true"></i></a>{% endif %}
+                    {% if perms.finance.delete_cashtransaction %}<form id="delete-cash-in-{{ item.pk }}" method="post" action="{% url 'finance:cash_in_delete' item.pk %}" class="d-inline">{% csrf_token %}<button type="button" class="btn btn-outline-danger btn-sm js-delete-trigger" title="Delete Cash In" aria-label="Delete Cash In" data-delete-form-id="delete-cash-in-{{ item.pk }}" data-delete-item-name="Cash In of {{ item.amount|money }}"><i class="bi bi-trash3" aria-hidden="true"></i></button></form>{% endif %}
                   {% elif item.source_type == 'manual' %}
                     {% if perms.finance.change_cashtransaction %}<a class="btn btn-outline-primary btn-sm" href="{% url 'finance:cash_out_update' item.pk %}" title="Edit Cash Out" aria-label="Edit Cash Out"><i class="bi bi-pencil" aria-hidden="true"></i></a>{% endif %}
-                    {% if perms.finance.delete_cashtransaction %}<a class="btn btn-outline-danger btn-sm" href="{% url 'finance:cash_out_delete' item.pk %}" title="Delete Cash Out" aria-label="Delete Cash Out"><i class="bi bi-trash3" aria-hidden="true"></i></a>{% endif %}
+                    {% if perms.finance.delete_cashtransaction %}<form id="delete-cash-out-{{ item.pk }}" method="post" action="{% url 'finance:cash_out_delete' item.pk %}" class="d-inline">{% csrf_token %}<button type="button" class="btn btn-outline-danger btn-sm js-delete-trigger" title="Delete Cash Out" aria-label="Delete Cash Out" data-delete-form-id="delete-cash-out-{{ item.pk }}" data-delete-item-name="Cash Out of {{ item.amount|money }}"><i class="bi bi-trash3" aria-hidden="true"></i></button></form>{% endif %}
                   {% endif %}
                 </td>
               </tr>

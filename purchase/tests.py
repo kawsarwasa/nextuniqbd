@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from pathlib import Path
 from django.test import TestCase
 from django.urls import reverse
 
@@ -61,6 +62,60 @@ class PurchaseTests(TestCase):
         self.assertContains(response, "purchase-product-select")
         self.assertContains(response, "productPrices")
 
+    def test_purchase_list_uses_the_shared_post_delete_confirmation(self):
+        purchase = Purchase.objects.create()
+        second_purchase = Purchase.objects.create()
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("dashboard_purchase_list"))
+
+        self.assertContains(response, f'delete-purchase-{purchase.pk}')
+        self.assertContains(response, "js-delete-trigger")
+        self.assertContains(response, 'type="button"')
+        self.assertContains(response, f'data-delete-form-id="delete-purchase-{purchase.pk}"')
+        self.assertContains(response, 'method="post"')
+        self.assertContains(response, 'name="csrfmiddlewaretoken"')
+        self.assertContains(response, 'id="dashboardDeleteConfirmModal"')
+        self.assertContains(response, "Confirm Delete")
+        self.assertContains(response, 'class="js-delete-item-name"')
+        self.assertContains(response, "This action cannot be undone.")
+        self.assertContains(response, 'class="btn btn-danger js-confirm-delete"')
+        self.assertContains(response, f"Purchase #{purchase.purchase_id}")
+        self.assertContains(response, f'delete-purchase-{second_purchase.pk}')
+        self.assertNotEqual(
+            f"delete-purchase-{purchase.pk}",
+            f"delete-purchase-{second_purchase.pk}",
+        )
+        self.assertEqual(
+            self.client.get(reverse("dashboard_purchase_delete", args=[purchase.pk])).status_code,
+            405,
+        )
+
+    def test_confirmed_purchase_delete_post_deletes_only_that_purchase(self):
+        purchase_to_delete = Purchase.objects.create()
+        untouched_purchase = Purchase.objects.create()
+        self.client.force_login(self.user)
+
+        response = self.client.post(reverse("dashboard_purchase_delete", args=[purchase_to_delete.pk]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Purchase.objects.filter(pk=purchase_to_delete.pk).exists())
+        self.assertTrue(Purchase.objects.filter(pk=untouched_purchase.pk).exists())
+
+    def test_shared_delete_javascript_prevents_submission_until_confirmation(self):
+        script = Path(__file__).resolve().parents[1] / "static" / "dashboard" / "js" / "dashboard-custom.js"
+        source = script.read_text(encoding="utf-8")
+
+        self.assertIn("BootstrapModal.getOrCreateInstance", source)
+        self.assertIn("document.addEventListener('click'", source)
+        self.assertIn("event.target.closest('.js-delete-trigger')", source)
+        self.assertIn("console.error('Delete form not found:'", source)
+        self.assertIn("event.preventDefault();", source)
+        self.assertIn("event.stopPropagation();", source)
+        self.assertIn("formToSubmit.requestSubmit()", source)
+        self.assertIn("confirmButton.disabled = true;", source)
+        self.assertIn("hidden.bs.modal", source)
+
     def test_dashboard_purchase_create_saves_multiple_items_and_total(self):
         self.client.force_login(self.user)
 
@@ -83,7 +138,7 @@ class PurchaseTests(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         purchase = Purchase.objects.prefetch_related("items").latest("id")
         self.assertEqual(purchase.items.count(), 2)
         self.assertEqual(float(purchase.total_amount), 1600.0)
@@ -285,19 +340,19 @@ class PurchaseStockIntegrationTests(TestCase):
         purchase = self.create_received_purchase((self.product_one, 10), (self.product_two, 4))
         self.client.force_login(self.user)
 
-        response = self.client.post(reverse("dashboard_purchase_delete", args=[purchase.pk]))
+        response = self.client.post(reverse("dashboard_purchase_delete", args=[purchase.pk]), follow=True)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'"{purchase.purchase_id}" deleted successfully.')
         self.assertFalse(Purchase.objects.filter(pk=purchase.pk).exists())
+        self.assertFalse(PurchaseItem.objects.filter(purchase_id=purchase.pk).exists())
+        self.assertFalse(PurchaseStockApplication.objects.filter(purchase_id=purchase.pk).exists())
         self.product_one.refresh_from_db()
         self.product_two.refresh_from_db()
-        transactions = list(StockTransaction.objects.filter(product=self.product_one).order_by("id"))
-        second_product_transactions = list(StockTransaction.objects.filter(product=self.product_two).order_by("id"))
         self.assertEqual(self.product_one.stock_quantity, 0)
         self.assertEqual(self.product_two.stock_quantity, 0)
-        self.assertEqual([transaction.quantity_change for transaction in transactions], [10, -10])
-        self.assertEqual([transaction.quantity_change for transaction in second_product_transactions], [4, -4])
-        self.assertEqual(transactions[-1].transaction_type, StockTransaction.TransactionType.PURCHASE_RETURN)
+        self.assertFalse(StockTransaction.objects.filter(product=self.product_one).exists())
+        self.assertFalse(StockTransaction.objects.filter(product=self.product_two).exists())
 
     def test_tracking_disabled_product_is_ignored(self):
         self.product_one.track_stock = False

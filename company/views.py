@@ -26,7 +26,7 @@ class CompanyProfileDashboardMixin(DashboardPermissionMixin):
 
 class CompanyProfileListView(CompanyProfileDashboardMixin, ListView):
     context_object_name = "company_profiles"
-    paginate_by = 10
+    paginate_by = 20
     template_name = "dashboard/company/profile_list.html"
 
     def get_queryset(self):

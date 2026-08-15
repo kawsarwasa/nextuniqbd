@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from django.views import View
 
 from sitepages.permissions import DashboardPermissionMixin
+from sitepages.dashboard_pagination import build_dashboard_pagination_context
 from sitepages.views import build_dashboard_order_detail_context, build_dashboard_order_list_context
 from sitepages.views import get_visible_orders_queryset
 from sitepages.models import AbandonedCheckout, Order, Sale
@@ -44,7 +45,7 @@ class DashboardOrderListView(DashboardPermissionMixin, View):
         return render(
             request,
             self.template_name,
-            build_dashboard_order_list_context(request.user, page_number=request.GET.get("page")),
+            build_dashboard_order_list_context(request.user, page_number=request.GET.get("page"), request=request),
         )
 
 
@@ -137,9 +138,6 @@ class DashboardAbandonedCheckoutListView(DashboardPermissionMixin, View):
         page_obj = paginator.get_page(request.GET.get("page"))
         for abandoned_checkout in page_obj.object_list:
             _decorate_abandoned_checkout(abandoned_checkout)
-        query_params = request.GET.copy()
-        query_params.pop("page", None)
-
         return render(
             request,
             self.template_name,
@@ -161,7 +159,7 @@ class DashboardAbandonedCheckoutListView(DashboardPermissionMixin, View):
                     (AbandonedCheckout.Status.CANCELLED, "Cancelled"),
                 ],
                 "filters": filters,
-                "pagination_query": query_params.urlencode(),
+                **build_dashboard_pagination_context(request, page_obj),
             },
         )
 
@@ -224,7 +222,7 @@ class DashboardAbandonedCheckoutStatusView(DashboardPermissionMixin, View):
 class DashboardSaleListView(DashboardPermissionMixin, View):
     permission_required = "sitepages.view_sale"
     template_name = "dashboard/sales/list.html"
-    paginate_by = 30
+    paginate_by = 20
 
     def get_queryset(self, user):
         queryset = (
@@ -258,6 +256,7 @@ class DashboardSaleListView(DashboardPermissionMixin, View):
                 else 0
             ),
         }
+        context.update(build_dashboard_pagination_context(request, page_obj))
         return render(request, self.template_name, context)
 
 

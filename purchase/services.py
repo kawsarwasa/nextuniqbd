@@ -136,3 +136,29 @@ def reverse_received_purchase_stock(purchase_id, *, user=None):
     )
     for application in applications:
         _reverse_application(application, user=user, reason="Received purchase reversed")
+
+
+def remove_reversed_purchase_stock_history(purchase):
+    """Remove reversible ledger rows when the corresponding purchase is deleted.
+
+    Purchase stock applications are deleted with their purchase.  Their ledger rows
+    have no foreign key to the purchase, so remove only the rows emitted by this
+    service for the now-deleted purchase.  Other stock, sale, and order history is
+    deliberately retained.
+    """
+    StockTransaction.objects.filter(
+        transaction_type__in=(
+            StockTransaction.TransactionType.PURCHASE,
+            StockTransaction.TransactionType.PURCHASE_RETURN,
+        ),
+        reference__startswith=f"Purchase {purchase.purchase_id} / item ",
+    ).delete()
+
+
+@transaction.atomic
+def delete_received_purchase(purchase_id, *, user=None):
+    """Reverse a purchase's applied stock and fully remove its reversible records."""
+    purchase = Purchase.objects.select_for_update().get(pk=purchase_id)
+    reverse_received_purchase_stock(purchase.pk, user=user)
+    remove_reversed_purchase_stock_history(purchase)
+    purchase.delete()

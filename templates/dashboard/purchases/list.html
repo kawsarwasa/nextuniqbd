@@ -64,21 +64,15 @@
               <td class="fw-semibold">&#2547;{{ purchase.total_amount }}</td>
               <td class="text-end">
                 {% if perms.purchase.view_purchase %}
-                  <a href="{% url 'dashboard_purchase_detail' purchase.pk %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-eye me-1"></i>View
-                  </a>
+                  <a href="{% url 'dashboard_purchase_detail' purchase.pk %}" class="btn btn-outline-secondary btn-sm" title="View" aria-label="View Purchase #{{ purchase.purchase_id }}"><i class="bi bi-eye"></i></a>
                 {% endif %}
                 {% if perms.purchase.change_purchase %}
-                  <a href="{% url 'dashboard_purchase_edit' purchase.pk %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-pencil-square me-1"></i>Edit
-                  </a>
+                  <a href="{% url 'dashboard_purchase_edit' purchase.pk %}" class="btn btn-outline-primary btn-sm" title="Edit" aria-label="Edit Purchase #{{ purchase.purchase_id }}"><i class="bi bi-pencil-square"></i></a>
                 {% endif %}
                 {% if perms.purchase.delete_purchase %}
-                  <form method="post" action="{% url 'dashboard_purchase_delete' purchase.pk %}" class="d-inline">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                      <i class="bi bi-trash3 me-1"></i>Delete
-                    </button>
+                  <form id="delete-purchase-{{ purchase.pk }}" action="{% url 'dashboard_purchase_delete' purchase.pk %}" method="post" class="d-inline">
+                      {% csrf_token %}
+                    <button type="button" class="btn btn-outline-danger btn-sm js-delete-trigger" title="Delete" aria-label="Delete Purchase #{{ purchase.purchase_id }}" data-delete-form-id="delete-purchase-{{ purchase.pk }}" data-delete-item-name="Purchase #{{ purchase.purchase_id }}"><i class="bi bi-trash"></i></button>
                   </form>
                 {% endif %}
               </td>

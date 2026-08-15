@@ -44,8 +44,10 @@ class HomepageLatestProductsTests(TestCase):
             Product.objects.filter(pk=product.pk).update(created_at=start + timedelta(minutes=index))
 
         draft = self.create_product("Draft product", status=Product.Status.DRAFT)
+        inactive_product = self.create_product("Inactive product", status=Product.Status.INACTIVE)
         inactive_category_product = self.create_product("Hidden category product", category=self.inactive_category)
         Product.objects.filter(pk=draft.pk).update(created_at=timezone.now() + timedelta(days=1))
+        Product.objects.filter(pk=inactive_product.pk).update(created_at=timezone.now() + timedelta(days=1))
         Product.objects.filter(pk=inactive_category_product.pk).update(created_at=timezone.now() + timedelta(days=1))
 
         latest_products, response = self.homepage_latest_products()
@@ -56,6 +58,7 @@ class HomepageLatestProductsTests(TestCase):
             [product.pk for product in reversed(products[-20:])],
         )
         self.assertNotIn(draft.pk, [product.pk for product in latest_products])
+        self.assertNotIn(inactive_product.pk, [product.pk for product in latest_products])
         self.assertNotIn(inactive_category_product.pk, [product.pk for product in latest_products])
         self.assertContains(response, "Latest Products")
         self.assertContains(response, reverse("frontend_products"))
@@ -69,3 +72,10 @@ class HomepageLatestProductsTests(TestCase):
         product.save(update_fields=["name"])
         self.assertIsNone(cache.get(HOMEPAGE_LATEST_PRODUCTS_CACHE_KEY))
 
+    def test_inactive_products_are_excluded_from_the_public_product_listing(self):
+        inactive_product = self.create_product("Inactive public product", status=Product.Status.INACTIVE)
+
+        response = self.client.get(reverse("frontend_products"), {"q": inactive_product.name})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(inactive_product.pk, [product.pk for product in response.context["products"]])

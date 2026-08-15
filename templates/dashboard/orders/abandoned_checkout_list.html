@@ -149,26 +149,6 @@
         </tbody>
       </table>
     </div>
-    {% if page_obj.paginator.num_pages > 1 %}
-      <div class="card-footer">
-        <nav aria-label="Abandoned checkout pagination">
-          <ul class="pagination pagination-sm mb-0 justify-content-end">
-            {% if page_obj.has_previous %}
-              <li class="page-item">
-                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
-              </li>
-            {% endif %}
-            <li class="page-item active">
-              <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-            </li>
-            {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>
-              </li>
-            {% endif %}
-          </ul>
-        </nav>
-      </div>
-    {% endif %}
+    {% include "dashboard/includes/pagination.html" with page_obj=page_obj label="Abandoned checkout pagination" %}
   </div>
 {% endblock %}

@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.views import View
 
 from sitepages.permissions import DashboardPermissionMixin
+from sitepages.dashboard_pagination import build_dashboard_pagination_context
 
 from .forms import (
     AccountsReportFilterForm,
@@ -234,7 +235,7 @@ class FinanceTransactionListView(DashboardPermissionMixin, View):
                 category_type__in=allowed_types + [CategoryType.BOTH],
                 is_active=True,
             ).order_by("name", "pk"),
-            "pagination_query": _pagination_query(request),
+            **build_dashboard_pagination_context(request, page_obj),
         }
         if self.fixed_transaction_type == TransactionType.CASH_IN:
             context["cash_in_total"] = self.filtered_total
@@ -569,7 +570,7 @@ class DueListView(DashboardPermissionMixin, View):
                 ("paid", "Paid"),
                 ("overdue", "Overdue"),
             ),
-            "pagination_query": _pagination_query(request),
+            **build_dashboard_pagination_context(request, page_obj),
         }
         context["original_amount_total"] = context["filtered_totals"]["original_total"]
         context["paid_amount_total"] = context["filtered_totals"]["paid_total"]
@@ -629,19 +630,26 @@ class DueDetailView(DashboardPermissionMixin, View):
 
     def get(self, request, pk):
         due = get_object_or_404(
-            annotated_due_queryset().prefetch_related("payments__created_by"),
+            annotated_due_queryset(),
             pk=pk,
         )
+        page_obj = Paginator(
+            due.payments.select_related("created_by").order_by("-payment_date", "-id"),
+            PAGE_SIZE,
+        ).get_page(request.GET.get("page"))
+        context = {
+            "due": due,
+            "payments": page_obj.object_list,
+            "page_obj": page_obj,
+            "can_add_payment": request.user.is_superuser or request.user.has_perm("finance.add_duepayment"),
+            "can_change_payment": request.user.is_superuser or request.user.has_perm("finance.change_duepayment"),
+            "can_delete_payment": request.user.is_superuser or request.user.has_perm("finance.delete_duepayment"),
+        }
+        context.update(build_dashboard_pagination_context(request, page_obj))
         return render(
             request,
             self.template_name,
-            {
-                "due": due,
-                "payments": due.payments.all(),
-                "can_add_payment": request.user.is_superuser or request.user.has_perm("finance.add_duepayment"),
-                "can_change_payment": request.user.is_superuser or request.user.has_perm("finance.change_duepayment"),
-                "can_delete_payment": request.user.is_superuser or request.user.has_perm("finance.delete_duepayment"),
-            },
+            context,
         )
 
 
@@ -820,7 +828,7 @@ class TransactionCategoryListView(DashboardPermissionMixin, View):
                 "page_obj": page_obj,
                 "filter_values": filters,
                 "category_types": CategoryType.choices,
-                "pagination_query": _pagination_query(request),
+                **build_dashboard_pagination_context(request, page_obj),
             },
         )
 
@@ -916,7 +924,7 @@ class ReportsView(AccountsAnyViewPermissionMixin, View):
                 filters["end_date"] = today
             report_data = get_accounts_report_data(filters=filters)
 
-        transaction_page_obj = Paginator(report_data["transactions"], 50).get_page(request.GET.get("page"))
+        transaction_page_obj = Paginator(report_data["transactions"], PAGE_SIZE).get_page(request.GET.get("page"))
         summary = report_data["summary"]
         return render(
             request,
@@ -927,7 +935,7 @@ class ReportsView(AccountsAnyViewPermissionMixin, View):
                 "summary": summary,
                 "report_transactions": transaction_page_obj.object_list,
                 "transaction_page_obj": transaction_page_obj,
-                "pagination_query": _pagination_query(request),
+                **build_dashboard_pagination_context(request, transaction_page_obj),
                 "report_start_date": filters.get("start_date"),
                 "report_end_date": filters.get("end_date"),
             },

@@ -1,4 +1,4 @@
-{% if page_obj.paginator.num_pages > 1 %}
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
   <div class="card-footer">
     <nav aria-label="{{ label|default:'Pagination' }}">
       <ul class="pagination pagination-sm mb-0 justify-content-end dashboard-pagination">
@@ -7,10 +7,14 @@
         {% else %}
           <li class="page-item disabled"><span class="page-link">Previous</span></li>
         {% endif %}
-        {% for page_number in page_obj.paginator.page_range %}
-          <li class="page-item{% if page_number == page_obj.number %} active{% endif %}">
-            {% if page_number == page_obj.number %}<span class="page-link">{{ page_number }}</span>{% else %}<a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_number }}">{{ page_number }}</a>{% endif %}
-          </li>
+        {% for page_number in pagination_page_numbers|default:page_obj.paginator.page_range %}
+          {% if page_number == page_obj.paginator.ELLIPSIS %}
+            <li class="page-item disabled"><span class="page-link">{{ page_number }}</span></li>
+          {% else %}
+            <li class="page-item{% if page_number == page_obj.number %} active{% endif %}">
+              {% if page_number == page_obj.number %}<span class="page-link">{{ page_number }}</span>{% else %}<a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_number }}">{{ page_number }}</a>{% endif %}
+            </li>
+          {% endif %}
         {% endfor %}
         {% if page_obj.has_next %}
           <li class="page-item"><a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a></li>
