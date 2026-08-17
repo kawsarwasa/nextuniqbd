@@ -11,5 +11,5 @@ def company_context(request):
         cache.set(COMPANY_PROFILE_CACHE_KEY, site_company, PUBLIC_CACHE_TIMEOUT)
     return {
         "site_company": site_company,
-        "default_company_name": "SBRevo",
+        "default_company_name": "Next Uniq BD",
     }

@@ -14,6 +14,7 @@ from purchase.models import Purchase
 from .dashboard_pagination import DashboardPaginationContextMixin
 from .models import (
     AbandonedCheckout,
+    ContactMessage,
     HeroSlide,
     Order,
     RoleProfile,
@@ -38,6 +39,7 @@ MANAGED_PERMISSION_MODULES = (
     ("product", "Product", (Product,)),
     ("purchase", "Purchase", (Purchase,)),
     ("order", "Orders", (Order, Sale, AbandonedCheckout)),
+    ("contactmessage", "Contact Messages", (ContactMessage,)),
     ("heroslide", "Carousel", (HeroSlide,)),
     ("company", "Company", (CompanyProfile,)),
     ("accounts", "Accounts", (TransactionCategory, CashTransaction, DueAccount, DuePayment)),

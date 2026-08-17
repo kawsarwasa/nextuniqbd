@@ -148,6 +148,31 @@ class AbandonedCheckout(models.Model):
         return f"{identity} ({self.get_status_display()})"
 
 
+class ContactMessage(models.Model):
+    class Status(models.TextChoices):
+        NEW = "new", "New"
+        READ = "read", "Read"
+        RESOLVED = "resolved", "Resolved"
+
+    name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=50)
+    email = models.EmailField(blank=True)
+    area = models.CharField(max_length=150, blank=True)
+    message = models.TextField(max_length=2000)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["status", "-created_at"], name="contactmsg_status_date")]
+        verbose_name = "Contact Message"
+        verbose_name_plural = "Contact Messages"
+
+    def __str__(self):
+        return f"{self.name} ({self.get_status_display()})"
+
+
 class Order(models.Model):
     ORDER_ID_LENGTH = 12
     ORDER_ID_ALPHABET = string.ascii_uppercase + string.digits

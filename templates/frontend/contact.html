@@ -1,9 +1,9 @@
-﻿{% extends "frontend/base.html" %}
+{% extends "frontend/base.html" %}
 
-{% block title %}Contact Us - SB Revo{% endblock %}
+{% block title %}Contact Us - {{ site_company.company_name|default:default_company_name }}{% endblock %}
 
 {% block content %}
-<div class="breadcrumb-bar">
+  <div class="breadcrumb-bar">
     <div class="container">
       <nav class="breadcrumb">
         <a href="{% url 'frontend_home' %}"><i class="fa fa-home"></i> Home</a>
@@ -17,36 +17,22 @@
     <div class="container contact-hero-inner">
       <div class="contact-hero-copy">
         <span class="section-label">Support That Feels Personal</span>
-        <h1>Letâ€™s Talk About Your Next Order</h1>
-        <p>Questions about delivery, products, bulk orders, or account help? Our team is ready to respond with the same care and speed that shapes the SB Revo shopping experience.</p>
+        <h1>Let’s Talk About Your Next Order</h1>
+        <p>Contact {{ site_company.company_name|default:default_company_name }} for product information, orders, delivery, returns and exchanges, account support, or bulk and business inquiries.</p>
         <div class="contact-hero-points">
-          <span><i class="fa fa-check-circle"></i> Fast support replies</span>
           <span><i class="fa fa-check-circle"></i> Helpful order assistance</span>
           <span><i class="fa fa-check-circle"></i> Friendly product guidance</span>
+          <span><i class="fa fa-check-circle"></i> Clear delivery support</span>
         </div>
       </div>
       <div class="contact-hero-card">
-        <div class="contact-mini-card">
-          <i class="fa fa-headset"></i>
-          <div>
-            <strong>Customer Care</strong>
-            <p>Available every day for shopping and order support.</p>
-          </div>
-        </div>
-        <div class="contact-mini-card">
-          <i class="fa fa-phone-volume"></i>
-          <div>
-            <strong>(+84) 4567 421 978</strong>
-            <p>Call for urgent order questions.</p>
-          </div>
-        </div>
-        <div class="contact-mini-card">
-          <i class="fa fa-envelope-open-text"></i>
-          <div>
-            <strong>support@sbrevo.com</strong>
-            <p>Email for product and account help.</p>
-          </div>
-        </div>
+        <div class="contact-mini-card"><i class="fa fa-headset"></i><div><strong>Customer Care</strong><p>Support for shopping and order questions.</p></div></div>
+        {% if site_company.phone %}
+          <div class="contact-mini-card"><i class="fa fa-phone-volume"></i><div><strong><a href="tel:{{ site_company.phone }}">{{ site_company.phone }}</a></strong><p>Call for urgent order questions.</p></div></div>
+        {% endif %}
+        {% if site_company.email %}
+          <div class="contact-mini-card"><i class="fa fa-envelope-open-text"></i><div><strong><a href="mailto:{{ site_company.email }}">{{ site_company.email }}</a></strong><p>Email for product and account help.</p></div></div>
+        {% endif %}
       </div>
     </div>
   </section>
@@ -58,103 +44,44 @@
           <div class="contact-info-card">
             <span class="section-label">Reach Us</span>
             <h2>We make support simple.</h2>
-            <p>Tell us what you need and our team will guide you with clear answers, quick follow-up, and the right next step.</p>
-
+            <p>Tell us what you need and our team will guide you with clear answers and the right next step.</p>
             <div class="contact-info-list">
-              <div class="contact-info-item">
-                <div class="contact-info-icon"><i class="fa fa-map-marker-alt"></i></div>
-                <div>
-                  <h4>Store Office</h4>
-                  <p>685 Market Street, San Francisco, CA 94105</p>
-                </div>
-              </div>
-              <div class="contact-info-item">
-                <div class="contact-info-icon"><i class="fa fa-clock"></i></div>
-                <div>
-                  <h4>Working Hours</h4>
-                  <p>Monday to Saturday, 9:00 AM to 8:00 PM</p>
-                </div>
-              </div>
-              <div class="contact-info-item">
-                <div class="contact-info-icon"><i class="fa fa-truck-fast"></i></div>
-                <div>
-                  <h4>Order Help</h4>
-                  <p>Tracking, returns, shipping updates, and product questions.</p>
-                </div>
-              </div>
+              {% if site_company.address %}
+                <div class="contact-info-item"><div class="contact-info-icon"><i class="fa fa-map-marker-alt"></i></div><div><h4>{{ site_company.company_name|default:default_company_name }}</h4><p>{{ site_company.address }}</p></div></div>
+              {% endif %}
+              {% if site_company.phone %}
+                <div class="contact-info-item"><div class="contact-info-icon"><i class="fa fa-phone"></i></div><div><h4>Phone</h4><p><a href="tel:{{ site_company.phone }}">{{ site_company.phone }}</a></p></div></div>
+              {% endif %}
+              {% if site_company.email %}
+                <div class="contact-info-item"><div class="contact-info-icon"><i class="fa fa-envelope"></i></div><div><h4>Email</h4><p><a href="mailto:{{ site_company.email }}">{{ site_company.email }}</a></p></div></div>
+              {% endif %}
             </div>
           </div>
-
-          <div class="contact-map-card">
-            <div class="contact-map-badge">Main Support Zone</div>
-            <h3>San Francisco Service Hub</h3>
-            <p>Our support, fulfillment coordination, and order verification teams work together here to keep every purchase moving smoothly.</p>
-          </div>
+          <div class="contact-map-card"><div class="contact-map-badge">Dhaka, Bangladesh</div><h3>{{ site_company.company_name|default:default_company_name }}</h3><p>Our support team is ready to help with purchases, delivery, returns, and business inquiries.</p></div>
         </div>
 
         <div class="contact-form-card">
-          <div class="contact-form-header">
-            <span class="section-label">Send a Message</span>
-            <h2>Contact Us</h2>
-            <p>Fill in your details below. This is a static frontend form for now, ready to connect with Django later.</p>
-          </div>
-
-          <form class="contact-form">
+          <div class="contact-form-header"><span class="section-label">Send a Message</span><h2>Contact Us</h2><p>Fill in your details and our team will get back to you soon.</p></div>
+          {% if messages %}{% for message in messages %}<div class="contact-form-message">{{ message }}</div>{% endfor %}{% endif %}
+          <form class="contact-form" method="post" novalidate>
+            {% csrf_token %}
             <div class="contact-form-grid">
-              <div class="contact-field">
-                <label for="contactName">Name</label>
-                <input id="contactName" type="text" placeholder="Enter your full name" />
-              </div>
-              <div class="contact-field">
-                <label for="contactPhone">Phone</label>
-                <input id="contactPhone" type="tel" placeholder="Enter your phone number" />
-              </div>
-              <div class="contact-field">
-                <label for="contactEmail">Email</label>
-                <input id="contactEmail" type="email" placeholder="Enter your email address" />
-              </div>
-              <div class="contact-field">
-                <label for="contactArea">Area</label>
-                <input id="contactArea" type="text" placeholder="Enter your area or city" />
-              </div>
+              {% for field in form.visible_fields %}
+                {% if field.name != "message" %}<div class="contact-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="contact-field-error">{{ field.errors|join:", " }}</div>{% endif %}</div>{% endif %}
+              {% endfor %}
             </div>
-
-            <div class="contact-field">
-              <label for="contactMessage">Message</label>
-              <textarea id="contactMessage" rows="7" placeholder="Write your message here"></textarea>
-            </div>
-
-            <div class="contact-form-footer">
-              <p><i class="fa fa-shield-alt"></i> Your details are safe and will only be used for support follow-up.</p>
-              <button type="submit" class="btn-cta-primary"><i class="fa fa-paper-plane"></i> Send Message</button>
-            </div>
+            <div class="contact-field"><label for="{{ form.message.id_for_label }}">Message</label>{{ form.message }}{% if form.message.errors %}<div class="contact-field-error">{{ form.message.errors|join:", " }}</div>{% endif %}</div>
+            <div class="contact-form-footer"><p><i class="fa fa-shield-alt"></i> Your details are safe and used only for support follow-up.</p><button type="submit" class="btn-cta-primary"><i class="fa fa-paper-plane"></i> Send Message</button></div>
           </form>
         </div>
       </div>
-
       <div class="contact-support-strip">
-        <div class="contact-support-box">
-          <i class="fa fa-comments"></i>
-          <h4>Live Chat Ready</h4>
-          <p>Quick product and order questions answered fast.</p>
-        </div>
-        <div class="contact-support-box">
-          <i class="fa fa-box-open"></i>
-          <h4>Order Assistance</h4>
-          <p>Need tracking, return, or exchange support? We can help.</p>
-        </div>
-        <div class="contact-support-box">
-          <i class="fa fa-store"></i>
-          <h4>Business Inquiries</h4>
-          <p>Reach out for partnerships, bulk buying, and vendor requests.</p>
-        </div>
+        <div class="contact-support-box"><i class="fa fa-comments"></i><h4>Product Information</h4><p>Get clear answers before you buy.</p></div>
+        <div class="contact-support-box"><i class="fa fa-box-open"></i><h4>Order Assistance</h4><p>We can help with delivery, returns, and exchanges.</p></div>
+        <div class="contact-support-box"><i class="fa fa-store"></i><h4>Business Inquiries</h4><p>Reach out for partnerships and bulk buying.</p></div>
       </div>
     </div>
   </section>
 {% endblock %}
 
-{% block page_overlays %}
-{% endblock %}
-
-
-
+{% block page_overlays %}{% endblock %}

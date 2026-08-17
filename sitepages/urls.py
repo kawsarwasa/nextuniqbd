@@ -43,7 +43,22 @@ urlpatterns = [
         name="save_abandoned_checkout",
     ),
     path("checkout/success/<str:order_id>/", views.frontend_order_success, name="frontend_order_success"),
-    path("contact/", views.frontend_page, {"template_name": "contact.html"}, name="frontend_contact"),
+    path("contact/", views.frontend_contact, name="frontend_contact"),
+    path(
+        "dashboard/contact-messages/",
+        views.DashboardContactMessageListView.as_view(),
+        name="dashboard_contact_message_list",
+    ),
+    path(
+        "dashboard/contact-messages/<int:pk>/",
+        views.DashboardContactMessageDetailView.as_view(),
+        name="dashboard_contact_message_detail",
+    ),
+    path(
+        "dashboard/contact-messages/<int:pk>/status/<str:status>/",
+        views.DashboardContactMessageStatusView.as_view(),
+        name="dashboard_contact_message_status",
+    ),
     path("products/<slug:slug>/", views.frontend_product_detail, name="frontend_product_detail"),
     path("products/", views.frontend_page, {"template_name": "products.html"}, name="frontend_products"),
     path("product-details/", views.frontend_product_detail, name="frontend_product_details"),

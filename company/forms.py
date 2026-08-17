@@ -16,10 +16,19 @@ class CompanyProfileForm(forms.ModelForm):
 
     class Meta:
         model = CompanyProfile
-        fields = ["company_name", "logo", "sort_order", "is_active"]
+        fields = ["company_name", "phone", "email", "address", "logo", "sort_order", "is_active"]
         widgets = {
             "company_name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "SBRevo"}
+                attrs={"class": "form-control", "placeholder": "Next Uniq BD"}
+            ),
+            "phone": forms.TextInput(attrs={"class": "form-control", "placeholder": "(+88) 01883 385 687"}),
+            "email": forms.EmailInput(attrs={"class": "form-control", "placeholder": "nextuniqbd@gmail.com"}),
+            "address": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "9, Shahid Tajuddin Road, Moghbazar, Dhaka, Bangladesh",
+                }
             ),
             "logo": forms.ClearableFileInput(attrs={"class": "form-control"}),
             "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": "0"}),

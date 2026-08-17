@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from .models import (
+    ContactMessage,
     HeroSlide,
     Order,
     RoleProfile,
@@ -180,6 +181,40 @@ class CheckoutOrderForm(forms.Form):
 
     def clean_order_notes(self):
         return self._clean_optional_text("order_notes")
+
+
+class ContactMessageForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ["name", "phone", "email", "area", "message"]
+        widgets = {
+            "name": forms.TextInput(attrs={"placeholder": "Enter your full name"}),
+            "phone": forms.TextInput(attrs={"type": "tel", "placeholder": "Enter your phone number"}),
+            "email": forms.EmailInput(attrs={"placeholder": "Enter your email address"}),
+            "area": forms.TextInput(attrs={"placeholder": "Enter your area or city"}),
+            "message": forms.Textarea(attrs={"rows": 7, "placeholder": "Write your message here"}),
+        }
+
+    def clean_name(self):
+        return (self.cleaned_data.get("name") or "").strip()
+
+    def clean_phone(self):
+        phone = (self.cleaned_data.get("phone") or "").strip()
+        if not phone:
+            raise ValidationError("Phone number is required.")
+        return phone
+
+    def clean_email(self):
+        return (self.cleaned_data.get("email") or "").strip().lower()
+
+    def clean_area(self):
+        return (self.cleaned_data.get("area") or "").strip()
+
+    def clean_message(self):
+        message = (self.cleaned_data.get("message") or "").strip()
+        if not message:
+            raise ValidationError("Message is required.")
+        return message
 
 
 class OrderStatusForm(forms.Form):

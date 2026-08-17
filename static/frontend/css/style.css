@@ -2166,6 +2166,9 @@ small {
   .cart-sidebar { position: static; }
 }
 
+.contact-field-error { margin-top: 6px; color: #c0392b; font-size: 13px; }
+.contact-form-message { margin: 0 0 18px; padding: 12px 14px; color: #176b3a; background: #eaf8ef; border: 1px solid #b8e6c6; border-radius: 8px; }
+
 @media (max-width: 768px) {
   .topbar-left { display: none; }
   .search-category { display: none; }
@@ -2190,6 +2193,7 @@ small {
     min-height: 46px;
   }
   .nav-all-categories { display: none; }
+  .nav-links .nav-cart-item { display: none; }
   .nav-links {
     display: flex;
     flex: 0 0 auto;

@@ -209,9 +209,9 @@ class Brand(models.Model):
 
 
 class Product(models.Model):
-    SKU_PREFIX = "NUB"
-    SKU_ALPHABET = string.ascii_letters + string.digits
-    GENERATED_SKU_SUFFIX_LENGTH = 8
+    SKU_LENGTH = 12
+    SKU_ALPHABET = string.ascii_lowercase + string.digits
+    SKU_ALLOWED_CHARACTERS = string.ascii_letters + string.digits + string.punctuation
 
     class Status(models.TextChoices):
         DRAFT = "draft", "Draft"
@@ -293,18 +293,14 @@ class Product(models.Model):
 
     @classmethod
     def generate_sku_candidate(cls):
-        suffix = "".join(
-            secrets.choice(cls.SKU_ALPHABET) for _ in range(cls.GENERATED_SKU_SUFFIX_LENGTH)
-        )
-        return f"{cls.SKU_PREFIX}{suffix}"
+        return "".join(secrets.choice(cls.SKU_ALPHABET) for _ in range(cls.SKU_LENGTH))
 
     @classmethod
     def is_valid_sku(cls, value):
-        if not isinstance(value, str) or not value.startswith(cls.SKU_PREFIX):
-            return False
-        suffix = value[len(cls.SKU_PREFIX):]
-        return bool(suffix) and len(value) <= cls._meta.get_field("sku").max_length and all(
-            character in cls.SKU_ALPHABET for character in suffix
+        return (
+            isinstance(value, str)
+            and 1 <= len(value) <= cls.SKU_LENGTH
+            and all(character in cls.SKU_ALLOWED_CHARACTERS for character in value)
         )
 
     @classmethod
@@ -316,7 +312,9 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         self.slug = self.build_unique_slug(self.name, instance=self)
-        if not self.is_valid_sku(self.sku):
+        # Legacy SKUs must remain intact on later edits. Generate only when an
+        # internal caller deliberately leaves the SKU blank.
+        if not self.sku:
             self.sku = self.generate_unique_sku()
         if self.track_stock:
             self.availability = "In Stock" if self.stock_quantity > 0 else "Out of Stock"

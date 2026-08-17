@@ -1,0 +1,24 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Contact Message{% endblock %}
+{% block page_title %}Contact Message{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_contact_message_list' %}">Contact Messages</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ contact_message.name }}</li>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+    <a href="{% url 'dashboard_contact_message_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to List</a>
+    {% if perms.sitepages.change_contactmessage %}
+      <div class="d-flex gap-2">
+        {% if contact_message.status != "read" %}<form method="post" action="{% url 'dashboard_contact_message_status' contact_message.pk 'read' %}">{% csrf_token %}<button class="btn btn-outline-info" type="submit">Mark as Read</button></form>{% endif %}
+        {% if contact_message.status != "resolved" %}<form method="post" action="{% url 'dashboard_contact_message_status' contact_message.pk 'resolved' %}">{% csrf_token %}<button class="btn btn-success" type="submit">Mark as Resolved</button></form>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+  <div class="row g-4"><div class="col-xl-8"><div class="card h-100"><div class="card-header"><h3 class="card-title mb-0">Message</h3></div><div class="card-body"><p class="mb-0 text-break">{{ contact_message.message|linebreaksbr }}</p></div></div></div>
+  <div class="col-xl-4"><div class="card h-100"><div class="card-header"><h3 class="card-title mb-0">Customer Information</h3></div><div class="card-body"><dl class="mb-0"><dt>Name</dt><dd>{{ contact_message.name }}</dd><dt>Phone</dt><dd><a href="tel:{{ contact_message.phone }}">{{ contact_message.phone }}</a></dd>{% if contact_message.email %}<dt>Email</dt><dd><a href="mailto:{{ contact_message.email }}">{{ contact_message.email }}</a></dd>{% endif %}{% if contact_message.area %}<dt>Area</dt><dd>{{ contact_message.area }}</dd>{% endif %}<dt>Status</dt><dd><span class="badge {% if contact_message.status == 'new' %}text-bg-warning{% elif contact_message.status == 'resolved' %}text-bg-success{% else %}text-bg-info{% endif %}">{{ contact_message.get_status_display }}</span></dd><dt>Submitted</dt><dd>{{ contact_message.created_at|date:"M d, Y h:i A" }}</dd></dl></div></div></div></div>
+{% endblock %}

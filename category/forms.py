@@ -141,8 +141,9 @@ class ProductForm(forms.ModelForm):
             "sku": forms.TextInput(
                 attrs={
                     "class": "form-control",
-                    "placeholder": "NUBabc123",
+                    "placeholder": "Ab#29x",
                     "autocomplete": "off",
+                    "maxlength": Product.SKU_LENGTH,
                 }
             ),
             "brand": forms.Select(
@@ -165,6 +166,7 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["brand"].required = False
         self.fields["sku"].required = True
+        self.fields["sku"].widget.attrs["maxlength"] = Product.SKU_LENGTH
         self.fields["category"].queryset = Category.objects.order_by("name")
         self.fields["brand"].queryset = Brand.objects.order_by("name")
         self.fields["new_images"].help_text = (
@@ -182,7 +184,6 @@ class ProductForm(forms.ModelForm):
             ]
         else:
             self.fields["full_description_html"].initial = ""
-            self.fields["sku"].initial = Product.SKU_PREFIX
             self.fields["status"].initial = Product.Status.PUBLISHED
             self.fields["availability"].initial = self.AVAILABILITY_IN_STOCK
             self.fields["remove_images"].choices = []
@@ -196,15 +197,18 @@ class ProductForm(forms.ModelForm):
 
     def clean_sku(self):
         sku = (self.cleaned_data.get("sku") or "").strip()
-        prefix = Product.SKU_PREFIX
-        suffix = sku[len(prefix):] if sku.startswith(prefix) else ""
 
-        if not sku.startswith(prefix):
-            raise forms.ValidationError(f"SKU must start with {prefix}.")
-        if not suffix:
-            raise forms.ValidationError(f"Enter at least one letter or number after {prefix}.")
-        if not all(character in Product.SKU_ALPHABET for character in suffix):
-            raise forms.ValidationError("SKU suffix can only contain letters and numbers.")
+        # An unchanged legacy SKU is valid for editing purposes only. Any new
+        # or changed value must follow the current 12-character rule.
+        if self.instance.pk and sku == self.instance.sku:
+            return sku
+
+        if len(sku) > Product.SKU_LENGTH:
+            raise forms.ValidationError("SKU cannot be more than 12 characters.")
+        if not all(character in Product.SKU_ALLOWED_CHARACTERS for character in sku):
+            raise forms.ValidationError(
+                "SKU can contain letters, numbers, and symbols, but not whitespace."
+            )
 
         queryset = Product.objects.filter(sku=sku)
         if self.instance.pk:

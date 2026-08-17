@@ -29,7 +29,7 @@
     <nav class="header-actions mobile-bottom-nav" aria-label="Account and cart navigation">
       <div class="header-auth">
         {% if request.user.is_authenticated %}
-          <a href="{% if request.user.is_superuser or perms.auth.view_user or perms.category.view_category or perms.category.view_brand or perms.category.view_product or perms.purchase.view_purchase or perms.sitepages.view_order or perms.blog.view_blogpost or perms.sitepages.view_heroslide or perms.company.view_companyprofile %}{% url 'dashboard_home' %}{% else %}{% url 'frontend_home' %}{% endif %}">
+          <a href="{% if request.user.is_superuser or perms.auth.view_user or perms.category.view_category or perms.category.view_brand or perms.category.view_product or perms.purchase.view_purchase or perms.sitepages.view_order or perms.sitepages.view_contactmessage or perms.blog.view_blogpost or perms.sitepages.view_heroslide or perms.company.view_companyprofile %}{% url 'dashboard_home' %}{% else %}{% url 'frontend_home' %}{% endif %}">
             <i class="fa fa-user"></i>
             <span>{{ request.user.username }}</span>
           </a>

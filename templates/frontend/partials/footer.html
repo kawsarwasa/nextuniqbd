@@ -12,11 +12,11 @@
           </span>
           <span class="footer-logo-name">{{ site_company.company_name|default:default_company_name }}</span>
         </div>
-        <p>Your one-stop destination for fashion, electronics, home goods, and more. Shop smart, shop Revo.</p>
+        <p>Your one-stop destination for fashion, electronics, home goods, and more.</p>
         <div class="footer-contact">
-          <p><i class="fa fa-map-marker-alt"></i> 9, Shahid Tajuddin Road, Moghbazar, Dhaka, Bangladesh</p>
-          <p><i class="fa fa-phone"></i> (+88) 01883 385 687</p>
-          <p><i class="fa fa-envelope"></i> nextuniqbd@gmail.com</p>
+          {% if site_company.address %}<p><i class="fa fa-map-marker-alt"></i> {{ site_company.address }}</p>{% endif %}
+          {% if site_company.phone %}<p><i class="fa fa-phone"></i> <a href="tel:{{ site_company.phone|urlencode }}">{{ site_company.phone }}</a></p>{% endif %}
+          {% if site_company.email %}<p><i class="fa fa-envelope"></i> <a href="mailto:{{ site_company.email }}">{{ site_company.email }}</a></p>{% endif %}
         </div>
         <div class="social-links">
           <a href="#"><i class="fab fa-facebook-f"></i></a>

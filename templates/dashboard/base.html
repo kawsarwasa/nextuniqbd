@@ -463,6 +463,17 @@
                 </a>
               </li>
               {% endif %}
+              {% if perms.sitepages.view_contactmessage %}
+              <li class="nav-item">
+                <a
+                  href="{% url 'dashboard_contact_message_list' %}"
+                  class="nav-link {% if current_url == 'dashboard_contact_message_list' or current_url == 'dashboard_contact_message_detail' %}active{% endif %}"
+                >
+                  <i class="nav-icon bi bi-envelope"></i>
+                  <p>Contact Messages</p>
+                </a>
+              </li>
+              {% endif %}
               {% if perms.sitepages.view_heroslide %}
               <li class="nav-item">
                 <a

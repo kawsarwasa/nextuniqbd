@@ -30,14 +30,24 @@ class ProductFormTests(TestCase):
 
         self.assertEqual(form.fields["status"].initial, Product.Status.PUBLISHED)
         self.assertEqual(form.fields["availability"].initial, ProductForm.AVAILABILITY_IN_STOCK)
-        self.assertEqual(form.fields["sku"].initial, Product.SKU_PREFIX)
+        self.assertIsNone(form.fields["sku"].initial)
         self.assertFalse(form.fields["sku"].disabled)
         self.assertTrue(form.fields["sku"].required)
+        self.assertNotIn("minlength", form.fields["sku"].widget.attrs)
+        self.assertEqual(form.fields["sku"].widget.attrs["maxlength"], Product.SKU_LENGTH)
         self.assertIn("is_featured", form.fields)
         self.assertFalse(form.fields["is_featured"].initial)
 
-    def test_form_accepts_flexible_case_preserving_skus(self):
-        for sku in ("NUB123", "NUBabc", "NUBAb12", "NUBxyz45", "NUB10001"):
+    def test_form_accepts_skus_up_to_twelve_characters_and_preserves_case(self):
+        for sku in (
+            "A",
+            "AB",
+            "abc123",
+            "Ab#29x",
+            "SKU@2026",
+            "123456789012",
+            "Ab3#xY9!Q2@k",
+        ):
             with self.subTest(sku=sku):
                 form = ProductForm(
                     data={
@@ -61,14 +71,14 @@ class ProductFormTests(TestCase):
                 self.assertEqual(form.cleaned_data["availability"], ProductForm.AVAILABILITY_OUT_OF_STOCK)
                 self.assertEqual(form.cleaned_data["sku"], sku)
 
-    def test_form_requires_a_sku_suffix(self):
+    def test_form_rejects_a_blank_sku(self):
         form = ProductForm(
             data={
                 "category": self.category.pk,
                 "name": "Wireless Mouse",
                 "regular_price": "1200",
                 "current_price": "999",
-                "sku": Product.SKU_PREFIX,
+                "sku": "",
                 "brand": self.brand.pk,
                 "status": Product.Status.PUBLISHED,
                 "availability": ProductForm.AVAILABILITY_IN_STOCK,
@@ -81,16 +91,16 @@ class ProductFormTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["sku"], ["Enter at least one letter or number after NUB."])
+        self.assertEqual(form.errors["sku"], ["This field is required."])
 
-    def test_form_rejects_sku_without_nub_prefix(self):
+    def test_form_rejects_sku_that_is_too_long(self):
         form = ProductForm(
             data={
                 "category": self.category.pk,
                 "name": "Wireless Mouse",
                 "regular_price": "1200",
                 "current_price": "999",
-                "sku": "ABC123",
+                "sku": "ABC123xyz!@#4",
                 "brand": self.brand.pk,
                 "status": Product.Status.PUBLISHED,
                 "availability": ProductForm.AVAILABILITY_IN_STOCK,
@@ -103,7 +113,54 @@ class ProductFormTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["sku"], ["SKU must start with NUB."])
+        self.assertEqual(form.errors["sku"], ["SKU cannot be more than 12 characters."])
+
+    def test_form_rejects_whitespace_in_sku(self):
+        form = ProductForm(
+            data={
+                "category": self.category.pk,
+                "name": "Wireless Mouse",
+                "regular_price": "1200",
+                "current_price": "999",
+                "sku": "ABC DEF12345",
+                "brand": self.brand.pk,
+                "status": Product.Status.PUBLISHED,
+                "availability": ProductForm.AVAILABILITY_IN_STOCK,
+                "track_stock": "on",
+                "stock_quantity": "0",
+                "low_stock_threshold": "5",
+                "short_description": "Compact mouse",
+                "full_description_html": "<p>Compact mouse</p>",
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(
+            form.errors["sku"],
+            ["SKU can contain letters, numbers, and symbols, but not whitespace."],
+        )
+
+    def test_form_trims_accidental_surrounding_sku_whitespace(self):
+        form = ProductForm(
+            data={
+                "category": self.category.pk,
+                "name": "Wireless Mouse",
+                "regular_price": "1200",
+                "current_price": "999",
+                "sku": "  ABC12  ",
+                "brand": self.brand.pk,
+                "status": Product.Status.PUBLISHED,
+                "availability": ProductForm.AVAILABILITY_IN_STOCK,
+                "track_stock": "on",
+                "stock_quantity": "0",
+                "low_stock_threshold": "5",
+                "short_description": "Compact mouse",
+                "full_description_html": "<p>Compact mouse</p>",
+            }
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data["sku"], "ABC12")
 
     def test_form_rejects_duplicate_manual_sku_on_create(self):
         Product.objects.create(
@@ -112,7 +169,7 @@ class ProductFormTests(TestCase):
             name="Existing Mouse",
             regular_price="1200",
             current_price="999",
-            sku="NUBABC123XYZ",
+            sku="Ab3#xY9!Q2@k",
             status=Product.Status.PUBLISHED,
             availability=ProductForm.AVAILABILITY_IN_STOCK,
         )
@@ -122,7 +179,7 @@ class ProductFormTests(TestCase):
                 "name": "Wireless Mouse",
                 "regular_price": "1200",
                 "current_price": "999",
-                "sku": "NUBABC123XYZ",
+                "sku": "Ab3#xY9!Q2@k",
                 "brand": self.brand.pk,
                 "status": Product.Status.PUBLISHED,
                 "availability": ProductForm.AVAILABILITY_IN_STOCK,
@@ -144,7 +201,7 @@ class ProductFormTests(TestCase):
             name="Existing Mouse",
             regular_price="1200",
             current_price="999",
-            sku="NUBABC123XYZ",
+            sku="NUBabc",
             status=Product.Status.PUBLISHED,
             availability=ProductForm.AVAILABILITY_IN_STOCK,
         )
@@ -154,7 +211,7 @@ class ProductFormTests(TestCase):
                 "name": "Wireless Mouse",
                 "regular_price": "1200",
                 "current_price": "999",
-                "sku": "NUBDEF456UVW",
+                "sku": "ABC123xyz!@#",
                 "brand": self.brand.pk,
                 "status": Product.Status.PUBLISHED,
                 "availability": ProductForm.AVAILABILITY_IN_STOCK,
@@ -168,9 +225,9 @@ class ProductFormTests(TestCase):
         )
 
         self.assertTrue(form.is_valid(), form.errors)
-        self.assertEqual(form.cleaned_data["sku"], "NUBDEF456UVW")
+        self.assertEqual(form.cleaned_data["sku"], "ABC123xyz!@#")
 
-    def test_edit_form_allows_its_existing_sku(self):
+    def test_edit_form_allows_an_unchanged_legacy_sku(self):
         product = Product.objects.create(
             category=self.category,
             brand=self.brand,
@@ -185,7 +242,7 @@ class ProductFormTests(TestCase):
             data={
                 "category": self.category.pk,
                 "name": "Existing Mouse",
-                "regular_price": "1200",
+                "regular_price": "1300",
                 "current_price": "999",
                 "sku": "NUBabc",
                 "brand": self.brand.pk,
@@ -202,6 +259,39 @@ class ProductFormTests(TestCase):
 
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.cleaned_data["sku"], "NUBabc")
+        saved_product = form.save()
+        self.assertEqual(saved_product.sku, "NUBabc")
+
+    def test_edit_form_requires_a_changed_sku_to_follow_the_current_maximum(self):
+        product = Product.objects.create(
+            category=self.category,
+            brand=self.brand,
+            name="Existing Mouse",
+            regular_price="1200",
+            current_price="999",
+            sku="NUBabc",
+        )
+        form = ProductForm(
+            data={
+                "category": self.category.pk,
+                "name": "Existing Mouse",
+                "regular_price": "1200",
+                "current_price": "999",
+                "sku": "ABC123xyz!@#4",
+                "brand": self.brand.pk,
+                "status": Product.Status.PUBLISHED,
+                "availability": ProductForm.AVAILABILITY_IN_STOCK,
+                "track_stock": "on",
+                "stock_quantity": "0",
+                "low_stock_threshold": "5",
+                "short_description": "Compact mouse",
+                "full_description_html": "<p>Compact mouse</p>",
+            },
+            instance=product,
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["sku"], ["SKU cannot be more than 12 characters."])
 
     def test_form_rejects_negative_stock_values(self):
         form = ProductForm(
@@ -240,7 +330,9 @@ class ProductModelTests(TestCase):
             availability="",
         )
 
-        self.assertRegex(product.sku, r"^NUB[A-Za-z0-9]+$")
+        self.assertLessEqual(len(product.sku), Product.SKU_LENGTH)
+        self.assertTrue(all(character in Product.SKU_ALPHABET for character in product.sku))
+        self.assertFalse(product.sku.startswith("NUB"))
 
         another_product = Product.objects.create(
             category=category,
@@ -252,10 +344,11 @@ class ProductModelTests(TestCase):
             availability="",
         )
 
-        self.assertRegex(another_product.sku, r"^NUB[A-Za-z0-9]+$")
+        self.assertLessEqual(len(another_product.sku), Product.SKU_LENGTH)
+        self.assertTrue(all(character in Product.SKU_ALPHABET for character in another_product.sku))
         self.assertNotEqual(product.sku, another_product.sku)
 
-    def test_product_save_replaces_invalid_manual_sku(self):
+    def test_product_save_does_not_replace_a_nonblank_legacy_or_manual_sku(self):
         category = Category.objects.create(name="Accessories")
         product = Product.objects.create(
             category=category,
@@ -267,7 +360,7 @@ class ProductModelTests(TestCase):
             availability="In Stock",
         )
 
-        self.assertRegex(product.sku, r"^NUB[A-Za-z0-9]+$")
+        self.assertEqual(product.sku, "MANUAL123")
 
     def test_product_save_preserves_valid_manually_entered_sku_case(self):
         category = Category.objects.create(name="Accessories")
@@ -276,12 +369,12 @@ class ProductModelTests(TestCase):
             name="Travel Bag",
             regular_price="100",
             current_price="80",
-            sku="NUBAb12",
+            sku="AbC123#xyZ!9",
             status=Product.Status.DRAFT,
             availability="In Stock",
         )
 
-        self.assertEqual(product.sku, "NUBAb12")
+        self.assertEqual(product.sku, "AbC123#xyZ!9")
 
     def test_product_review_properties_reflect_related_reviews(self):
         category = Category.objects.create(name="Home")

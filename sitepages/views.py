@@ -37,6 +37,7 @@ from .abandoned_checkout import (
 )
 from .forms import (
     CheckoutOrderForm,
+    ContactMessageForm,
     DashboardPasswordForm,
     DashboardProfileForm,
     UsernameAuthenticationForm,
@@ -57,6 +58,7 @@ from .permissions import (
 )
 from .models import (
     HeroSlide,
+    ContactMessage,
     Order,
     OrderItem,
     Sale,
@@ -877,6 +879,95 @@ def frontend_page(request, template_name: str):
     if not FRONTEND_TEMPLATE_RE.fullmatch(template_name):
         raise Http404("Invalid frontend page.")
     return _render_known_template(request, "frontend", template_name)
+
+
+def frontend_contact(request):
+    form = ContactMessageForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(
+            request,
+            "Thank you. Your message has been sent successfully. Our team will contact you soon.",
+        )
+        return redirect("frontend_contact")
+
+    return render(
+        request,
+        "frontend/contact.html",
+        {"active_page": "contact", "template_stem": "contact", "form": form},
+    )
+
+
+class DashboardContactMessageListView(DashboardPermissionMixin, View):
+    permission_required = "sitepages.view_contactmessage"
+    template_name = "dashboard/contact_messages/list.html"
+    paginate_by = DEFAULT_DASHBOARD_PAGE_SIZE
+
+    def get(self, request):
+        search = request.GET.get("q", "").strip()
+        status = request.GET.get("status", "").strip()
+        queryset = ContactMessage.objects.all()
+
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search)
+                | Q(phone__icontains=search)
+                | Q(email__icontains=search)
+                | Q(area__icontains=search)
+            )
+        if status in ContactMessage.Status.values:
+            queryset = queryset.filter(status=status)
+        else:
+            status = ""
+
+        paginator = Paginator(queryset, self.paginate_by)
+        page_obj = paginator.get_page(request.GET.get("page"))
+        return render(
+            request,
+            self.template_name,
+            {
+                "contact_messages": page_obj.object_list,
+                "page_obj": page_obj,
+                "contact_message_total": paginator.count,
+                "filters": {"q": search, "status": status},
+                "status_choices": ContactMessage.Status.choices,
+                **build_dashboard_pagination_context(request, page_obj),
+            },
+        )
+
+
+class DashboardContactMessageDetailView(DashboardPermissionMixin, View):
+    permission_required = "sitepages.view_contactmessage"
+    template_name = "dashboard/contact_messages/detail.html"
+
+    def get(self, request, pk):
+        contact_message = get_object_or_404(ContactMessage, pk=pk)
+        if (
+            contact_message.status == ContactMessage.Status.NEW
+            and request.user.has_perm("sitepages.change_contactmessage")
+        ):
+            contact_message.status = ContactMessage.Status.READ
+            contact_message.save(update_fields=["status", "updated_at"])
+        return render(request, self.template_name, {"contact_message": contact_message})
+
+
+class DashboardContactMessageStatusView(DashboardPermissionMixin, View):
+    permission_required = "sitepages.change_contactmessage"
+
+    def post(self, request, pk, status):
+        if status not in {ContactMessage.Status.READ, ContactMessage.Status.RESOLVED}:
+            messages.error(request, "Invalid contact message status.")
+            return redirect("dashboard_contact_message_detail", pk=pk)
+
+        contact_message = get_object_or_404(ContactMessage, pk=pk)
+        contact_message.status = status
+        contact_message.save(update_fields=["status", "updated_at"])
+        messages.success(
+            request,
+            f"Contact message marked as {contact_message.get_status_display().lower()}.",
+            extra_tags="toast-edit",
+        )
+        return redirect("dashboard_contact_message_detail", pk=pk)
 
 
 @ensure_csrf_cookie

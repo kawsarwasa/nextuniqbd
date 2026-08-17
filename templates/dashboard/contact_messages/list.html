@@ -1,0 +1,29 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ site_company.company_name|default:default_company_name }} | Contact Messages{% endblock %}
+{% block page_title %}Contact Messages{% endblock %}
+
+{% block breadcrumb %}
+  <li class="breadcrumb-item"><a href="{% url 'dashboard_home' %}">Dashboard</a></li>
+  <li class="breadcrumb-item active" aria-current="page">Contact Messages</li>
+{% endblock %}
+
+{% block content %}
+  <div class="row mb-4"><div class="col-lg-3 col-6"><div class="small-box text-bg-info"><div class="inner"><h3>{{ contact_message_total }}</h3><p>Messages</p></div><i class="small-box-icon bi bi-envelope"></i></div></div></div>
+  <div class="card mb-4"><div class="card-header"><h3 class="card-title mb-0">Search and Filters</h3></div><div class="card-body">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-6 col-lg-5"><label for="contact-search" class="form-label">Search</label><input id="contact-search" class="form-control" type="search" name="q" value="{{ filters.q }}" placeholder="Name, phone, email, or area" /></div>
+      <div class="col-md-4 col-lg-3"><label for="contact-status" class="form-label">Status</label><select id="contact-status" class="form-select" name="status"><option value="">All statuses</option>{% for value, label in status_choices %}<option value="{{ value }}"{% if filters.status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+      <div class="col-md-2 col-lg-auto"><button type="submit" class="btn btn-primary"><i class="bi bi-search me-1"></i>Apply</button> <a href="{% url 'dashboard_contact_message_list' %}" class="btn btn-outline-secondary">Reset</a></div>
+    </form>
+  </div></div>
+  <div class="card"><div class="card-header"><h3 class="card-title mb-0">Customer Messages</h3></div><div class="card-body table-responsive p-0">
+    <table class="table table-hover align-middle mb-0"><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Area</th><th>Status</th><th>Received</th><th class="text-end">Action</th></tr></thead><tbody>
+      {% for contact_message in contact_messages %}
+        <tr><td class="fw-semibold">{{ contact_message.name }}</td><td>{{ contact_message.phone }}</td><td>{{ contact_message.email|default:"—" }}</td><td>{{ contact_message.area|default:"—" }}</td><td><span class="badge {% if contact_message.status == 'new' %}text-bg-warning{% elif contact_message.status == 'resolved' %}text-bg-success{% else %}text-bg-info{% endif %}">{{ contact_message.get_status_display }}</span></td><td>{{ contact_message.created_at|date:"M d, Y h:i A" }}</td><td class="text-end"><a href="{% url 'dashboard_contact_message_detail' contact_message.pk %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-eye me-1"></i>View</a></td></tr>
+      {% empty %}
+        <tr><td colspan="7" class="text-center py-5 text-muted">No contact messages match the selected filters.</td></tr>
+      {% endfor %}
+    </tbody></table>
+  </div>{% include "dashboard/includes/pagination.html" with page_obj=page_obj label="Contact message pagination" %}</div>
+{% endblock %}

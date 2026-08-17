@@ -52,7 +52,7 @@
               <div class="col-md-6">
                 <label for="{{ form.sku.id_for_label }}" class="form-label">SKU</label>
                 {{ form.sku }}
-                <div class="form-text">SKU must start with NUB, followed by at least one letter or number.</div>
+                <div class="form-text">SKU can contain up to 12 characters. Letters, numbers, and symbols are allowed.</div>
                 {% if form.sku.errors %}
                   <div class="text-danger small mt-1">{{ form.sku.errors|join:", " }}</div>
                 {% endif %}
