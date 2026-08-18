@@ -407,12 +407,28 @@ document.addEventListener('DOMContentLoaded', function () {
     return 1;
   }
 
+  function createMetaEventId(prefix) {
+    const randomPart = window.crypto?.randomUUID?.()
+      || `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    return `${prefix}_${randomPart.replace(/[^a-zA-Z0-9_-]/g, '')}`;
+  }
+
+  function trackMetaEvent(metaEvent) {
+    if (!metaEvent || typeof window.fbq !== 'function') return;
+    window.fbq('track', metaEvent.event_name, metaEvent.custom_data, { eventID: metaEvent.event_id });
+  }
+
+  window.sbRevoTrackMetaEvent = trackMetaEvent;
+
   async function addProductToSessionCart(productId, quantity) {
+    const eventId = createMetaEventId('add_to_cart');
     const data = await postJson(frontendRoutes.cartAdd, {
       product_id: productId,
       quantity: quantity,
+      event_id: eventId,
     });
     renderCartPreview(data.cart);
+    trackMetaEvent(data.meta_event);
     return data;
   }
 

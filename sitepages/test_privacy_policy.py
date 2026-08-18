@@ -29,12 +29,13 @@ class PrivacyPolicyPageTests(TestCase):
         self.assertContains(response, 'href="mailto:nextuniqbd@gmail.com"', html=False)
         self.assertContains(response, reverse("frontend_contact"))
 
-    def test_privacy_policy_discloses_actual_cod_and_session_practices_without_demo_tracking(self):
+    def test_privacy_policy_discloses_actual_cod_session_and_meta_tracking_practices(self):
         response = self.client.get(reverse("frontend_privacy_policy"))
 
         self.assertContains(response, "Cash on Delivery (COD)")
         self.assertContains(response, "Abandoned Checkout Information")
-        self.assertContains(response, "does not currently use third-party advertising pixels or analytics")
+        self.assertContains(response, "Meta Pixel")
+        self.assertContains(response, "Meta Conversions API")
         self.assertNotContains(response, "Stripe")
         self.assertNotContains(response, "PayPal")
         self.assertNotContains(response, "{% now")

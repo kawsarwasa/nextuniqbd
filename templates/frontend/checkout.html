@@ -211,6 +211,48 @@
 {% endblock %}
 
 {% block extra_scripts %}
+  {% if meta_initiate_checkout_event %}
+    {{ meta_initiate_checkout_event|json_script:"meta-initiate-checkout-event" }}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const eventElement = document.getElementById('meta-initiate-checkout-event');
+        if (!eventElement || !window.sbRevoMetaPixelInitialized || typeof window.fbq !== 'function') {
+          return;
+        }
+
+        try {
+          const metaEvent = JSON.parse(eventElement.textContent);
+          const customData = metaEvent.custom_data || {};
+          if (
+            metaEvent.event_name !== 'InitiateCheckout'
+            || !metaEvent.event_id
+            || !Array.isArray(customData.content_ids)
+            || !customData.content_ids.length
+            || !Array.isArray(customData.contents)
+            || !customData.contents.length
+          ) {
+            return;
+          }
+
+          window.fbq(
+            'track',
+            'InitiateCheckout',
+            {
+              content_ids: customData.content_ids,
+              contents: customData.contents,
+              content_type: 'product',
+              currency: 'BDT',
+              value: customData.value,
+              num_items: customData.num_items,
+            },
+            { eventID: metaEvent.event_id },
+          );
+        } catch (error) {
+          console.warn('Unable to send Meta InitiateCheckout event.', error);
+        }
+      }, { once: true });
+    </script>
+  {% endif %}
   <script>
     (function () {
       const districtInput = document.getElementById('district');

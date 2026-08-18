@@ -45,6 +45,10 @@ if not SECRET_KEY:
 
 DEBUG = env_bool("DJANGO_DEBUG", False)
 CURRENCY_SYMBOL = os.environ.get("CURRENCY_SYMBOL", "৳")
+META_TRACKING_ENABLED = env_bool("META_TRACKING_ENABLED", False)
+META_PIXEL_ID = os.environ.get("META_PIXEL_ID", "").strip()
+META_CAPI_ACCESS_TOKEN = os.environ.get("META_CAPI_ACCESS_TOKEN", "").strip()
+META_TEST_EVENT_CODE = os.environ.get("META_TEST_EVENT_CODE", "").strip()
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
@@ -68,6 +72,7 @@ INSTALLED_APPS = [
     'company.apps.CompanyConfig',
     'purchase.apps.PurchaseConfig',
     'sitepages.apps.SitepagesConfig',
+    'tracking.apps.TrackingConfig',
 ]
 
 MIDDLEWARE = [
@@ -99,6 +104,7 @@ TEMPLATES = [
                 'sitepages.context_processors.footer_brand_context',
                 'sitepages.context_processors.dashboard_profile_context',
                 'company.context_processors.company_context',
+                'tracking.context_processors.meta_tracking',
             ],
         },
     },

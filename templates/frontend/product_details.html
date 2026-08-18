@@ -15,6 +15,40 @@
 {% endblock %}
 
 {% block extra_scripts %}
+  {% if meta_view_content_event %}
+    {{ meta_view_content_event|json_script:"meta-view-content-event" }}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const eventElement = document.getElementById('meta-view-content-event');
+        if (!eventElement || !window.sbRevoMetaPixelInitialized || typeof window.fbq !== 'function') {
+          return;
+        }
+
+        try {
+          const metaEvent = JSON.parse(eventElement.textContent);
+          if (metaEvent.event_name !== 'ViewContent') {
+            return;
+          }
+
+          const customData = metaEvent.custom_data || {};
+          window.fbq(
+            'track',
+            'ViewContent',
+            {
+              content_ids: customData.content_ids,
+              content_type: 'product',
+              content_name: customData.content_name,
+              value: customData.value,
+              currency: 'BDT',
+            },
+            { eventID: metaEvent.event_id },
+          );
+        } catch (error) {
+          console.warn('Unable to send Meta ViewContent event.', error);
+        }
+      }, { once: true });
+    </script>
+  {% endif %}
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       {% if review_submitted %}

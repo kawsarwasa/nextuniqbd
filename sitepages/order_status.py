@@ -91,6 +91,9 @@ def change_order_status(*, order, new_status, changed_by=None, note="", source=O
             )
         elif previous_status == Order.Status.DELIVERED and new_status == Order.Status.CONFIRMED:
             Sale.objects.generate_from_order(locked_order)
+            from tracking.services import queue_purchase
+
+            queue_purchase(locked_order)
         return OrderStatusChangeResult(
             order=locked_order,
             previous_status=previous_status,

@@ -79,6 +79,12 @@ from .cart import (
 )
 from .order_stock import validate_checkout_stock
 from .order_status import change_order_status
+from tracking.services import (
+    capture_order_attribution,
+    queue_add_to_cart,
+    queue_initiate_checkout,
+    queue_view_content,
+)
 from .order_tracking import build_order_tracking_context
 from .cache import (
     HERO_SLIDES_CACHE_KEY,
@@ -584,6 +590,7 @@ def create_order_from_checkout(request, checkout_form, cart_state):
             for item in cart_state["items"]
         ]
     )
+    capture_order_attribution(request, order)
     mark_pending_abandoned_checkout_converted(request)
     return order
 
@@ -1042,6 +1049,8 @@ def frontend_product_detail(request, slug=None):
         "template_stem": "product_details",
     }
     context.update(build_product_detail_context(product))
+    if request.method == "GET":
+        context["meta_view_content_event"] = queue_view_content(request, product)
     context.update(build_review_form_context(submitted=request.GET.get("review_submitted") == "1"))
     return render(request, "frontend/product_details.html", context)
 
@@ -1088,6 +1097,12 @@ def frontend_checkout(request):
         "template_stem": "checkout",
     }
     context.update(build_checkout_page_context(request, checkout_form=checkout_form))
+    if request.method == "GET" and not cart_state["is_empty"]:
+        context["meta_initiate_checkout_event"] = queue_initiate_checkout(
+            request,
+            cart_state,
+            get_delivery_zone_details(request.session)["amount"],
+        )
     return render(request, "frontend/checkout.html", context)
 
 
@@ -1142,8 +1157,11 @@ def _parse_json_body(request):
         return {}
 
 
-def _build_cart_json(request, *, message="", status=200):
-    return JsonResponse({"message": message, "cart": serialize_cart_state(get_cart_state(request))}, status=status)
+def _build_cart_json(request, *, message="", status=200, meta_event=None):
+    response_data = {"message": message, "cart": serialize_cart_state(get_cart_state(request))}
+    if meta_event is not None:
+        response_data["meta_event"] = meta_event
+    return JsonResponse(response_data, status=status)
 
 
 @require_POST
@@ -1168,7 +1186,8 @@ def cart_add(request):
             status=400,
         )
     add_to_cart_session(request, product.pk, quantity)
-    return _build_cart_json(request, message=f"{product.name} added to cart.")
+    meta_event = queue_add_to_cart(request, product, quantity, payload.get("event_id"))
+    return _build_cart_json(request, message=f"{product.name} added to cart.", meta_event=meta_event)
 
 
 @require_POST
