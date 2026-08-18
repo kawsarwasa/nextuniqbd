@@ -12,6 +12,7 @@ from django.contrib.auth.models import Permission
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
+from django.utils import timezone
 from PIL import Image
 
 from purchase.models import Purchase, PurchaseItem, PurchaseStockApplication
@@ -1061,7 +1062,7 @@ class ProductManagementActionTests(TestCase):
             self.client.force_login(self.admin)
             response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
 
-            self.assertContains(response, '"Stock history product" deleted successfully.')
+            self.assertContains(response, "&quot;Stock history product&quot; deleted successfully.")
             self.assertFalse(Product.objects.filter(pk=product.pk).exists())
             self.assertFalse(StockTransaction.objects.filter(product_id=product_id).exists())
             self.assertFalse(ProductImage.objects.filter(pk=image.pk).exists())
@@ -1080,7 +1081,7 @@ class ProductManagementActionTests(TestCase):
 
         response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
 
-        self.assertContains(response, '"Manual adjustment product" deleted successfully.')
+        self.assertContains(response, "&quot;Manual adjustment product&quot; deleted successfully.")
         self.assertFalse(Product.objects.filter(pk=product.pk).exists())
 
     def test_stale_reversed_purchase_stock_rows_do_not_block_product_deletion(self):
@@ -1104,7 +1105,7 @@ class ProductManagementActionTests(TestCase):
 
         response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
 
-        self.assertContains(response, '"Stale purchase stock product" deleted successfully.')
+        self.assertContains(response, "&quot;Stale purchase stock product&quot; deleted successfully.")
         self.assertFalse(Product.objects.filter(pk=product.pk).exists())
 
     def test_delete_with_purchase_history_inactivates_product_and_keeps_purchase_item(self):
@@ -1203,7 +1204,7 @@ class ProductManagementActionTests(TestCase):
 
         response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
 
-        self.assertContains(response, '"Disposable product" deleted successfully.')
+        self.assertContains(response, "&quot;Disposable product&quot; deleted successfully.")
         self.assertFalse(Product.objects.filter(pk=product.pk).exists())
 
     def test_inactive_product_without_history_is_permanently_deleted(self):
@@ -1216,7 +1217,7 @@ class ProductManagementActionTests(TestCase):
 
         response = self.client.post(reverse("dashboard_product_delete", args=[product.pk]), follow=True)
 
-        self.assertContains(response, '"Inactive disposable product" deleted successfully.')
+        self.assertContains(response, "&quot;Inactive disposable product&quot; deleted successfully.")
         self.assertFalse(Product.objects.filter(pk=product.pk).exists())
 
     def test_unrelated_order_audit_history_does_not_block_product_deletion(self):
