@@ -16,6 +16,7 @@ from sitepages.permissions import DashboardPermissionMixin
 from purchase.models import Purchase, PurchaseItem
 
 from .forms import BrandForm, CategoryForm, ProductForm
+from .image_derivatives import product_image_optimized_name
 from .models import Brand, Category, Product, ProductImage, StockTransaction
 
 
@@ -307,10 +308,31 @@ class ProductDashboardMixin(DashboardPermissionMixin):
         )
         return context
 
-    def sync_images(self, product, form):
+    @staticmethod
+    def cleanup_uploaded_image_files(product_images):
+        """Remove files written before an enclosing database transaction failed."""
+        removed_names = set()
+        for product_image in product_images:
+            image_field = product_image.image
+            if not image_field or not image_field.name or image_field.name in removed_names:
+                continue
+
+            removed_names.add(image_field.name)
+            storage = image_field.storage
+            for file_name in (image_field.name, product_image_optimized_name(image_field.name)):
+                if storage.exists(file_name):
+                    storage.delete(file_name)
+
+    def sync_images(self, product, form, uploaded_images=None):
+        uploaded_images = uploaded_images if uploaded_images is not None else []
         remove_images = form.cleaned_data.get("remove_images") or []
         if remove_images:
-            product.images.filter(pk__in=remove_images).delete()
+            # Defer physical-file deletion until the surrounding database
+            # transaction commits, so a later failure cannot restore image
+            # records that point at files already removed from storage.
+            for product_image in product.images.filter(pk__in=remove_images):
+                product_image._defer_file_cleanup = True
+                product_image.delete()
 
         next_sort_order = (
             product.images.order_by("-sort_order").values_list("sort_order", flat=True).first()
@@ -318,12 +340,18 @@ class ProductDashboardMixin(DashboardPermissionMixin):
         next_sort_order = 0 if next_sort_order is None else next_sort_order + 1
 
         for image in form.cleaned_data.get("new_images") or []:
-            ProductImage.objects.create(
+            product_image = ProductImage(
                 product=product,
                 image=image,
                 sort_order=next_sort_order,
             )
+            # Track before saving: image storage occurs before the database write,
+            # and derivative generation runs immediately after it.
+            uploaded_images.append(product_image)
+            product_image.save()
             next_sort_order += 1
+
+        return uploaded_images
 
 
 class ProductListView(ProductDashboardMixin, ListView):
@@ -496,19 +524,24 @@ class ProductCreateView(ProductDashboardMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        with transaction.atomic():
-            response = super().form_valid(form)
-            self.sync_images(self.object, form)
-            opening_stock = self.object.stock_quantity
-            if opening_stock:
-                StockTransaction.objects.create(
-                    product=self.object,
-                    transaction_type=StockTransaction.TransactionType.OPENING_STOCK,
-                    quantity_change=opening_stock,
-                    balance_after=opening_stock,
-                    reference="Product creation",
-                    created_by=self.request.user if self.request.user.is_authenticated else None,
-                )
+        uploaded_images = []
+        try:
+            with transaction.atomic():
+                response = super().form_valid(form)
+                self.sync_images(self.object, form, uploaded_images)
+                opening_stock = self.object.stock_quantity
+                if opening_stock:
+                    StockTransaction.objects.create(
+                        product=self.object,
+                        transaction_type=StockTransaction.TransactionType.OPENING_STOCK,
+                        quantity_change=opening_stock,
+                        balance_after=opening_stock,
+                        reference="Product creation",
+                        created_by=self.request.user if self.request.user.is_authenticated else None,
+                    )
+        except Exception:
+            self.cleanup_uploaded_image_files(uploaded_images)
+            raise
         messages.success(
             self.request,
             "Product created successfully.",
@@ -532,19 +565,24 @@ class ProductUpdateView(ProductDashboardMixin, UpdateView):
             "stock_quantity", flat=True
         ).get()
         new_quantity = form.cleaned_data["stock_quantity"]
-        with transaction.atomic():
-            response = super().form_valid(form)
-            self.sync_images(self.object, form)
-            quantity_change = new_quantity - previous_quantity
-            if quantity_change:
-                StockTransaction.objects.create(
-                    product=self.object,
-                    transaction_type=StockTransaction.TransactionType.MANUAL_ADJUSTMENT,
-                    quantity_change=quantity_change,
-                    balance_after=new_quantity,
-                    reference="Dashboard product edit",
-                    created_by=self.request.user if self.request.user.is_authenticated else None,
-                )
+        uploaded_images = []
+        try:
+            with transaction.atomic():
+                response = super().form_valid(form)
+                self.sync_images(self.object, form, uploaded_images)
+                quantity_change = new_quantity - previous_quantity
+                if quantity_change:
+                    StockTransaction.objects.create(
+                        product=self.object,
+                        transaction_type=StockTransaction.TransactionType.MANUAL_ADJUSTMENT,
+                        quantity_change=quantity_change,
+                        balance_after=new_quantity,
+                        reference="Dashboard product edit",
+                        created_by=self.request.user if self.request.user.is_authenticated else None,
+                    )
+        except Exception:
+            self.cleanup_uploaded_image_files(uploaded_images)
+            raise
         messages.info(
             self.request,
             "Product updated successfully.",

@@ -518,15 +518,20 @@ def delete_product_image_file(sender, instance, **kwargs):
     if not instance.image or not instance.image.name:
         return
 
-    # Keep the optimized sidecar in sync with its source image. Check for another
-    # record using the same file name before removing anything from storage.
-    if ProductImage.objects.filter(image=instance.image.name).exists():
-        return
+    def remove_files():
+        # Check at deletion time because cleanup can be deferred until commit.
+        if ProductImage.objects.filter(image=instance.image.name).exists():
+            return
 
-    storage = instance.image.storage
-    for name in (
-        instance.image.name,
-        product_image_optimized_name(instance.image.name),
-    ):
-        if storage.exists(name):
-            storage.delete(name)
+        storage = instance.image.storage
+        for name in (
+            instance.image.name,
+            product_image_optimized_name(instance.image.name),
+        ):
+            if storage.exists(name):
+                storage.delete(name)
+
+    if getattr(instance, "_defer_file_cleanup", False):
+        transaction.on_commit(remove_files)
+    else:
+        remove_files()

@@ -1,7 +1,10 @@
 from datetime import timedelta
 from io import BytesIO, StringIO
+from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
+from django.utils.datastructures import MultiValueDict
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
@@ -37,6 +40,186 @@ class ProductFormTests(TestCase):
         self.assertEqual(form.fields["sku"].widget.attrs["maxlength"], Product.SKU_LENGTH)
         self.assertIn("is_featured", form.fields)
         self.assertFalse(form.fields["is_featured"].initial)
+
+    def product_form_data(self, **overrides):
+        data = {
+            "category": self.category.pk,
+            "name": "Wireless Mouse",
+            "regular_price": "1200",
+            "current_price": "999",
+            "sku": "NUBFORMIMAGE",
+            "brand": self.brand.pk,
+            "status": Product.Status.PUBLISHED,
+            "availability": ProductForm.AVAILABILITY_IN_STOCK,
+            "track_stock": "on",
+            "stock_quantity": "0",
+            "low_stock_threshold": "5",
+            "short_description": "Compact mouse",
+            "full_description_html": "<p>Compact mouse</p>",
+        }
+        data.update(overrides)
+        return data
+
+    @staticmethod
+    def uploaded_image(name="product.png", width=20, height=20, trailing_bytes=0):
+        output = BytesIO()
+        Image.new("RGB", (width, height), "#ff5c00").save(output, format="PNG")
+        return SimpleUploadedFile(
+            name,
+            output.getvalue() + (b"\0" * trailing_bytes),
+            content_type="image/png",
+        )
+
+    def test_form_accepts_an_empty_full_description(self):
+        form = ProductForm(data=self.product_form_data(full_description_html=""))
+
+        self.assertTrue(form.is_valid(), form.errors)
+        product = form.save()
+        self.assertEqual(product.full_description, "")
+
+    def test_form_preserves_submitted_full_description_html(self):
+        description = "<h2>Details</h2><p>Compact <strong>mouse</strong></p>"
+        form = ProductForm(data=self.product_form_data(full_description_html=description))
+
+        self.assertTrue(form.is_valid(), form.errors)
+        product = form.save()
+        self.assertEqual(product.full_description, description)
+
+    def test_edit_form_preserves_an_unchanged_description_and_allows_it_to_be_cleared(self):
+        product = Product.objects.create(
+            category=self.category,
+            name="Existing Mouse",
+            regular_price="1200",
+            current_price="999",
+            sku="NUBEXISTDESC",
+            full_description="<p>Saved detail</p>",
+        )
+        unchanged_form = ProductForm(
+            data=self.product_form_data(
+                name=product.name,
+                sku=product.sku,
+                full_description_html=product.full_description,
+            ),
+            instance=product,
+        )
+        self.assertTrue(unchanged_form.is_valid(), unchanged_form.errors)
+        self.assertEqual(unchanged_form.save().full_description, "<p>Saved detail</p>")
+
+        cleared_form = ProductForm(
+            data=self.product_form_data(name=product.name, sku=product.sku, full_description_html=""),
+            instance=product,
+        )
+        self.assertTrue(cleared_form.is_valid(), cleared_form.errors)
+        self.assertEqual(cleared_form.save().full_description, "")
+
+    def test_form_accepts_an_image_at_the_file_size_limit(self):
+        base_image = self.uploaded_image()
+        image = SimpleUploadedFile(
+            "at-limit.png",
+            base_image.read() + (b"\0" * (ProductForm.MAX_PRODUCT_IMAGE_BYTES - base_image.size)),
+            content_type="image/png",
+        )
+        self.assertEqual(image.size, ProductForm.MAX_PRODUCT_IMAGE_BYTES)
+        form = ProductForm(
+            data=self.product_form_data(),
+            files=MultiValueDict({"new_images": [image]}),
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(image.tell(), 0)
+
+    def test_form_rejects_an_image_larger_than_the_file_size_limit(self):
+        base_image = self.uploaded_image()
+        image = SimpleUploadedFile(
+            "too-large.png",
+            base_image.read()
+            + (b"\0" * (ProductForm.MAX_PRODUCT_IMAGE_BYTES + 1 - base_image.size)),
+            content_type="image/png",
+        )
+        self.assertEqual(image.size, ProductForm.MAX_PRODUCT_IMAGE_BYTES + 1)
+        form = ProductForm(
+            data=self.product_form_data(),
+            files=MultiValueDict({"new_images": [image]}),
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("too-large.png: file exceeds the maximum size of 3 MB.", form.errors["new_images"])
+
+    def test_form_rejects_more_than_four_images(self):
+        images = [self.uploaded_image(name=f"product-{number}.png") for number in range(5)]
+        form = ProductForm(
+            data=self.product_form_data(),
+            files=MultiValueDict({"new_images": images}),
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("You can keep up to 4 images per product.", form.errors["new_images"])
+
+    def test_form_accepts_four_images_and_an_image_at_the_pixel_limit(self):
+        images = [self.uploaded_image(name=f"product-{number}.png") for number in range(3)]
+        images.append(self.uploaded_image(name="pixel-limit.png", width=2000, height=1000))
+        form = ProductForm(
+            data=self.product_form_data(),
+            files=MultiValueDict({"new_images": images}),
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        for image in images:
+            self.assertEqual(image.tell(), 0)
+            with Image.open(image) as verified_image:
+                self.assertGreater(verified_image.width * verified_image.height, 0)
+
+    def test_combined_existing_and_new_image_limits_allow_a_removed_slot(self):
+        product = Product.objects.create(
+            category=self.category,
+            name="Existing image product",
+            regular_price="1200",
+            current_price="999",
+            sku="NUBEXISTIMG",
+        )
+        existing_images = [
+            ProductImage.objects.create(product=product, image=f"products/existing-{number}.png")
+            for number in range(3)
+        ]
+        valid_form = ProductForm(
+            data=self.product_form_data(name=product.name, sku=product.sku),
+            files=MultiValueDict({"new_images": [self.uploaded_image()]}),
+            instance=product,
+        )
+        self.assertTrue(valid_form.is_valid(), valid_form.errors)
+
+        over_limit_form = ProductForm(
+            data=self.product_form_data(name=product.name, sku=product.sku),
+            files=MultiValueDict({"new_images": [self.uploaded_image(), self.uploaded_image("second.png")]}),
+            instance=product,
+        )
+        self.assertFalse(over_limit_form.is_valid())
+        self.assertIn("You can keep up to 4 images per product.", over_limit_form.errors["new_images"])
+
+        remove_one_form = ProductForm(
+            data=self.product_form_data(
+                name=product.name,
+                sku=product.sku,
+                remove_images=[str(existing_images[0].pk)],
+            ),
+            files=MultiValueDict({"new_images": [self.uploaded_image(), self.uploaded_image("second.png")]}),
+            instance=product,
+        )
+        self.assertTrue(remove_one_form.is_valid(), remove_one_form.errors)
+
+    def test_form_retains_existing_pixel_and_invalid_image_validation(self):
+        oversized_image = self.uploaded_image(width=2000, height=1001)
+        invalid_image = SimpleUploadedFile("invalid.png", b"not an image", content_type="image/png")
+        form = ProductForm(
+            data=self.product_form_data(),
+            files=MultiValueDict({"new_images": [oversized_image, invalid_image]}),
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertTrue(
+            any("product.png: image exceeds the 2 megapixel limit." in error for error in form.errors["new_images"])
+        )
+        self.assertIn("invalid.png: invalid image file.", form.errors["new_images"])
 
     def test_form_accepts_skus_up_to_twelve_characters_and_preserves_case(self):
         for sku in (
@@ -1203,6 +1386,171 @@ class ProductStockWorkflowTests(TestCase):
         self.assertEqual(response.status_code, 302)
         product.refresh_from_db()
         self.assertEqual(product.status, Product.Status.PUBLISHED)
+
+
+class ProductCreateImageUploadTests(TestCase):
+    def setUp(self):
+        self.media_directory = TemporaryDirectory()
+        self.settings_override = self.settings(MEDIA_ROOT=self.media_directory.name)
+        self.settings_override.enable()
+        self.addCleanup(self.settings_override.disable)
+        self.addCleanup(self.media_directory.cleanup)
+        self.category = Category.objects.create(name="Upload Category")
+        self.user = get_user_model().objects.create_superuser(
+            username="upload-admin", email="upload-admin@example.com", password="test-password"
+        )
+        self.client.force_login(self.user)
+        self.uploaded_image_bytes = self.uploaded_image().read()
+
+    def product_data(self, **overrides):
+        data = {
+            "category": self.category.pk,
+            "name": "Uploaded Product",
+            "regular_price": "1200",
+            "current_price": "999",
+            "sku": "NUBUPLOAD001",
+            "status": Product.Status.PUBLISHED,
+            "availability": ProductForm.AVAILABILITY_IN_STOCK,
+            "track_stock": "on",
+            "stock_quantity": "0",
+            "low_stock_threshold": "5",
+            "short_description": "Uploaded product",
+            "full_description_html": "",
+        }
+        data.update(overrides)
+        return data
+
+    @staticmethod
+    def uploaded_image(name="uploaded.png"):
+        output = BytesIO()
+        Image.new("RGB", (40, 30), "#ff5c00").save(output, format="PNG")
+        return SimpleUploadedFile(name, output.getvalue(), content_type="image/png")
+
+    def test_product_form_passes_the_server_file_limit_to_the_client(self):
+        response = self.client.get(reverse("dashboard_product_add"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'data-max-file-size="{ProductForm.MAX_PRODUCT_IMAGE_BYTES}"')
+        self.assertContains(response, 'data-max-file-size-label="3 MB"')
+        self.assertContains(response, "if (window.Quill)")
+
+    def test_product_creation_saves_a_product_and_valid_uploaded_images(self):
+        response = self.client.post(
+            reverse("dashboard_product_add"),
+            self.product_data(new_images=[self.uploaded_image(), self.uploaded_image("second.png")]),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        product = Product.objects.get(sku="NUBUPLOAD001")
+        self.assertEqual(product.full_description, "")
+        self.assertEqual(product.images.count(), 2)
+        self.assertTrue(all(image.image.storage.exists(image.image.name) for image in product.images.all()))
+
+    def test_product_creation_without_a_description_or_images_succeeds(self):
+        response = self.client.post(reverse("dashboard_product_add"), self.product_data())
+
+        self.assertEqual(response.status_code, 302)
+        product = Product.objects.get(sku="NUBUPLOAD001")
+        self.assertEqual(product.full_description, "")
+        self.assertFalse(product.images.exists())
+
+    def create_product_with_image(self):
+        product = Product.objects.create(
+            category=self.category,
+            name="Existing Uploaded Product",
+            regular_price="1200",
+            current_price="999",
+            sku="NUBUPLOADEDIT",
+            full_description="<p>Existing description</p>",
+        )
+        return product, ProductImage.objects.create(product=product, image=self.uploaded_image("existing.png"))
+
+    def test_product_edit_without_new_images_preserves_existing_images_and_description(self):
+        product, existing_image = self.create_product_with_image()
+
+        response = self.client.post(
+            reverse("dashboard_product_edit", args=[product.pk]),
+            self.product_data(
+                name=product.name,
+                sku=product.sku,
+                full_description_html=product.full_description,
+            ),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.full_description, "<p>Existing description</p>")
+        self.assertEqual(list(product.images.values_list("pk", flat=True)), [existing_image.pk])
+        self.assertTrue(existing_image.image.storage.exists(existing_image.image.name))
+
+    def test_product_edit_can_remove_one_image_and_add_one_new_image(self):
+        product, existing_image = self.create_product_with_image()
+        existing_name = existing_image.image.name
+        storage = existing_image.image.storage
+
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(
+                reverse("dashboard_product_edit", args=[product.pk]),
+                self.product_data(
+                    name=product.name,
+                    sku=product.sku,
+                    remove_images=[existing_image.pk],
+                    new_images=[self.uploaded_image("replacement.png")],
+                ),
+            )
+
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.images.count(), 1)
+        self.assertFalse(storage.exists(existing_name))
+        self.assertTrue(storage.exists(product.images.get().image.name))
+
+    def test_invalid_product_edit_does_not_remove_existing_images(self):
+        product, existing_image = self.create_product_with_image()
+
+        response = self.client.post(
+            reverse("dashboard_product_edit", args=[product.pk]),
+            self.product_data(
+                name=product.name,
+                sku=product.sku,
+                current_price="1300",
+                remove_images=[existing_image.pk],
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(ProductImage.objects.filter(pk=existing_image.pk).exists())
+        self.assertTrue(existing_image.image.storage.exists(existing_image.image.name))
+
+    @patch("category.image_derivatives.Image.Image.save", side_effect=OSError("WebP unavailable"))
+    def test_derivative_failure_falls_back_to_the_original_valid_image(self, _image_save):
+        response = self.client.post(
+            reverse("dashboard_product_add"),
+            self.product_data(
+                new_images=[
+                    SimpleUploadedFile(
+                        "uploaded.png", self.uploaded_image_bytes, content_type="image/png"
+                    )
+                ]
+            ),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        product_image = ProductImage.objects.get(product__sku="NUBUPLOAD001")
+        self.assertTrue(product_image.image.storage.exists(product_image.image.name))
+        self.assertEqual(product_image.optimized_url, product_image.image.url)
+
+    @patch("category.views.StockTransaction.objects.create", side_effect=RuntimeError("database failure"))
+    def test_failed_database_operation_removes_newly_uploaded_source_files(self, _stock_transaction_create):
+        with self.assertRaisesRegex(RuntimeError, "database failure"):
+            self.client.post(
+                reverse("dashboard_product_add"),
+                self.product_data(stock_quantity="1", new_images=[self.uploaded_image()]),
+            )
+
+        self.assertFalse(Product.objects.filter(sku="NUBUPLOAD001").exists())
+        self.assertFalse(ProductImage.objects.exists())
+        self.assertEqual([path for path in Path(self.media_directory.name).rglob("*") if path.is_file()], [])
 
 
 class ProductImageDerivativeTests(TestCase):

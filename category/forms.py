@@ -89,6 +89,8 @@ class MultipleFileField(forms.FileField):
 class ProductForm(forms.ModelForm):
     MAX_PRODUCT_IMAGES = 4
     MAX_IMAGE_PIXELS = 2_000_000
+    MAX_PRODUCT_IMAGE_BYTES = 3 * 1024 * 1024
+    MAX_PRODUCT_IMAGE_SIZE_LABEL = "3 MB"
     AVAILABILITY_IN_STOCK = "In Stock"
     AVAILABILITY_OUT_OF_STOCK = "Out of Stock"
     AVAILABILITY_CHOICES = (
@@ -104,7 +106,7 @@ class ProductForm(forms.ModelForm):
         required=False,
         widget=forms.CheckboxSelectMultiple,
     )
-    full_description_html = forms.CharField(widget=forms.HiddenInput())
+    full_description_html = forms.CharField(required=False, widget=forms.HiddenInput())
     availability = forms.ChoiceField(
         choices=AVAILABILITY_CHOICES,
         widget=forms.RadioSelect,
@@ -171,9 +173,16 @@ class ProductForm(forms.ModelForm):
         self.fields["brand"].queryset = Brand.objects.order_by("name")
         self.fields["new_images"].help_text = (
             f"You can add up to {self.MAX_PRODUCT_IMAGES} product images. "
-            "Each image must be 2 megapixels or smaller; for square photos, use 1400 x 1400 px or smaller."
+            f"Each image must be {self.MAX_PRODUCT_IMAGE_SIZE_LABEL} or smaller and 2 megapixels or smaller; "
+            "for square photos, use 1400 x 1400 px or smaller."
         )
-        self.fields["new_images"].widget.attrs["accept"] = "image/*"
+        self.fields["new_images"].widget.attrs.update(
+            {
+                "accept": "image/*",
+                "data-max-file-size": self.MAX_PRODUCT_IMAGE_BYTES,
+                "data-max-file-size-label": self.MAX_PRODUCT_IMAGE_SIZE_LABEL,
+            }
+        )
 
         if self.instance.pk:
             self.fields["full_description_html"].initial = self.instance.full_description
@@ -232,11 +241,19 @@ class ProductForm(forms.ModelForm):
 
         for file in files:
             try:
+                if file.size > self.MAX_PRODUCT_IMAGE_BYTES:
+                    errors.append(
+                        f"{file.name}: file exceeds the maximum size of "
+                        f"{self.MAX_PRODUCT_IMAGE_SIZE_LABEL}."
+                    )
+                    continue
+
                 if hasattr(file, "seek"):
                     file.seek(0)
 
                 with Image.open(file) as image:
                     width, height = image.size
+                    image.verify()
 
                 if width * height > self.MAX_IMAGE_PIXELS:
                     errors.append(
