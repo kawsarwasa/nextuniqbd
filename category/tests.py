@@ -1434,6 +1434,7 @@ class ProductCreateImageUploadTests(TestCase):
         self.assertContains(response, f'data-max-file-size="{ProductForm.MAX_PRODUCT_IMAGE_BYTES}"')
         self.assertContains(response, 'data-max-file-size-label="3 MB"')
         self.assertContains(response, "if (window.Quill)")
+        self.assertContains(response, "quill.root.addEventListener('paste'")
 
     def test_product_creation_saves_a_product_and_valid_uploaded_images(self):
         response = self.client.post(

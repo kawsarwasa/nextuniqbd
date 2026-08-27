@@ -260,9 +260,32 @@
         }
       }
 
-      form.addEventListener('submit', () => {
+      const syncFullDescription = () => {
         hiddenInput.value = quill ? quill.root.innerHTML : editorElement.innerHTML;
-      });
+      };
+
+      if (quill) {
+        // Handle plain-text clipboard content directly. This keeps Ctrl/Cmd+V
+        // reliable across browsers and avoids bringing in unsupported markup.
+        quill.root.addEventListener('paste', (event) => {
+          const pastedText = event.clipboardData?.getData('text/plain');
+          if (!pastedText) {
+            return;
+          }
+
+          event.preventDefault();
+          const range = quill.getSelection(true);
+          quill.deleteText(range.index, range.length, 'user');
+          quill.insertText(range.index, pastedText, 'user');
+          quill.setSelection(range.index + pastedText.length, 0, 'silent');
+          syncFullDescription();
+        });
+        quill.on('text-change', syncFullDescription);
+      } else {
+        editorElement.addEventListener('input', syncFullDescription);
+      }
+
+      form.addEventListener('submit', syncFullDescription);
 
       availabilityInputs.forEach((input) => {
         input.addEventListener('change', () => {
