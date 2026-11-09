@@ -4,7 +4,7 @@
 {% block title %}{{ site_company.company_name|default:default_company_name }}{% endblock %}
 
 {% block extra_head %}
-  <link rel="stylesheet" href="{% static 'frontend/css/b2b-home.css' %}?v=1" />
+  <link rel="stylesheet" href="{% static 'frontend/css/b2b-home.css' %}?v=2" />
   {% if hero_slides %}
     {% with first_slide=hero_slides.0 %}
       <link rel="preload" as="image" href="{{ first_slide.image.url }}" fetchpriority="high" />
@@ -93,6 +93,9 @@
     </div>
   </section>
 
+  <!-- WHOLESALE & B2B: homepage-only, links go to existing Contact page -->
+  {% include "frontend/partials/home/b2b_section.html" %}
+
   <!-- FEATURED CATEGORIES -->
   <section class="section categories-section">
     <div class="container">
@@ -128,9 +131,6 @@
       </div>
     </div>
   </section>
-
-  <!-- WHOLESALE & B2B: homepage-only, links go to existing Contact page -->
-  {% include "frontend/partials/home/b2b_section.html" %}
 
   <!-- BRANDS SECTION -->
   <section class="brands-section">
