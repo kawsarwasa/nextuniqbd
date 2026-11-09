@@ -1,0 +1,47 @@
+{# Homepage-only wholesale promotion; no new forms, pages or navigation items. #}
+<section class="b2b-home-section" aria-labelledby="b2b-home-heading">
+  <div class="container">
+    <div class="b2b-home-panel">
+      <div class="b2b-home-content">
+        <p class="b2b-home-eyebrow">All-in-One B2B <span aria-hidden="true"></span></p>
+        <h2 id="b2b-home-heading">Wholesale &amp; <span>B2B</span> Solutions</h2>
+        <p class="b2b-home-description">
+          Your partner for electronics and smart gadgets in Bangladesh.
+          Let's talk about bulk orders, reseller partnerships, corporate purchases,
+          product sourcing and delivery.
+        </p>
+
+        <div class="b2b-home-services" aria-label="Business services">
+          <a class="b2b-home-service" href="{% url 'frontend_contact' %}">
+            <i class="fa-solid fa-cubes" aria-hidden="true"></i>
+            <span><strong>Bulk Orders</strong><small>Explore high-volume purchases</small></span>
+          </a>
+          <a class="b2b-home-service" href="{% url 'frontend_contact' %}">
+            <i class="fa-solid fa-users" aria-hidden="true"></i>
+            <span><strong>Retailer &amp; Reseller</strong><small>Grow your business with us</small></span>
+          </a>
+          <a class="b2b-home-service" href="{% url 'frontend_contact' %}">
+            <i class="fa-regular fa-building" aria-hidden="true"></i>
+            <span><strong>Corporate Purchases</strong><small>Solutions for organizations</small></span>
+          </a>
+          <a class="b2b-home-service" href="{% url 'frontend_contact' %}">
+            <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
+            <span><strong>Product Sourcing</strong><small>Discuss supply and delivery</small></span>
+          </a>
+        </div>
+
+        <div class="b2b-home-actions">
+          <a href="{% url 'frontend_contact' %}" class="b2b-home-cta b2b-home-cta--primary">
+            <i class="fa-regular fa-handshake" aria-hidden="true"></i>
+            Request Wholesale Pricing
+            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+          <a href="{% url 'frontend_contact' %}" class="b2b-home-cta b2b-home-cta--secondary">
+            <i class="fa-solid fa-phone" aria-hidden="true"></i>
+            Talk to Sales
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
