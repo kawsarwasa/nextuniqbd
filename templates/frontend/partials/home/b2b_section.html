@@ -1,0 +1,51 @@
+{# Homepage-only B2B promotion. All links reuse the existing Contact page. #}
+<section class="b2b-home-section" aria-labelledby="b2b-home-heading">
+  <div class="container">
+    <div class="b2b-home-panel">
+      <div class="b2b-home-intro">
+        <span class="b2b-home-eyebrow">Business &amp; Wholesale</span>
+        <h2 id="b2b-home-heading">Wholesale &amp; <span>B2B Solutions</span></h2>
+        <p>
+          Grow your business with Next Uniq BD. Connect with us about bulk gadget orders,
+          reseller partnerships, corporate purchases, and product sourcing.
+        </p>
+        <a href="{% url 'frontend_contact' %}" class="b2b-home-cta">
+          Contact Us for Wholesale Pricing
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </a>
+        <p class="b2b-home-cta-note">Have a product or quantity in mind? Tell us on the Contact page.</p>
+      </div>
+
+      <div class="b2b-home-services" aria-label="Business services">
+        <a href="{% url 'frontend_contact' %}" class="b2b-home-service">
+          <span class="b2b-home-icon"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i></span>
+          <span class="b2b-home-service-content">
+            <strong>Bulk Orders &amp; Wholesale</strong>
+            <span>Discuss larger-quantity electronics and gadget orders.</span>
+          </span>
+        </a>
+        <a href="{% url 'frontend_contact' %}" class="b2b-home-service">
+          <span class="b2b-home-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+          <span class="b2b-home-service-content">
+            <strong>Retailer &amp; Reseller Partners</strong>
+            <span>Explore product options for your store or online business.</span>
+          </span>
+        </a>
+        <a href="{% url 'frontend_contact' %}" class="b2b-home-service">
+          <span class="b2b-home-icon"><i class="fa-solid fa-building" aria-hidden="true"></i></span>
+          <span class="b2b-home-service-content">
+            <strong>Corporate Supply</strong>
+            <span>Ask about gadgets and accessories for organizations.</span>
+          </span>
+        </a>
+        <a href="{% url 'frontend_contact' %}" class="b2b-home-service">
+          <span class="b2b-home-icon"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i></span>
+          <span class="b2b-home-service-content">
+            <strong>Distribution &amp; Sourcing</strong>
+            <span>Share your requirements and discuss sourcing opportunities.</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
